@@ -34,7 +34,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'myproject.urls'
+ROOT_URLCONF = 'classicsonscreen.urls'
 
 TEMPLATES = [
     {
@@ -52,11 +52,11 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'myproject.wsgi.application'
+WSGI_APPLICATION = 'classicsonscreen.wsgi.application'
 
 # Database configuration using internal DATABASE_URL from Render
 DATABASES = {
-    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
+    'default': dj_database_url.config(default=os.getenv('postgres://cosdata_jfni_user:rNeHXFxCyz5XA7RbrIh62NtOjvWsMhYU@dpg-cpq896hu0jms738r9810-a/cosdata_jfni'))
 }
 
 # Static files (CSS, JavaScript, Images)

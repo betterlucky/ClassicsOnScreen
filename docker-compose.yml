@@ -6,22 +6,20 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      POSTGRES_DB: cosdata
-      POSTGRES_USER: cosdata_user
-      POSTGRES_PASSWORD: a7ZIn6929R1TKSLp5lWvtLDxUgPxcsmJ
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
 
   web:
     build: .
     command: >
       sh -c "python manage.py migrate &&
              python manage.py collectstatic --noinput &&
-             gunicorn myproject.wsgi:application --bind 0.0.0.0:8000"
+             python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/usr/src/app
     ports:
       - "8000:8000"
-    env_file:
-      - .env
     depends_on:
       - db
 

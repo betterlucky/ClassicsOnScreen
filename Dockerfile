@@ -19,4 +19,4 @@ COPY . .
 RUN python manage.py collectstatic --noinput
 
 # Run database migrations and start server
-CMD ["sh", "-c", "python manage.py migrate && gunicorn myproject.wsgi:application --bind 0.0.0.0:$PORT"]
+CMD ["sh", "-c", "python manage.py migrate && gunicorn classicsonscreen.wsgi:application --bind 0.0.0.0:$PORT"]

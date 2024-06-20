@@ -1,3 +1,5 @@
+# settings.py
+
 import os
 import dj_database_url
 from pathlib import Path
@@ -32,7 +34,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'ClassicsOnScreen.urls'
+ROOT_URLCONF = 'myproject.urls'
 
 TEMPLATES = [
     {
@@ -50,13 +52,11 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ClassicsOnScreen.wsgi.application'
+WSGI_APPLICATION = 'myproject.wsgi.application'
 
-# Database configuration
+# Database configuration using internal DATABASE_URL from Render
 DATABASES = {
-    'default': dj_database_url.config(
-        default=f'postgres://{os.getenv("DB_USER")}:{os.getenv("DB_PASSWORD")}@{os.getenv("DB_HOST")}:{os.getenv("DB_PORT")}/{os.getenv("DB_NAME")}'
-    )
+    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
 }
 
 # Static files (CSS, JavaScript, Images)
@@ -65,6 +65,3 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Other Django settings...
-
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

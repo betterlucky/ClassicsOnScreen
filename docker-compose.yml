@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 services:
   db:
@@ -6,21 +6,24 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=mydatabase
-      - POSTGRES_USER=myuser
-      - POSTGRES_PASSWORD=mypassword
+      POSTGRES_DB: cosdata
+      POSTGRES_USER: cosdata_user
+      POSTGRES_PASSWORD: a7ZIn6929R1TKSLp5lWvtLDxUgPxcsmJ
 
   web:
     build: .
-    command: gunicorn myproject.wsgi:application --bind 0.0.0.0:8000
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn myproject.wsgi:application --bind 0.0.0.0:8000"
     volumes:
       - .:/usr/src/app
     ports:
       - "8000:8000"
-    depends_on:
-      - db
     env_file:
       - .env
+    depends_on:
+      - db
 
 volumes:
   postgres_data:

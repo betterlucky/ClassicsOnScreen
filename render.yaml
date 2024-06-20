@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: my-django-app
+    name: ClassicsOnScreen
     env: docker
     plan: free
     region: oregon
@@ -11,8 +11,3 @@ services:
         fromDatabase:
           name: cosdata
           property: connectionString
-
-databases:
-  - name: cosdata
-    plan: free
-    region: oregon

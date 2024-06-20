@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: ClassicsOnScreen
+    name: my-django-app
     env: docker
     plan: auto  # Adjust the plan as per your requirements
     region: oregon  # Choose your preferred region
@@ -9,28 +9,13 @@ services:
     envVars:
       - key: SECRET_KEY
         generateValue: true  # Render can generate a secure random value for SECRET_KEY
-      - key: DB_NAME
+      - key: DATABASE_URL
         fromDatabase:
-          name: mydatabase
-          property: dbName
-      - key: DB_USER
-        fromDatabase:
-          name: mydatabase
-          property: username
-      - key: DB_PASSWORD
-        fromDatabase:
-          name: mydatabase
-          property: password
-      - key: DB_HOST
-        fromDatabase:
-          name: mydatabase
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: mydatabase
-          property: port
+          name: cosdata
+          property: connectionString
 
 databases:
   - name: mydatabase
     plan: free
     region: oregon
+

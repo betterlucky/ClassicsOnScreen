@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Classics On Screen</title>
+    <!--<link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css"> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.5/dist/css/foundation.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.5/dist/js/foundation.min.js"></script>
+    
+</head>
+
+<body>
+<h1>Classics On Screen</h1>
+<a href="{% url "blog_index" %}">Home</a>
+<hr>
+{% block page_title %}{% endblock page_title %}
+{% block page_content %}{% endblock page_content %}
+{% block sidebar %}
+    <ul class="sidebar-nav">
+    
+        {% if user.is_authenticated %}
+            <li>User: {{ user.get_username }}</li>
+            <li><a href="{% url 'create_show' %}">Create A New Event</a></li>
+            <li>
+                <form id="logout-form" method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-link">Logout</button>
+                </form>
+            </li>
+        {% else %}
+            <li><a href="{% url 'login' %}?next={{ request.path }}">Login</a></li>
+        {% endif %}
+    
+        {% if user.is_staff %}
+            <li><a href="{% url 'admin:index' %}">Admin</a></li>
+        {% endif %}
+
+    </ul>
+{% endblock sidebar %}
+</body>
+</html>

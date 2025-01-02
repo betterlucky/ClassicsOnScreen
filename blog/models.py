@@ -1,5 +1,8 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
+class SiteUser(AbstractUser):
+    credits = models.IntegerField(blank=True, null=True, default=0)
 
 class Film(models.Model):
     name = models.CharField(max_length=60, unique=True)
@@ -13,26 +16,30 @@ class Location(models.Model):
     def __str__(self):
         return self.name
 
-
 class Show(models.Model):
-    title = models.CharField(max_length=255)
-    body = models.TextField()
-    created_by = models.CharField(max_length=60)
+    title = models.CharField(max_length=255, blank=False, unique=True)
+    body = models.TextField(blank=False)
+    created_by = models.ForeignKey("SiteUser", on_delete=models.CASCADE)
     created_on = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
-    film = models.ForeignKey("Film", on_delete=models.CASCADE)
-    location = models.ForeignKey("Location", on_delete=models.CASCADE)
-    eventtime = models.DateTimeField(blank=False, null=False)
+    film = models.ForeignKey("Film", on_delete=models.CASCADE, related_name="shows", blank=False)
+    location = models.ForeignKey("Location", on_delete=models.CASCADE, related_name="shows", blank=False)
+    eventtime = models.DateTimeField(blank=False)
+
+    class Meta:
+        ordering = ['-created_on']
 
     def __str__(self):
         return self.title
 
-
 class Comment(models.Model):
-    author = models.CharField(max_length=60)
+    author = models.ForeignKey("SiteUser", on_delete=models.CASCADE)
     body = models.TextField()
     created_on = models.DateTimeField(auto_now_add=True)
-    show = models.ForeignKey("Show", on_delete=models.CASCADE)
+    show = models.ForeignKey("Show", on_delete=models.CASCADE, related_name="comments")
+
+    class Meta:
+        ordering = ['-created_on']
 
     def __str__(self):
-        return f"{self.author} on '{self.show}'"
+        return f"{self.author.username} on '{self.show}'"

@@ -1,8 +1,9 @@
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
 
-from blog.forms import CommentForm, CustomUserCreationForm
+from blog.forms import CommentForm, CustomUserCreationForm, ShowForm
 from blog.models import Comment, Show, Film, Location
 
 def register(request):
@@ -60,3 +61,16 @@ def blog_detail(request, pk):
     context = {"show": show, "comments": comments, "form": form}
 
     return render(request, "blog/detail.html", context)
+
+@login_required
+def create_show(request):
+    if request.method == 'POST':
+        form = ShowForm(request.POST)
+        if form.is_valid():
+            show = form.save(commit=False)
+            show.created_by = request.user  # Assign the logged-in user as the creator
+            show.save()
+            return redirect('/')
+    else:
+        form = ShowForm()
+    return render(request, 'blog/create_show.html', {'form': form})

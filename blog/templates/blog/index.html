@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block page_title %}
-    <h2>Blog shows</h2>
+    <h2>Shows</h2>
 {% endblock page_title %}
 
 {% block page_content %}
@@ -13,13 +13,13 @@
                     <p>{{show.location.name}}</p>
                 </a>
                 <p> {{ show.eventtime.date}} at {{show.eventtime.time}} | Films:</p>
-                {{ show.created_on.date }} | Films:
                     <a href="{% url 'blog_film' show.film.name %}">
                         {{ show.film.name }}
                     </a>
                 
             </small>
             <p>{{ show.body | slice:":400" }}...</p>
+            Event suggested by {{ show.created_by}} on {{ show.created_on.date }}  
         {% endfor %}
     {% endblock shows %}
 {% endblock page_content %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block page_title %}
+    <h2>{{ show.title }}</h2>
+{% endblock page_title %}
+
+{% block page_content %}
+    <small>
+       
+        <p>{{show.location}}</p>
+        <p> {{ show.eventtime.date}} at {{show.eventtime.time}} | Films:</p>
+        
+        {% if show.film %}
+            <a href="{% url 'blog_film' show.film.name %}">
+                {{ show.film.name }}
+            </a>
+        {% else %}
+            No Films        
+        {% endif %}
+    </small>
+    <p>{{ show.body | linebreaks }}</p>
+    <p>Event suggested by {{ show.created_by }} on {{ show.created_on.date }}</p>
+
+    <h3>Comments:</h3>
+    {% for comment in comments %}
+        <p>
+            On {{ comment.created_on.date }} <b>{{ comment.author }}</b> wrote:
+        </p>
+        <p>
+            {{ comment.body | linebreaks }}
+        </p>
+    {% endfor %}
+    
+    <h3>Leave a comment:</h3>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.author }}
+        </div>
+        <div class="form-group">
+            {{ form.body }}
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+
+{% endblock page_content %}

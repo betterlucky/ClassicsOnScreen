@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block page_title %}
+<h2>{{ film }}</h2>
+{% endblock page_title %}
+
+{% block page_content %}
+{% block shows %}
+    {% for show in shows %}
+        {% if show.film == film %}
+            <h3><a href="{% url 'blog_detail' show.pk %}">{{ show.title }}</a></h3>
+            <small>
+                {{ show.eventtime.date}} at {{show.eventtime.time}} | Location:
+                <a href="{% url 'blog_location' show.location.name %}">
+                    {{ show.location.name }}
+                </a>
+            </small>
+            <p>{{ show.body | slice:":400" }}...</p>
+        {% endif %}
+    {% endfor %}
+{% endblock shows %}
+{% endblock page_content %}

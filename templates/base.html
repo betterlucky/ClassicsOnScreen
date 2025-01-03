@@ -15,8 +15,8 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" id="sidebarMenu">
-                <div class="position-sticky">
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse" id="sidebarMenu">
+                <div class="position-sticky pt-3">
                     <ul class="nav flex-column">
                         <li class="nav-item">
                             <a class="nav-link active" href="{% url 'blog_index' %}">
@@ -66,7 +66,7 @@
 
                 <!-- Page Title Block -->
                 {% block page_title %}
-                <h2>{% block page_title_content %}Welcome to the site!{% endblock page_title_content %}</h2>
+                <h2 class="mb-4">{% block page_title_content %}Welcome to the site!{% endblock page_title_content %}</h2>
                 {% endblock page_title %}
 
                 <!-- Page Content Block -->
@@ -78,4 +78,36 @@
     </div>
 
 </body>
+
+<style>
+    html, body {
+        height: 100%; /* Ensures full height coverage */
+        margin: 0; /* Removes default margin */
+        background: linear-gradient(to bottom, #add8e6, #ffffff);
+        font-family: Arial, sans-serif;
+    }
+
+    .container-fluid {
+        min-height: 100vh; /* Ensures content fills the viewport */
+        background: linear-gradient(to bottom, #add8e6, #ffffff); /* Gradient background */
+    }
+
+    .sidebar {
+        background: none; /* Removes default background color */
+    }
+
+    .main-content {
+        background: none; /* Removes default background color */
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Optional: Make sure the list group is part of the background */
+    .list-group {
+        background: none; /* Removes default background color */
+        border-radius: 8px;
+        padding: 15px;
+    }
+</style>
 </html>

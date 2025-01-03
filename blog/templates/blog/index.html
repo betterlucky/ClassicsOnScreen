@@ -1,25 +1,34 @@
 {% extends "base.html" %}
 
 {% block page_title %}
-    <h2>Shows</h2>
+    <h2 class="mb-4">Upcoming Shows</h2>
 {% endblock page_title %}
 
 {% block page_content %}
     {% block shows %}
-        {% for show in shows %}
-            <h3><a href="{% url 'blog_detail' show.pk %}">{{ show.title }}</a></h3>
-            <small>
-                <a href="{% url 'blog_location' show.location.name %}">
-                    <p>{{show.location.name}}</p>
-                </a>
-                <p> {{ show.eventtime.date}} at {{show.eventtime.time}} | Films:</p>
-                    <a href="{% url 'blog_film' show.film.name %}">
-                        {{ show.film.name }}
-                    </a>
-                
-            </small>
-            <p>{{ show.body | slice:":400" }}...</p>
-            Event suggested by {{ show.created_by}} on {{ show.created_on.date }}  
+        {% regroup shows by eventtime.date as shows_by_date %}
+        
+        {% for date_group in shows_by_date %}
+            <h3>{{ date_group.grouper|date:"l, F j, Y" }}</h3>
+            <ul>
+                {% for show in date_group.list %}
+                    <li>
+                        <strong>{{ show.eventtime|time:"g:i A" }}</strong> - 
+                        <a href="{% url 'blog_location' show.location.name %}">
+                            {{ show.location.name }}
+                        </a> | 
+                        Film: <a href="{% url 'blog_film' show.film.name %}">
+                            {{ show.film.name }}
+                        </a>
+                        <p>{{ show.body|slice:":400" }}...</p>
+                        <p>Event suggested by 
+                            <a href="{% url 'user_shows' show.created_by %}"> {{ show.created_by }} </a> 
+                            on {{ show.created_on|date:"F j, Y" }}
+                        </p>
+                    </li>
+                {% endfor %}
+            </ul>
         {% endfor %}
     {% endblock shows %}
 {% endblock page_content %}
+

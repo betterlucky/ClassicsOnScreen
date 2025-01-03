@@ -1,10 +1,11 @@
-from django.http import HttpResponseRedirect, Http404
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
-from django.contrib.auth import login
+from django.contrib.auth import login, get_user_model
 from django.contrib.auth.decorators import login_required
 
-from blog.forms import CommentForm, CustomUserCreationForm, ShowForm
-from blog.models import Comment, Show, Film, Location
+
+from blog.forms import  CustomUserCreationForm, CommentForm, ShowForm
+from blog.models import Show, Film, Location, Comment
 
 def register(request):
     if request.method == 'POST':
@@ -18,7 +19,7 @@ def register(request):
     return render(request, 'registration/register.html', {'form': form})
 
 def blog_index(request):
-    shows = Show.objects.all().order_by("-created_on")
+    shows = Show.objects.all().order_by("eventtime")
     context = {"shows": shows}
     return render(request, "blog/index.html", context)
 
@@ -43,6 +44,17 @@ def blog_location(request, location_name):
     context = {'location': location, 'shows': shows}
     return render(request, "blog/location.html", context)
 
+def user_shows(request, creator):
+    # Get the user by username (creator)
+    try:
+        user = get_user_model().objects.get(username=creator)
+    except get_user_model().DoesNotExist:
+        user = None
+
+    # Get all shows created by this user
+    shows = Show.objects.filter(created_by=user).order_by('eventtime')
+
+    return render(request, 'blog/user_shows.html', {'shows': shows, 'creator': user.username if user else 'Unknown'})
 
 def blog_detail(request, pk):
     show = Show.objects.get(pk=pk)
@@ -74,3 +86,4 @@ def create_show(request):
     else:
         form = ShowForm()
     return render(request, 'blog/create_show.html', {'form': form})
+

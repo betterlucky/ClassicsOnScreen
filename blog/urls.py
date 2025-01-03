@@ -10,6 +10,7 @@ urlpatterns = [
     path("show/<int:pk>/", views.blog_detail, name="blog_detail"),
     path('film/<str:film_name>/', views.blog_film, name='blog_film'),
     path('location/<str:location_name>/', views.blog_location, name='blog_location'),
+    path('creator/<str:creator>/shows/', views.user_shows, name='user_shows'),
 ]
 # Add Django site authentication urls (for login, logout, password management)
 

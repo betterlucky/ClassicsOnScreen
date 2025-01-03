@@ -1,20 +1,20 @@
 {% extends "base.html" %}
 
 {% block page_title %}
-<h2>{{ location }}</h2>
+<h2 class="mb-4">{{ location }}</h2>
 {% endblock page_title %}
 
 {% block page_content %}
 {% block shows %}
     {% for show in shows %}
         {% if show.location == location %}
-            <h3><a href="{% url 'blog_detail' show.pk %}">{{ show.title }}</a></h3>
-            <small>
+            
+            
                 {{ show.eventtime.date}} at {{show.eventtime.time}} | Films:
                 <a href="{% url 'blog_film' show.film.name %}">
                     {{ show.film.name }}
                 </a>
-            </small>
+            
             <p>{{ show.body | slice:":400" }}...</p>
         {% endif %}
     {% endfor %}

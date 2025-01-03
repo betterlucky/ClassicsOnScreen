@@ -19,7 +19,7 @@
         {% endif %}
     </small>
     <p>{{ show.body | linebreaks }}</p>
-    <p>Event suggested by {{ show.created_by }} on {{ show.created_on.date }}</p>
+    <p>Event suggested by <a href="{% url 'user_shows' show.created_by %}"> {{ show.created_by }} </a> on {{ show.created_on.date }}</p>
 
     <h3>Comments:</h3>
     {% for comment in comments %}

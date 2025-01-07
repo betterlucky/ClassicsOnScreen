@@ -17,7 +17,6 @@ class Location(models.Model):
         return self.name
 
 class Show(models.Model):
-    title = models.CharField(max_length=255, blank=False, unique=True)
     body = models.TextField(blank=False)
     created_by = models.ForeignKey("SiteUser", on_delete=models.CASCADE)
     created_on = models.DateTimeField(auto_now_add=True)
@@ -27,10 +26,11 @@ class Show(models.Model):
     eventtime = models.DateTimeField(blank=False)
 
     class Meta:
-        ordering = ['-created_on']
+        ordering = ['eventtime']
 
     def __str__(self):
-        return self.title
+        # Updated to provide a meaningful string representation
+        return f"{self.film.name} at {self.location.name} on {self.eventtime.strftime('%Y-%m-%d %H:%M')}"
 
 class Comment(models.Model):
     author = models.ForeignKey("SiteUser", on_delete=models.CASCADE)

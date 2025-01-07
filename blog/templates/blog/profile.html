@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block page_title %}
+<h2 class="mb-4">{{ profile_user.username }}'s Profile</h2>
+{% endblock page_title %}
+
+{% block page_content %}
+<div class="container">
+    <!-- Credits Section -->
+    {% if is_own_profile %}
+        <p><strong>Credits:</strong> {{ profile_user.credits }}</p>
+    {% endif %}
+
+    <!-- Created Shows Section -->
+    <h3>Shows Created</h3>
+    {% if created_shows %}
+
+            {% for show in created_shows %}
+                
+                    {{ show.eventtime|date:"l, F j, Y g:i A" }} - 
+                    <a href="{% url 'blog_location' show.location.name %}">
+                        {{ show.location.name }}
+                    </a> | 
+                    Film: <a href="{% url 'blog_film' show.film.name %}">
+                        {{ show.film.name }}
+                    </a>
+                    <p>{{ show.body|slice:":200" }}...</p>
+               
+            {% endfor %}
+
+    {% else %}
+        <p>No shows created yet.</p>
+    {% endif %}
+</div>
+{% endblock page_content %}

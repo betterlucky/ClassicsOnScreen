@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 
+{% block page_title %}
+    <h2>Create a New Show</h2>
+{% endblock page_title %}
+
 {% block page_content %}
-  <h2>Create a New Show</h2>
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}

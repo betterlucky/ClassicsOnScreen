@@ -6,11 +6,13 @@ from . import views
 urlpatterns = [
     path("", views.blog_index, name="blog_index"),
     path('register/', views.register, name='register'),
+    path('confirm/<uidb64>/<token>/', views.activate, name='activate'),
     path('show/create/', views.create_show, name='create_show'),
     path("show/<int:pk>/", views.blog_detail, name="blog_detail"),
     path('film/<str:film_name>/', views.blog_film, name='blog_film'),
     path('location/<str:location_name>/', views.blog_location, name='blog_location'),
     path('creator/<str:creator>/shows/', views.user_shows, name='user_shows'),
+    path('profile/<str:username>/', views.profile, name='profile'),
 ]
 # Add Django site authentication urls (for login, logout, password management)
 

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from blog.models import Film, Comment, Show, Location, SiteUser
-
+from django.utils.timezone import now
 
 # Inline configuration for shows created by a user
 class ShowInline(admin.TabularInline):
@@ -43,13 +43,32 @@ class FilmAdmin(admin.ModelAdmin):
     ordering = ('name',)
 
 
-# Admin configuration for Show
+# Admin configuration for show
 @admin.register(Show)
 class ShowAdmin(admin.ModelAdmin):
-    list_display = ('film', 'location', 'eventtime', 'created_by', 'created_on')
-    list_filter = ('eventtime', 'location', 'film')
-    search_fields = ('film__name', 'location__name', 'created_by__username')
-    ordering = ('eventtime',)
+    list_display = ('film', 'location', 'eventtime', 'credits', 'status')
+    list_filter = ('status', 'location', 'eventtime')
+    actions = ['mark_confirmed', 'mark_cancelled', 'mark_completed']
+
+    def mark_confirmed(self, request, queryset):
+        queryset.update(status='confirmed')
+        self.message_user(request, "Selected shows have been marked as confirmed.")
+
+    def mark_cancelled(self, request, queryset):
+        queryset.update(status='cancelled')
+        self.message_user(request, "Selected shows have been marked as cancelled.")
+
+    def mark_completed(self, request, queryset):
+        for show in queryset:
+            if show.eventtime < now():
+                show.status = 'completed'
+                show.save()
+            else:
+                self.message_user(request, f"Show '{show}' cannot be marked as completed because it hasn't occurred yet.", level='error')
+
+    mark_confirmed.short_description = "Mark selected shows as confirmed"
+    mark_cancelled.short_description = "Mark selected shows as cancelled"
+    mark_completed.short_description = "Mark selected shows as completed"
 
 
 # Admin configuration for Comment

@@ -13,7 +13,7 @@
             <ul>
                 {% for show in date_group.list %}
                     <li>
-                        <strong>{{ show.eventtime|time:"g:i A" }}</strong> - 
+                        {{ show.eventtime|time:"g:i A" }} - 
                         <a href="{% url 'blog_location' show.location.name %}">
                             {{ show.location.name }}
                         </a> | 
@@ -22,9 +22,17 @@
                         </a>
                         <p>{{ show.body|slice:":400" }}...</p>
                         <p>Event suggested by 
-                            <a href="{% url 'user_shows' show.created_by %}"> {{ show.created_by }} </a> 
+                            <a href="{% url 'profile' show.created_by %}"> {{ show.created_by }} </a> 
                             on {{ show.created_on|date:"F j, Y" }}
                         </p>
+                        <p>Tickets sold so far: {{ show.credits }}</p>
+                        <p>Current show status: {{ show.status }}</p>
+                        <form method="post" action="{% url 'add_credits_to_show' show.id %}">
+                            {% csrf_token %}
+                            <label for="credits">Add Credits:</label>
+                            <input type="number" name="credits" id="credits" min="1" required>
+                            <button type="submit">Add Credits</button>
+                        </form>
                     </li>
                 {% endfor %}
             </ul>

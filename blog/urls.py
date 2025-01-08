@@ -11,8 +11,8 @@ urlpatterns = [
     path("show/<int:pk>/", views.blog_detail, name="blog_detail"),
     path('film/<str:film_name>/', views.blog_film, name='blog_film'),
     path('location/<str:location_name>/', views.blog_location, name='blog_location'),
-    path('creator/<str:creator>/shows/', views.user_shows, name='user_shows'),
     path('profile/<str:username>/', views.profile, name='profile'),
+    path('show/<int:show_id>/add-credits/', views.add_credits_to_show, name='add_credits_to_show'),
 ]
 # Add Django site authentication urls (for login, logout, password management)
 

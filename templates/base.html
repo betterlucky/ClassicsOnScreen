@@ -30,6 +30,11 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link" href="{% url 'profile' user.username %}">
+                                    <i class="bi bi-calendar-plus"></i> View your profile
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <form id="logout-form" method="post" action="{% url 'logout' %}">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-link nav-link">Logout</button>

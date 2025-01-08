@@ -19,7 +19,7 @@
                     </a>
                     <p>{{ show.body|slice:":400" }}...</p>
                     <p>Event suggested by 
-                        <a href="{% url 'user_shows' show.created_by %}"> {{ show.created_by }} </a> 
+                        <a href="{% url 'profile' show.created_by %}"> {{ show.created_by }} </a> 
                         on {{ show.created_on|date:"F j, Y" }}
                     </p>
                 </li>

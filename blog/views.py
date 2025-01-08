@@ -1,51 +1,17 @@
-from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, get_user_model
-from django.contrib.auth.decorators import login_required
-
-from blog.forms import  SiteUserCreationForm, CommentForm, ShowForm
-from blog.models import Show, Film, Location, Comment, SiteUser
-
-from django.contrib.sites.shortcuts import get_current_site
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.template.loader import render_to_string
-from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.forms import UserCreationForm
-from django.core.mail import send_mail
-
-
-
-
-from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.utils.http import urlsafe_base64_encode
-from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth import get_user_model
 from django.http import HttpResponse
-from blog.models import SiteUser  # Import your custom SiteUser model
-from django.db import IntegrityError
-import random
-import string
-
-from django.shortcuts import render, redirect
 from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.core.mail import send_mail
+from django.core.exceptions import PermissionDenied
 from django.template.loader import render_to_string
-from django.utils.http import urlsafe_base64_encode
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib import messages
-from blog.forms import SiteUserCreationForm
-from blog.models import SiteUser  # Import your custom SiteUser model
-
-from django.shortcuts import render, redirect
-from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.utils.http import urlsafe_base64_encode
-from django.contrib.auth.tokens import default_token_generator
-from django.contrib import messages
-from blog.forms import SiteUserCreationForm
-from blog.models import SiteUser
+from blog.forms import SiteUserCreationForm, ShowForm, CommentForm
+from blog.models import SiteUser, Film, Show, Location
 
 def register(request):
     if request.method == 'POST':
@@ -128,18 +94,6 @@ def blog_location(request, location_name):
     context = {'location': location, 'shows': shows}
     return render(request, "blog/location.html", context)
 
-def user_shows(request, creator):
-    # Get the user by username (creator)
-    try:
-        user = get_user_model().objects.get(username=creator)
-    except get_user_model().DoesNotExist:
-        user = None
-
-    # Get all shows created by this user
-    shows = Show.objects.filter(created_by=user).order_by('eventtime')
-
-    return render(request, 'blog/user_shows.html', {'shows': shows, 'creator': user.username if user else 'Unknown'})
-
 def blog_detail(request, pk):
     show = Show.objects.get(pk=pk)
     form = CommentForm()
@@ -189,3 +143,29 @@ def profile(request, username):
         'created_shows': created_shows,
     }
     return render(request, 'blog/profile.html', context)
+
+@login_required
+def add_credits_to_show(request, show_id):
+    show = get_object_or_404(Show, id=show_id)
+
+    # Ensure the show is not already completed or cancelled
+    if show.status in ['completed', 'cancelled']:
+        raise PermissionDenied("Cannot add credits to a completed or cancelled show.")
+
+    # Get credits from POST data
+    try:
+        credits_to_add = int(request.POST.get('credits'))
+        if credits_to_add <= 0:
+            raise ValueError("Credits must be a positive number.")
+    except (TypeError, ValueError):
+        messages.error(request, "Invalid credit amount.")
+        return redirect('/', show_id=show.id)
+
+    # Add credits to the show
+    try:
+        show.add_credits(request.user, credits_to_add)
+        messages.success(request, f"Successfully added {credits_to_add} credits to the show.")
+    except ValidationError as e:
+        messages.error(request, str(e))
+
+    return redirect('/', show_id=show.id)

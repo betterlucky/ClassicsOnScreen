@@ -1,5 +1,0 @@
-blog/__pycache__/
-blog/migrations/
-personal_blog/__pycache__/
-personal_blog/.env
-personal_blog/db.sqlite3

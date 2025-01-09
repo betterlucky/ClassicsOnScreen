@@ -1,8 +1,13 @@
 
-from .models import Show
+from .models import Show, Location, Film
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import SiteUser
+
+class ShowFilterForm(forms.Form):
+    location = forms.ModelChoiceField(queryset=Location.objects.all(), required=False, empty_label="All Locations")
+    film = forms.ModelChoiceField(queryset=Film.objects.all(), required=False, empty_label="All Films")
+
 
 class SiteUserCreationForm(UserCreationForm):
     class Meta:

@@ -1,21 +1,10 @@
 {% extends "base.html" %}
 
 {% block page_title %}
-    <h2 class="mb-4">Upcoming Shows</h2>
+    <h2 class="mb-4">{{ title }}</h2>
 {% endblock page_title %}
 
 {% block page_content %}
-    <form method="get" id="filter-form">
-        <div class="form-group">
-            <label for="location">Location:</label>
-            {{ form.location }}
-        </div>
-        <div class="form-group">
-            <label for="film">Film:</label>
-            {{ form.film }}
-        </div>
-    </form>
-
     {% block shows %}
         {% regroup shows by eventtime.date as shows_by_date %}
         
@@ -33,26 +22,12 @@
                         </a>
                         <p>{{ show.body|slice:":400" }}...</p>
                         <p>Event suggested by 
-                            <a href="{% url 'profile' show.created_by %}"> {{ show.created_by }} </a> 
+                            <a href="{% url 'profile' show.created_by.username %}"> {{ show.created_by.username }} </a> 
                             on {{ show.created_on|date:"F j, Y" }}
                         </p>
-                        <p>Tickets sold so far: {{ show.credits }}</p>
-                        <p>Current show status: {{ show.status }}</p>
-                        <a href="{% url 'blog_detail' show.id %}" class="btn btn-info">View Details</a>
                     </li>
                 {% endfor %}
             </ul>
         {% endfor %}
     {% endblock shows %}
 {% endblock page_content %}
-
-{% block scripts %}
-<script>
-    // Auto-submit the filter form when a user changes a filter option
-    document.querySelectorAll('#filter-form select').forEach(function(select) {
-        select.addEventListener('change', function() {
-            document.querySelector('#filter-form').submit();
-        });
-    });
-</script>
-{% endblock scripts %}

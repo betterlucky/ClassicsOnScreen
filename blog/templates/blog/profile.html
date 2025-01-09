@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block page_title %}
-<h2 class="mb-4">{{ profile_user.username }}'s Profile</h2>
+    <h2 class="mb-4">{{ profile_user.username }}'s Profile</h2>
 {% endblock page_title %}
 
 {% block page_content %}
@@ -14,20 +14,28 @@
     <!-- Created Shows Section -->
     <h3>Shows Created</h3>
     {% if created_shows %}
-
-            {% for show in created_shows %}
-                
-                    {{ show.eventtime|date:"l, F j, Y g:i A" }} - 
-                    <a href="{% url 'blog_location' show.location.name %}">
-                        {{ show.location.name }}
-                    </a> | 
-                    Film: <a href="{% url 'blog_film' show.film.name %}">
-                        {{ show.film.name }}
-                    </a>
-                    <p>{{ show.body|slice:":200" }}...</p>
-               
-            {% endfor %}
-
+        {% regroup created_shows by eventtime.date as shows_by_date %}
+        
+        {% for date_group in shows_by_date %}
+            <h4>{{ date_group.grouper|date:"l, F j, Y" }}</h4>
+            <ul>
+                {% for show in date_group.list %}
+                    <li>
+                        {{ show.eventtime|time:"g:i A" }} - 
+                        <a href="{% url 'blog_location' show.location.name %}">
+                            {{ show.location.name }}
+                        </a> | 
+                        Film: <a href="{% url 'blog_film' show.film.name %}">
+                            {{ show.film.name }}
+                        </a>
+                        <p>{{ show.body|slice:":200" }}...</p>
+                        <p>Tickets sold so far: {{ show.credits }}</p>
+                        <p>Current show status: {{ show.status }}</p>
+                        <a href="{% url 'blog_detail' show.id %}" class="btn btn-primary">View Details</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
     {% else %}
         <p>No shows created yet.</p>
     {% endif %}

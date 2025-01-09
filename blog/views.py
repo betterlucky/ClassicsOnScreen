@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model
-from django.http import HttpResponse
-from django.contrib.sites.shortcuts import get_current_site
+from django.http import HttpResponse, Http404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
@@ -9,9 +8,8 @@ from django.core.exceptions import PermissionDenied
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib import messages
-from blog.forms import SiteUserCreationForm, ShowForm, CommentForm
-from blog.models import SiteUser, Film, Show, Location
+from blog.forms import SiteUserCreationForm, ShowForm, CommentForm, ShowFilterForm
+from blog.models import SiteUser, Film, Show, Location, Comment
 
 def register(request):
     if request.method == 'POST':
@@ -68,10 +66,25 @@ def activate(request, uidb64, token):
         return HttpResponse('Activation link is invalid or has expired.')
     
     
+
+from django.shortcuts import render
+from .models import Show, Location, Film
+from .forms import ShowFilterForm
+
 def blog_index(request):
-    shows = Show.objects.all().order_by("eventtime")
-    context = {"shows": shows}
-    return render(request, "blog/index.html", context)
+    shows = Show.objects.all()
+    form = ShowFilterForm(request.GET)
+    
+    if form.is_valid():
+        location = form.cleaned_data.get('location')
+        film = form.cleaned_data.get('film')
+        
+        if location:
+            shows = shows.filter(location=location)
+        if film:
+            shows = shows.filter(film=film)
+    
+    return render(request, 'blog/index.html', {'shows': shows, 'form': form})
 
 
 def blog_film(request, film_name):
@@ -81,8 +94,12 @@ def blog_film(request, film_name):
         raise Http404("Film not found")
     
     shows = Show.objects.filter(film=film).order_by("eventtime")
-    context = {'film': film, 'shows': shows}
-    return render(request, "blog/film.html", context)
+    context = {
+        "shows": shows,
+        "title": f"Shows for {film.name}",
+    }
+    return render(request, "blog/show_list.html", context)
+
 
 def blog_location(request, location_name):
     try:
@@ -91,11 +108,15 @@ def blog_location(request, location_name):
         raise Http404("Location not found")
     
     shows = Show.objects.filter(location=location).order_by("eventtime")
-    context = {'location': location, 'shows': shows}
-    return render(request, "blog/location.html", context)
+    context = {
+        "shows": shows,
+        "title": f"Shows at {location.name}",
+    }
+    return render(request, "blog/show_list.html", context)
+
 
 def blog_detail(request, pk):
-    show = Show.objects.get(pk=pk)
+    show = get_object_or_404(Show, pk=pk)
     form = CommentForm()
     if request.method == "POST":
         form = CommentForm(request.POST)
@@ -106,11 +127,15 @@ def blog_detail(request, pk):
                 show=show,
             )
             comment.save()
-            return HttpResponseRedirect(request.path_info)
+            return redirect(request.path_info)
     comments = Comment.objects.filter(show=show)
-    context = {"show": show, "comments": comments, "form": form}
-
+    context = {
+        "show": show,
+        "comments": comments,
+        "form": form
+    }
     return render(request, "blog/detail.html", context)
+
 
 @login_required
 def create_show(request):
@@ -141,8 +166,10 @@ def profile(request, username):
         'profile_user': profile_user,
         'is_own_profile': is_own_profile,
         'created_shows': created_shows,
+        'title': f"{profile_user.username}'s Shows"
     }
     return render(request, 'blog/profile.html', context)
+
 
 @login_required
 def add_credits_to_show(request, show_id):
@@ -159,7 +186,7 @@ def add_credits_to_show(request, show_id):
             raise ValueError("Credits must be a positive number.")
     except (TypeError, ValueError):
         messages.error(request, "Invalid credit amount.")
-        return redirect('/', show_id=show.id)
+        return redirect('blog_detail', pk=show.id)
 
     # Add credits to the show
     try:
@@ -168,4 +195,4 @@ def add_credits_to_show(request, show_id):
     except ValidationError as e:
         messages.error(request, str(e))
 
-    return redirect('/', show_id=show.id)
+    return redirect('blog_detail', pk=show.id)

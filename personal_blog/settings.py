@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'blog',
   #  "blog.apps.BlogConfig",
     "django.contrib.admin",
+    'django_celery_beat',
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",

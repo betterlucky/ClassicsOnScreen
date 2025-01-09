@@ -5,43 +5,77 @@
 {% endblock page_title %}
 
 {% block page_content %}
-    <small>
-       
-        <p>{{show.location}}</p>
-        <p> {{ show.eventtime.date}} at {{show.eventtime.time}} | Films:</p>
+<div class="container">
+    <!-- Show Information -->
+    <div class="mb-4">
+        <p><strong>Location:</strong> 
+            <a href="{% url 'blog_location' show.location.name %}">{{ show.location }}</a>
+        </p>
+        <p><strong>Date & Time:</strong> {{ show.eventtime.date }} at {{ show.eventtime.time }}</p>
         
-        {% if show.film %}
-            <a href="{% url 'blog_film' show.film.name %}">
-                {{ show.film.name }}
-            </a>
+        <p><strong>Films:</strong>
+            {% if show.film %}
+                <a href="{% url 'blog_film' show.film.name %}">{{ show.film.name }}</a>
+            {% else %}
+                No Films
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Show Description -->
+    <div class="mb-4">
+        <p><strong>Description:</strong></p>
+        <p>{{ show.body | linebreaks }}</p>
+    </div>
+
+    <!-- Event Creator -->
+    <div class="mb-4">
+        <p>Event suggested by <a href="{% url 'profile' show.created_by %}">{{ show.created_by }}</a> on {{ show.created_on.date }}</p>
+    </div>
+
+    <!-- Add Credits Section (Only for authenticated users) -->
+    {% if user.is_authenticated %}
+    <div class="mb-4">
+        <h3>Add Credits</h3>
+        <form method="post" action="{% url 'add_credits_to_show' show.id %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="credits">Credits to add:</label>
+                <input type="number" name="credits" id="credits" min="1" required class="form-control">
+            </div>
+            <button type="submit" class="btn btn-success">Add Credits</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Comments Section (Moved above the comment form) -->
+    <div>
+        <h3>Comments</h3>
+        {% if comments %}
+            {% for comment in comments %}
+                <div class="mb-3">
+                    <p><strong>On {{ comment.created_on.date }}:</strong> <b>{{ comment.author }}</b> wrote:</p>
+                    <p>{{ comment.body | linebreaks }}</p>
+                </div>
+            {% endfor %}
         {% else %}
-            No Films        
+            <p>No comments yet.</p>
         {% endif %}
-    </small>
-    <p>{{ show.body | linebreaks }}</p>
-    <p>Event suggested by <a href="{% url 'profile' show.created_by %}"> {{ show.created_by }} </a> on {{ show.created_on.date }}</p>
+    </div>
 
-    <h3>Comments:</h3>
-    {% for comment in comments %}
-        <p>
-            On {{ comment.created_on.date }} <b>{{ comment.author }}</b> wrote:
-        </p>
-        <p>
-            {{ comment.body | linebreaks }}
-        </p>
-    {% endfor %}
-    
-    <h3>Leave a comment:</h3>
-    <form method="post">
-        {% csrf_token %}
-        <div class="form-group">
-            {{ form.author }}
-        </div>
-        <div class="form-group">
-            {{ form.body }}
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
-
-
+    <!-- Leave a Comment Section -->
+    <div class="mb-4">
+        <h3>Leave a Comment</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.author }}
+            </div>
+            <div class="form-group">
+                {{ form.body }}
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</div>
 {% endblock page_content %}

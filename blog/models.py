@@ -20,6 +20,7 @@ class ShowCreditLog(models.Model):
 class Film(models.Model):
     name = models.CharField(max_length=60, unique=True)
     overridecapacity = models.IntegerField(blank=True, null=True)
+    imdb_code = models.CharField(max_length=10, blank=False, null=False, unique=True)
 
     def __str__(self):
         return self.name

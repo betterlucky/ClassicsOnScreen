@@ -1,0 +1,205 @@
+/* General styles */
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(to bottom, #add8e6, #ffffff);
+}
+
+/* Main container */
+.container-fluid {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+}
+
+/* Sidebar */
+.sidebar {
+    background-color: transparent;
+    color: #343a40;
+    width: 250px;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    border-right: 1px solid #ced4da;
+}
+
+.sidebar .nav-link {
+    color: #007bff;
+}
+
+.sidebar .nav-link:hover {
+    background-color: rgba(226, 230, 234, 0.5);
+}
+
+/* Content area */
+.content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.main-content {
+    background-color: #fefefe;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    flex: 1;
+}
+
+.main-header {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.page-title {
+    color: #007bff;
+}
+
+/* Footer */
+footer {
+    background-color: transparent;
+    color: #343a40;
+    padding: 10px 0;
+    text-align: center;
+    width: 100%;
+    border-top: 1px solid #ced4da;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .container-fluid {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        border-right: none; /* Corrected: Remove border from sidebar */
+    }
+
+    .content-wrapper {
+        padding: 10px;
+    }
+}
+
+/* Filter styles */
+.filter-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.filter-group label {
+    margin-right: 10px;
+    white-space: nowrap;
+}
+
+.show-listings {
+    margin-top: 20px;
+}
+
+/* About Us page styles */
+.about-us-container {
+    padding: 20px;
+}
+
+.about-section {
+    margin-bottom: 30px;
+}
+
+.about-section h3 {
+    margin-bottom: 15px;
+    color: #007bff; /* Use your primary color */
+}
+
+/* Contact Us page styles */
+.contact-us-container {
+    padding: 20px;
+}
+
+.contact-us-container p {
+    margin-bottom: 20px;
+}
+
+/* Optional: Style form elements more specifically if needed */
+.contact-us-container label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.contact-us-container input[type="text"],
+.contact-us-container input[type="email"],
+.contact-us-container textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.contact-us-container textarea {
+    height: 120px;
+}
+
+/* FAQ page styles */
+.faq-container {
+    padding: 20px;
+}
+
+.faq-section {
+    margin-bottom: 30px;
+}
+
+.faq-section h3 {
+    margin-bottom: 15px;
+    color: #007bff; /* Use your primary color */
+}
+
+.faq-item {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    cursor: pointer; /* Indicate clickable */
+}
+
+.faq-question {
+    font-weight: bold;
+    margin-bottom: 10px;
+    position: relative; /* For the plus/minus icon */
+    padding-right: 20px; /* Make space for the icon */
+}
+
+.faq-question::after {
+    content: "+"; /* Initial plus icon */
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: transform 0.2s ease-in-out; /* Smooth transition */
+}
+
+.faq-answer {
+    display: none; /* Initially hide the answer */
+    padding-left: 20px;
+    margin-bottom: 10px;
+}
+
+.faq-answer.show {
+    display: block; /* Show the answer when clicked */
+}
+
+.faq-question.active::after {
+    content: "-"; /* Change to minus icon when active */
+    transform: translateY(-50%) rotate(45deg); /* Rotate for a nicer effect */
+}

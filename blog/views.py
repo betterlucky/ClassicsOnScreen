@@ -8,7 +8,8 @@ from django.core.exceptions import PermissionDenied
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
-from blog.forms import SiteUserCreationForm, ShowForm, CommentForm, ShowFilterForm
+from django.conf import settings
+from blog.forms import SiteUserCreationForm, ShowForm, CommentForm, ShowFilterForm, ContactForm
 from blog.models import SiteUser, Film, Show, Location, Comment
 
 def register(request):
@@ -67,25 +68,36 @@ def activate(request, uidb64, token):
     
     
 
-from django.shortcuts import render
-from .models import Show, Location, Film
-from .forms import ShowFilterForm
+def blog_about(request):
+    return render(request, 'blog/about.html')
+
+def blog_faq(request):
+    return render(request, 'blog/faq.html')
 
 def blog_index(request):
     shows = Show.objects.all()
+
+    # Handle filtering by location, film, and status
     form = ShowFilterForm(request.GET)
-    
+
     if form.is_valid():
         location = form.cleaned_data.get('location')
         film = form.cleaned_data.get('film')
-        
+        status = form.cleaned_data.get('status')
+
         if location:
             shows = shows.filter(location=location)
         if film:
             shows = shows.filter(film=film)
-    
-    return render(request, 'blog/index.html', {'shows': shows, 'form': form})
+        
+        # Apply the status filter if selected
+        if status and status != 'all':
+            shows = shows.filter(status=status)
+        elif status == 'all':
+            # Exclude completed, expired, and cancelled shows by default
+            shows = shows.exclude(status__in=['completed', 'expired', 'cancelled'])
 
+    return render(request, 'blog/index.html', {'shows': shows, 'form': form})
 
 def blog_film(request, film_name):
     try:
@@ -196,3 +208,31 @@ def add_credits_to_show(request, show_id):
         messages.error(request, str(e))
 
     return redirect('blog_detail', pk=show.id)
+
+def blog_contact(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            email = form.cleaned_data['email']
+            message = form.cleaned_data['message']
+
+            try:
+                send_mail(
+                    f'Contact Form Submission from {name}', # Subject
+                    f'Name: {name}\nEmail: {email}\n\nMessage:\n{message}', # Message
+                    settings.DEFAULT_FROM_EMAIL, # From email (configured in settings.py)
+                    [settings.CONTACT_EMAIL], # To email (configured in settings.py)
+                    fail_silently=False,
+                )
+                messages.success(request, 'Thank you for your message! We will get back to you shortly.')
+                return redirect('/') # Redirect to prevent resubmission
+            except Exception as e:
+                messages.error(request, f'There was an error sending your message: {e}. Please try again later.')
+                return redirect('/')
+
+        else:
+            messages.error(request, 'There was an error with your submission. Please check the form.')
+    else:
+        form = ContactForm()
+    return render(request, 'blog/contact.html', {'form': form})

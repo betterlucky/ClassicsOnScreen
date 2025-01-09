@@ -1,0 +1,58 @@
+<nav class="col-md-3 col-lg-2 d-md-block sidebar collapse" id="sidebarMenu">
+    <div class="position-sticky pt-3">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="{% url 'blog_index' %}">
+                    <i class="bi bi-house-door"></i> Home
+                </a>
+            </li>
+            {% if user.is_authenticated %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'create_show' %}">
+                    <i class="bi bi-calendar-plus"></i> Create A New Event
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'profile' user.username %}">
+                    <i class="bi bi-calendar-plus"></i> View your profile
+                </a>
+            </li>
+            <li class="nav-item">
+                <form id="logout-form" method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-link nav-link">Logout</button>
+                </form>
+            </li>
+            {% else %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'login' %}?next={{ request.path }}">
+                    <i class="bi bi-box-arrow-in-right"></i> Login
+                </a>
+            </li>
+            {% endif %}
+            {% if user.is_staff %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'admin:index' %}">
+                    <i class="bi bi-shield-lock"></i> Admin
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'blog_contact' %}">
+                    <i class="bi bi-box-arrow-in-right"></i> Contact Us
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'blog_faq' %}">
+                    <i class="bi bi-box-arrow-in-right"></i> FAQ
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'blog_about' %}">
+                    <i class="bi bi-box-arrow-in-right"></i> About Us
+                </a>
+            </li>
+
+            {% endif %}
+        </ul>
+    </div>
+</nav>

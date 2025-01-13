@@ -1,6 +1,6 @@
 /* General styles */
 html, body {
-    height: 100%;
+    /*height: 100%; */
     margin: 0;
     font-family: Arial, sans-serif;
 }
@@ -8,14 +8,16 @@ html, body {
 body {
     display: flex;
     flex-direction: column;
+    min-height: 100vh; /* Ensure body covers full viewport height */
     background: linear-gradient(to bottom, #add8e6, #ffffff);
 }
 
 /* Main container */
 .container-fluid {
+    flex: 1; /* Allows content to expand and push footer down */
     display: flex;
-    flex: 1;
-    min-height: 0;
+    flex-direction: column; /* Adjust to column for stacking content and footer */
+    min-height: 100%;
 }
 
 /* Sidebar */
@@ -39,7 +41,7 @@ body {
 
 /* Content area */
 .content-wrapper {
-    flex: 1;
+    flex: 1; /* Pushes the footer down when content grows */
     display: flex;
     flex-direction: column;
     padding: 20px;
@@ -51,7 +53,6 @@ body {
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    flex: 1;
 }
 
 .main-header {
@@ -68,12 +69,14 @@ body {
 
 /* Footer */
 footer {
-    background-color: transparent;
-    color: #343a40;
+    background-color: #343a40;
+    color: black;
     padding: 10px 0;
     text-align: center;
     width: 100%;
-    border-top: 1px solid #ced4da;
+    background: linear-gradient(to bottom, #add8e6, #ffffff); /* Matches body background */
+    position: fixed; /* Keeps it within the flow of the document */
+    bottom: 0px;
 }
 
 /* Responsive design */
@@ -84,7 +87,7 @@ footer {
 
     .sidebar {
         width: 100%;
-        border-right: none; /* Corrected: Remove border from sidebar */
+        border-right: none;
     }
 
     .content-wrapper {
@@ -106,100 +109,4 @@ footer {
 
 .show-listings {
     margin-top: 20px;
-}
-
-/* About Us page styles */
-.about-us-container {
-    padding: 20px;
-}
-
-.about-section {
-    margin-bottom: 30px;
-}
-
-.about-section h3 {
-    margin-bottom: 15px;
-    color: #007bff; /* Use your primary color */
-}
-
-/* Contact Us page styles */
-.contact-us-container {
-    padding: 20px;
-}
-
-.contact-us-container p {
-    margin-bottom: 20px;
-}
-
-/* Optional: Style form elements more specifically if needed */
-.contact-us-container label {
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.contact-us-container input[type="text"],
-.contact-us-container input[type="email"],
-.contact-us-container textarea {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-.contact-us-container textarea {
-    height: 120px;
-}
-
-/* FAQ page styles */
-.faq-container {
-    padding: 20px;
-}
-
-.faq-section {
-    margin-bottom: 30px;
-}
-
-.faq-section h3 {
-    margin-bottom: 15px;
-    color: #007bff; /* Use your primary color */
-}
-
-.faq-item {
-    margin-bottom: 20px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-    cursor: pointer; /* Indicate clickable */
-}
-
-.faq-question {
-    font-weight: bold;
-    margin-bottom: 10px;
-    position: relative; /* For the plus/minus icon */
-    padding-right: 20px; /* Make space for the icon */
-}
-
-.faq-question::after {
-    content: "+"; /* Initial plus icon */
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    transition: transform 0.2s ease-in-out; /* Smooth transition */
-}
-
-.faq-answer {
-    display: none; /* Initially hide the answer */
-    padding-left: 20px;
-    margin-bottom: 10px;
-}
-
-.faq-answer.show {
-    display: block; /* Show the answer when clicked */
-}
-
-.faq-question.active::after {
-    content: "-"; /* Change to minus icon when active */
-    transform: translateY(-50%) rotate(45deg); /* Rotate for a nicer effect */
 }

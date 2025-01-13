@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 from . import views
 
 urlpatterns = [
+    path('reset/', views.reset, name='reset'),
     path("", views.blog_index, name="blog_index"),
     path('register/', views.register, name='register'),
     path('confirm/<uidb64>/<token>/', views.activate, name='activate'),
@@ -18,9 +19,7 @@ urlpatterns = [
     path("about/", views.blog_about, name="blog_about"),
     path("faq/", views.blog_faq, name="blog_faq"),
     path("contact/", views.blog_contact, name="blog_contact"),
+    path('accounts/', include('django.contrib.auth.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 # Add Django site authentication urls (for login, logout, password management)
 
-urlpatterns += [
-    path('accounts/', include('django.contrib.auth.urls')),
-]

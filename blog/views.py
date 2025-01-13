@@ -1,16 +1,53 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpRequest
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
-from django.core.exceptions import PermissionDenied
+from django.contrib.sites.models import Site
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
-from blog.forms import SiteUserCreationForm, ShowForm, CommentForm, ShowFilterForm, ContactForm
+from blog.forms import SiteUserCreationForm, ShowForm, CommentForm, ShowFilterForm, ContactForm, PasswordResetForm
 from blog.models import SiteUser, Film, Show, Location, Comment
+
+def reset(request):
+    if request.method == 'POST':
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            try:
+                user = SiteUser.objects.get(email=email)
+            except SiteUser.DoesNotExist:
+                form.add_error('email', 'No user is associated with this email address.')
+                return render(request, 'registration/password_reset.html', {'form': form})
+
+            # Generate the uid and token for password reset
+            uid = urlsafe_base64_encode(str(user.pk).encode('utf-8'))
+            token = default_token_generator.make_token(user)
+
+            # Prepare the email content
+            subject = 'Password Reset Request'
+            message = render_to_string('registration/password_reset_email.html', {
+                'user': user,
+                'uid': uid,
+                'token': token,
+                'domain': "daveharris.eu.pythonanywhere.com",
+                'protocol': 'https',  # Use 'http' if your site doesn't use HTTPS
+            })
+
+            # Send the password reset email
+            send_mail(subject, message, 'no-reply@classicsbackonscreen.com', [user.email])
+
+            messages.success(request, 'A password reset email has been sent. Please check your inbox.')
+            return redirect('/')
+
+    else:
+        form = PasswordResetForm()
+
+    return render(request, 'registration/reset.html', {'form': form})
 
 def register(request):
     if request.method == 'POST':
@@ -32,19 +69,20 @@ def register(request):
             token = default_token_generator.make_token(user)
 
             # Prepare email content
+
             subject = 'Confirm your email'
             message = render_to_string('registration/confirmation_email.html', {
                 'user': user,
                 'uid': uid,
                 'token': token,
-                'domain': get_current_site(request).domain,
+                'domain': "daveharris.eu.pythonanywhere.com",
             })
 
             # Send the confirmation email
-            send_mail(subject, message, 'no-reply@example.com', [user.email])
+            send_mail(subject, message, 'no-reply@classicsbackonscreen.com', [user.email])
 
             messages.success(request, 'Please check your email to confirm your registration.')
-            return redirect('login')  # Redirect to login page or any other page after registration
+            return redirect('/')  # Redirect to login page or any other page after registration
 
     else:
         form = SiteUserCreationForm()
@@ -62,17 +100,17 @@ def activate(request, uidb64, token):
     if user and default_token_generator.check_token(user, token):
         user.is_active = True  # Activate the user
         user.save()
-        return redirect('login')  # Redirect to login after activation
+        return redirect('/')  # Redirect to login after activation
     else:
         return HttpResponse('Activation link is invalid or has expired.')
-    
-    
+
+
 
 def blog_about(request):
-    return render(request, 'blog/about.html')
+    return render(request, 'about.html')
 
 def blog_faq(request):
-    return render(request, 'blog/faq.html')
+    return render(request, 'faq.html')
 
 def blog_index(request):
     shows = Show.objects.all()
@@ -89,28 +127,28 @@ def blog_index(request):
             shows = shows.filter(location=location)
         if film:
             shows = shows.filter(film=film)
-        
+
         # Apply the status filter if selected
         if status and status != 'all':
             shows = shows.filter(status=status)
-        elif status == 'all':
+        else:
             # Exclude completed, expired, and cancelled shows by default
             shows = shows.exclude(status__in=['completed', 'expired', 'cancelled'])
 
-    return render(request, 'blog/index.html', {'shows': shows, 'form': form})
+    return render(request, 'index.html', {'shows': shows, 'form': form})
 
 def blog_film(request, film_name):
     try:
         film = Film.objects.get(name=film_name)
     except Film.DoesNotExist:
         raise Http404("Film not found")
-    
+
     shows = Show.objects.filter(film=film).order_by("eventtime")
     context = {
         "shows": shows,
         "title": f"Shows for {film.name}",
     }
-    return render(request, "blog/show_list.html", context)
+    return render(request, "show_list.html", context)
 
 
 def blog_location(request, location_name):
@@ -118,13 +156,13 @@ def blog_location(request, location_name):
         location = Location.objects.get(name=location_name)
     except Location.DoesNotExist:
         raise Http404("Location not found")
-    
+
     shows = Show.objects.filter(location=location).order_by("eventtime")
     context = {
         "shows": shows,
         "title": f"Shows at {location.name}",
     }
-    return render(request, "blog/show_list.html", context)
+    return render(request, "show_list.html", context)
 
 
 def blog_detail(request, pk):
@@ -146,7 +184,7 @@ def blog_detail(request, pk):
         "comments": comments,
         "form": form
     }
-    return render(request, "blog/detail.html", context)
+    return render(request, "detail.html", context)
 
 
 @login_required
@@ -160,27 +198,27 @@ def create_show(request):
             return redirect('/')
     else:
         form = ShowForm()
-    return render(request, 'blog/create_show.html', {'form': form})
+    return render(request, 'create_show.html', {'form': form})
 
 
 @login_required
 def profile(request, username):
     # Get the user whose profile is being viewed
     profile_user = get_object_or_404(SiteUser, username=username)
-    
+
     # Determine if the logged-in user is viewing their own profile
     is_own_profile = request.user == profile_user
-    
+
     # Get the shows created by the profile user
     created_shows = Show.objects.filter(created_by=profile_user).order_by('eventtime')
-    
+
     context = {
         'profile_user': profile_user,
         'is_own_profile': is_own_profile,
         'created_shows': created_shows,
         'title': f"{profile_user.username}'s Shows"
     }
-    return render(request, 'blog/profile.html', context)
+    return render(request, 'profile.html', context)
 
 
 @login_required
@@ -235,4 +273,4 @@ def blog_contact(request):
             messages.error(request, 'There was an error with your submission. Please check the form.')
     else:
         form = ContactForm()
-    return render(request, 'blog/contact.html', {'form': form})
+    return render(request, 'contact.html', {'form': form})

@@ -19,10 +19,40 @@ class ContactForm(forms.Form):
     message = forms.CharField(label="Your Message", widget=forms.Textarea(attrs={'placeholder': 'Enter your message'}))
 
 class SiteUserCreationForm(UserCreationForm):
+    first_name = forms.CharField(
+        max_length=30,
+        required=True,
+        help_text="Enter your first name."
+    )
+    last_name = forms.CharField(
+        max_length=30,
+        required=True,
+        help_text="Enter your last name."
+    )
+    email = forms.EmailField(
+        required=True,
+        help_text="Enter a valid email address."
+    )
+
     class Meta:
         model = SiteUser
-        fields = ['username', 'email', 'password1', 'password2']
+        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
 
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if SiteUser.objects.filter(email=email).exists():
+            raise forms.ValidationError("A user with this email address already exists.")
+        return email
+
+class PasswordResetForm(forms.Form):
+    email = forms.EmailField(
+        label="Email Address",
+        max_length=254,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your email address',
+        })
+    )
 
 class CommentForm(forms.Form):
     author = forms.CharField(

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block page_title %}
+    <h2>Frequently Asked Questions (FAQ)</h2>
+{% endblock page_title %}
+
+{% block page_content %}
+    <div class="faq-container">
+        <div class="faq-section">
+            <h3>General Questions</h3>
+            <div class="faq-item">
+                <h4 class="faq-question">What is Classics On Screen?</h4>
+                <div class="faq-answer">
+                    <p>Classics On Screen is a platform dedicated to bringing classic films back to the big screen. Take a look at our <a href="{% url 'blog_about' %}">About</a> page for more information.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <h4 class="faq-question">How do I find upcoming screenings?</h4>
+                <div class="faq-answer">
+                    <p>You can find all our upcoming screenings on the <a href="{% url 'blog_index' %}">Home</a> page. As people create new screenings, they'll appear there automatically.</p>
+                </div>
+            </div>
+            </div>
+
+        <div class="faq-section">
+            <h3>Tickets and Booking</h3>
+            <div class="faq-item">
+                <h4 class="faq-question">How do I purchase tickets?</h4>
+                <div class="faq-answer">
+                    <p>You can buy credits via your profile page, use these to buy tickets for a particular show or create one of your own!</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <h4 class="faq-question">What is your refund policy?</h4>
+                <div class="faq-answer">
+                    <p>Typically we will arrange for cinema tickets for regular shows (not including special events) at your local cinema rather than refund but talk to us using the <a href="{% url 'blog_contact' %}">Contact Us</a> page either way.</p>
+                </div>
+            </div>
+            </div>
+
+        <div class="faq-section">
+            <h3>Other Questions</h3>
+            <div class="faq-item">
+                <h4 class="faq-question">How can I suggest a film?</h4>
+                <div class="faq-answer">
+                    <p>You can suggest films through our <a href="{% url 'blog_contact' %}">Contact Us</a> page. We appreciate your suggestions!</p>
+                </div>
+            </div>
+            </div>
+    </div>
+
+    <script>
+        const faqQuestions = document.querySelectorAll('.faq-question');
+
+        faqQuestions.forEach(question => {
+            question.addEventListener('click', () => {
+                const answer = question.nextElementSibling;
+                answer.classList.toggle('show');
+            });
+        });
+    </script>
+
+{% endblock page_content %}

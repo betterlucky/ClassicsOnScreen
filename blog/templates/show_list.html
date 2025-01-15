@@ -5,37 +5,7 @@
 {% endblock page_title %}
 
 {% block page_content %}
-    {% block shows %}
-        {% regroup shows by eventtime.date as shows_by_date %}
-        
-        {% for date_group in shows_by_date %}
-            <h3>{{ date_group.grouper|date:"l, F j, Y" }}</h3>
-            <ul>
-                {% for show in date_group.list %}
-                    <li>
-                        {{ show.eventtime|time:"g:i A" }} - 
-                        <a href="{% url 'blog_location' show.location.name %}">
-                            {{ show.location.name }}
-                        </a> | 
-                        Film: <a href="{% url 'blog_film' show.film.name %}">
-                            {{ show.film.name }}
-                        </a>
-                        {% if show.film.imdb_code %}
-                            <p>More info on IMDb: 
-                            <a href="https://www.imdb.com/title/{{ show.film.imdb_code }}" target="_blank" class="btn btn-info">
-                            View on IMDb
-                            </a>
-                            </p>
-                        {% endif %}
-                        <p>{{ show.body|slice:":400" }}...</p>
-                        <a href="{% url 'blog_detail' show.id %}" class="btn btn-primary">View Details</a>
-                        <p>Event suggested by 
-                            <a href="{% url 'profile' show.created_by.username %}"> {{ show.created_by.username }} </a> 
-                            on {{ show.created_on|date:"F j, Y" }}
-                        </p>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% endfor %}
-    {% endblock shows %}
+    <div class="show-listings">
+        {% include "show_listings.html" %}
+    </div>
 {% endblock page_content %}

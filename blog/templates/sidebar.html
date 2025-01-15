@@ -18,6 +18,12 @@
                 </a>
             </li>
             <li class="nav-item">
+                <form method="post" action="{% url 'buy_credits' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-link nav-link">Buy 10 Credits</button>
+                </form>
+            </li>
+            <li class="nav-item">
                 <form id="logout-form" method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-link nav-link">Logout</button>

@@ -1,20 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
-
+from datetime import timedelta
+from django.utils.timezone import now
 
 
 class SiteUser(AbstractUser):
     credits = models.IntegerField(blank=True, null=True, default=0)
-
-
-class ShowCreditLog(models.Model):
-    user = models.ForeignKey("SiteUser", on_delete=models.CASCADE, related_name="credit_logs")
-    show = models.ForeignKey("Show", on_delete=models.CASCADE, related_name="credit_logs")
-    credits = models.PositiveIntegerField()
-
-    def __str__(self):
-        return f"{self.user.username} contributed {self.credits} credits to {self.show}"
 
 
 class Film(models.Model):
@@ -54,6 +46,9 @@ class Show(models.Model):
     credits = models.PositiveIntegerField(blank=True, null=True, default=0)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='inactive')
 
+    subtitles = models.BooleanField(default=False, help_text="Does this show have subtitles?")
+    relaxed_screening = models.BooleanField(default=False, help_text="Is this a relaxed screening?")
+
     class Meta:
         ordering = ['eventtime']
         unique_together = ('film', 'location', 'eventtime')
@@ -86,7 +81,10 @@ class Show(models.Model):
         for log in self.credit_logs.all():
             log.user.credits += log.credits
             log.user.save()
-            log.delete()
+
+            # Mark log as refunded instead of deleting it
+            log.refunded = True
+            log.save()
 
         # Update status to expired
         self.status = 'expired'
@@ -105,6 +103,24 @@ class Show(models.Model):
         self.status = 'cancelled'
         self.save()
 
+
+    def clean(self):
+        super().clean()
+
+        # Check if the instance already exists in the database
+        if not self.pk and self.eventtime < now() + timedelta(weeks=3):
+            raise ValidationError("Shows cannot be created within three weeks of the current date.")
+
+
+class ShowCreditLog(models.Model):
+    user = models.ForeignKey("SiteUser", on_delete=models.CASCADE)
+    show = models.ForeignKey("Show", on_delete=models.CASCADE, related_name="credit_logs")
+    credits = models.PositiveIntegerField()
+    refunded = models.BooleanField(default=False)
+    created_on = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_on']
 
 class Comment(models.Model):
     author = models.ForeignKey("SiteUser", on_delete=models.CASCADE)

@@ -5,60 +5,73 @@
 {% endblock page_title %}
 
 {% block page_content %}
-    <div class="faq-container">
-        <div class="faq-section">
-            <h3>General Questions</h3>
-            <div class="faq-item">
-                <h4 class="faq-question">What is Classics On Screen?</h4>
-                <div class="faq-answer">
-                    <p>Classics On Screen is a platform dedicated to bringing classic films back to the big screen. Take a look at our <a href="{% url 'blog_about' %}">About</a> page for more information.</p>
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <h4 class="faq-question">How do I find upcoming screenings?</h4>
-                <div class="faq-answer">
-                    <p>You can find all our upcoming screenings on the <a href="{% url 'blog_index' %}">Home</a> page. As people create new screenings, they'll appear there automatically.</p>
-                </div>
-            </div>
-            </div>
-
-        <div class="faq-section">
-            <h3>Tickets and Booking</h3>
-            <div class="faq-item">
-                <h4 class="faq-question">How do I purchase tickets?</h4>
-                <div class="faq-answer">
-                    <p>You can buy credits via your profile page, use these to buy tickets for a particular show or create one of your own!</p>
-                </div>
-            </div>
-            <div class="faq-item">
-                <h4 class="faq-question">What is your refund policy?</h4>
-                <div class="faq-answer">
-                    <p>Typically we will arrange for cinema tickets for regular shows (not including special events) at your local cinema rather than refund but talk to us using the <a href="{% url 'blog_contact' %}">Contact Us</a> page either way.</p>
-                </div>
-            </div>
-            </div>
-
-        <div class="faq-section">
-            <h3>Other Questions</h3>
-            <div class="faq-item">
-                <h4 class="faq-question">How can I suggest a film?</h4>
-                <div class="faq-answer">
-                    <p>You can suggest films through our <a href="{% url 'blog_contact' %}">Contact Us</a> page. We appreciate your suggestions!</p>
-                </div>
-            </div>
-            </div>
+<div class="faq-container">
+    <!-- General Questions Section -->
+    <div class="faq-section">
+        <h3>General Questions</h3>
+        <details>
+            <summary>What is Classics On Screen?</summary>
+            <p>
+                Classics On Screen is a platform dedicated to bringing classic films back to the big screen.
+                Take a look at our <a href="{% url 'blog_about' %}">About</a> page for more information.
+            </p>
+        </details>
+        <details>
+            <summary>How do I find upcoming screenings?</summary>
+            <p>
+                You can find all our upcoming screenings on the <a href="{% url 'blog_index' %}">Home</a> page.
+                As people create new screenings, they'll appear there automatically.
+            </p>
+        </details>
+        <details>
+            <summary>Why do new shows have to be at least 3 weeks in the future?</summary>
+            <p>
+                There are two main reasons for this: the first is that the venue has to plan their own programme and need to have
+                time to work around your show if need be. The second is that, for cinemas at least, films are not available
+                "on-demand" and booking new films tends to be manual, slow and time-consuming.
+            </p>
+        </details>
     </div>
 
-    <script>
-        const faqQuestions = document.querySelectorAll('.faq-question');
+    <!-- Tickets and Booking Section -->
+    <div class="faq-section">
+        <h3>Tickets and Booking</h3>
+        <details>
+            <summary>How do I purchase tickets?</summary>
+            <p>
+                You can buy credits via your profile page and use these to buy tickets for a particular show or create one of your own!
+            </p>
+        </details>
+        <details>
+            <summary>What is your refund policy?</summary>
+            <p>
+                Typically, we arrange for cinema tickets for regular shows (not including special events) at your local cinema
+                rather than issuing refunds. However, feel free to reach out via the <a href="{% url 'blog_contact' %}">Contact Us</a> page.
+            </p>
+        </details>
+        <details>
+            <summary>Why credits?</summary>
+            <p>
+                Here's the thing, we want to keep things as simple as possible. Due to the costs involved, we also need to keep refunds and other cash transfers to a minimum. A credits system allows you to use your ticket anywhere without having to worry about having to top up the difference in ticket prices or have a stray 50p sitting in your account.
+            </p>
+        </details>
+        <details>
+            <summary>I've seen films at a particular cinema cheaper than the credits you have here. Why is that?</summary>
+            <p>
+                It's partly down us being able to handle multiple sites with different ticket prices, it's partly because we don't want to have to use booking fees and it's partly down to the fact that one-off shows cost more to put on (see our <a href="{% url 'blog_about' %}">About</a> page for more on that last bit).
+            </p>
+        </details>
+    </div>
 
-        faqQuestions.forEach(question => {
-            question.addEventListener('click', () => {
-                const answer = question.nextElementSibling;
-                answer.classList.toggle('show');
-            });
-        });
-    </script>
-
+    <!-- Other Questions Section -->
+    <div class="faq-section">
+        <h3>Other Questions</h3>
+        <details>
+            <summary>How can I suggest a film?</summary>
+            <p>
+                You can suggest films through our <a href="{% url 'blog_contact' %}">Contact Us</a> page. We appreciate your suggestions!
+            </p>
+        </details>
+    </div>
+</div>
 {% endblock page_content %}

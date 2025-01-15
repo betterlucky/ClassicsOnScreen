@@ -70,7 +70,7 @@ class CommentForm(forms.Form):
 class ShowForm(forms.ModelForm):
     class Meta:
         model = Show
-        fields = ['body', 'film', 'location', 'eventtime']
+        fields = ['body', 'film', 'location', 'eventtime', 'subtitles', 'relaxed_screening']
         widgets = {
             'eventtime': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
@@ -79,4 +79,7 @@ class ShowForm(forms.ModelForm):
             'film': 'Film',
             'location': 'Location',
             'eventtime': 'Event Time',
+            'subtitles': 'Subtitled',
+            'relaxed_screening': 'Relaxed Screening'
+
         }

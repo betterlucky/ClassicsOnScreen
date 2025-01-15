@@ -15,6 +15,7 @@ urlpatterns = [
     path('film/<str:film_name>/', views.blog_film, name='blog_film'),
     path('location/<str:location_name>/', views.blog_location, name='blog_location'),
     path('profile/<str:username>/', views.profile, name='profile'),
+    path('buy-credits/', views.buy_credits, name='buy_credits'),
     path('show/<int:show_id>/add-credits/', views.add_credits_to_show, name='add_credits_to_show'),
     path("about/", views.blog_about, name="blog_about"),
     path("faq/", views.blog_faq, name="blog_faq"),

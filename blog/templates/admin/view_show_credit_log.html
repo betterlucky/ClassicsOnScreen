@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<h1>Credit Log for {{ show.name }}</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Credits</th>
+        <th>Timestamp</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in log_entries %}
+        <tr>
+          <td>{{ entry.user.username }}</td>
+          <td>{{ entry.credits }}</td>
+          <td>{{ entry.timestamp }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="3">No credit logs for this show.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+    <a href="{{ back_to_show_credits_url }}">Back to Show Credits</a>
+
+{% endblock %}

@@ -39,6 +39,15 @@ body {
     background-color: rgba(226, 230, 234, 0.5);
 }
 
+.sidebar-button {
+    display: inline-block; /* Or use a more specific display value */
+    padding: 0.5rem 1rem;
+    border: 1px solid #007bff;
+    border-radius: 0.25rem;
+    color: #343a40;
+    text-decoration: none;
+}
+
 /* Content area */
 .content-wrapper {
     flex: 1; /* Pushes the footer down when content grows */
@@ -66,6 +75,44 @@ body {
 .page-title {
     color: #007bff;
 }
+
+/* FAQ section */
+.faq-container {
+    margin: 20px 0;
+}
+
+.faq-section {
+    margin-bottom: 20px;
+}
+
+details {
+    margin-bottom: 10px;
+    box-shadow: none; /* Remove shadow */
+    border: none; /* Remove border */
+    padding: 0; /* Remove padding */
+    background-color: transparent; /* Remove background */
+}
+
+summary {
+    cursor: pointer;
+    font-weight: bold;
+    color: #007bff;
+}
+
+summary:hover {
+    text-decoration: underline;
+}
+
+details p {
+    margin: 10px 0 0;
+    color: #343a40;
+    font-style: italic; /* Italicize the FAQ answers */
+}
+
+details[open] {
+    background-color: transparent; /* Ensure no background when open */
+}
+
 
 /* Footer */
 footer {

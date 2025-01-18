@@ -70,7 +70,8 @@ class ShowAdmin(admin.ModelAdmin):
     actions = ['mark_confirmed', 'mark_cancelled', 'mark_completed', 'refund_credits', 'email_guest_lists']
 
     def mark_confirmed(self, request, queryset):
-        queryset.update(status='confirmed')
+        for show in queryset:
+            show.confirm_show()
         self.message_user(request, "Selected shows have been marked as confirmed.")
 
     def mark_cancelled(self, request, queryset):

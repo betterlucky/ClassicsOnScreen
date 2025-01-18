@@ -1,3 +1,4 @@
+{% load custom_filters %}
 <form method="get" id="filters-form">
     {% csrf_token %}
     <div class="row">
@@ -5,7 +6,7 @@
             <div class="col-md-4">
                 <div class="filter-group">
                     <label for="id_location">Location:</label>
-                    {{ form.location }}
+                    {{ form.location|add_class:"filter-select" }}
                 </div>
             </div>
         {% endif %}
@@ -13,14 +14,14 @@
             <div class="col-md-4">
                 <div class="filter-group">
                     <label for="id_film">Film:</label>
-                    {{ form.film }}
+                    {{ form.film|add_class:"filter-select" }}
                 </div>
             </div>
         {% endif %}
         <div class="col-md-4">
             <div class="filter-group">
                 <label for="id_status">Status:</label>
-                {{ form.status }}
+                {{ form.status|add_class:"filter-select" }}
             </div>
         </div>
     </div>
@@ -29,11 +30,13 @@
 {% regroup shows by eventtime.date as shows_by_date %}
 
 {% for date_group in shows_by_date %}
+
     <h3>{{ date_group.grouper|date:"l, F j, Y" }}</h3>
     <ul>
         {% for show in date_group.list %}
             <li>
-                {{ show.eventtime|time:"g:i A" }} -
+
+            {{ show.eventtime|time:"g:i A" }} -
                 <a href="{% url 'blog_location' show.location.name %}">
                     {{ show.location.name }}
                 </a> |

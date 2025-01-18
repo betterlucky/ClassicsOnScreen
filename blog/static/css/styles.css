@@ -157,3 +157,31 @@ footer {
 .show-listings {
     margin-top: 20px;
 }
+
+/* New styles for filter inputs */
+.filter-input {
+    border-radius: 25px; /* Curved corners */
+    border: 1px solid royalblue; /* Royal blue border */
+    background-color: #f0f8ff; /* Light blue background */
+    padding: 10px 15px; /* Padding for better spacing */
+    font-size: 1rem; /* Adjust the font size */
+    color: royalblue; /* Text color */
+    width: 100%; /* Full width */
+}
+
+/* Optional: Style for the select dropdown */
+.filter-select {
+    border-radius: 25px; /* Curved corners */
+    border: 1px solid royalblue; /* Royal blue border */
+    background-color: #f0f8ff; /* Light blue background */
+    padding: 10px 15px; /* Padding for better spacing */
+    font-size: 1rem; /* Adjust the font size */
+    color: royalblue; /* Text color */
+    width: 100%; /* Full width */
+}
+
+/* Hover effect for the input fields */
+.filter-input:hover, .filter-select:hover {
+    border-color: #4169e1; /* Darker royal blue when hovered */
+    background-color: #e0f0ff; /* Slightly darker background on hover */
+}

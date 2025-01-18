@@ -204,6 +204,9 @@ def profile(request, username):
     profile_user = get_object_or_404(SiteUser, username=username)
     is_own_profile = request.user == profile_user
     created_shows = Show.objects.filter(created_by=profile_user).order_by('-eventtime')
+
+    print("Created shows:", created_shows)
+
     form = ShowFilterForm(request.GET)
 
     if form.is_valid():
@@ -214,10 +217,9 @@ def profile(request, username):
     context = {
         'profile_user': profile_user,
         'is_own_profile': is_own_profile,
-        'created_shows': created_shows,
+        'shows': created_shows,
         'form': form,
         'title': f"{profile_user.username}'s Shows",
-        'exclude_user_filter': True,
     }
     return render(request, 'profile.html', context)
 
@@ -228,21 +230,20 @@ def add_credits_to_show(request, show_id):
     if show.status in ['completed', 'cancelled']:
         raise PermissionDenied("Cannot add credits to a completed or cancelled show.")
 
-    try:
-        credits_to_add = int(request.POST.get('credits'))
-        if credits_to_add <= 0:
-            raise ValueError("Credits must be a positive number.")
-    except (TypeError, ValueError):
-        messages.error(request, "Invalid credit amount.")
-        return redirect('blog_detail', pk=show.id)
-
-    try:
-        show.add_credits(request.user, credits_to_add)
-        messages.success(request, f"Successfully added {credits_to_add} credits to the show.")
-    except ValidationError as e:
-        messages.error(request, str(e))
+    if request.method == 'POST':
+        credits_to_add = request.POST.get('credits', None)
+        try:
+            # Ensure the input is valid and delegate validation to the model
+            credits_to_add = int(credits_to_add)
+            show.add_credits(request.user, credits_to_add)
+            messages.success(request, f"Successfully added {credits_to_add} credits to the show.")
+        except (TypeError, ValueError):
+            messages.error(request, "Invalid credit amount. Please enter a positive number.")
+        except ValidationError as e:
+            messages.error(request, e.message if len(e.messages) == 1 else " ".join(e.messages))
 
     return redirect('blog_detail', pk=show.id)
+
 
 @login_required
 def buy_credits(request):

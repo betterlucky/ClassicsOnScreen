@@ -1,0 +1,10 @@
+Hello {{ user.username }},
+
+We are excited to let you know that the show "{{ show.film.name }}" at "{{ show.location.name }}" on
+{{ show.eventtime|date:"l, F j, Y at g:i A" }} has been confirmed!
+
+{% if resend %}
+    This is a follow-up email to ensure you have the latest details about the confirmed show.
+{% endif %}
+
+Thank you for your support in making this happen!

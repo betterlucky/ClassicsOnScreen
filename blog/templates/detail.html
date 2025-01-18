@@ -8,11 +8,11 @@
 <div class="container">
     <!-- Show Information -->
     <div class="mb-4">
-        <p><strong>Location:</strong> 
+        <p><strong>Location:</strong>
             <a href="{% url 'blog_location' show.location.name %}">{{ show.location }}</a>
         </p>
         <p><strong>Date & Time:</strong> {{ show.eventtime.date }} at {{ show.eventtime.time }}</p>
-        
+
         <p><strong>Films:</strong>
             {% if show.film %}
                 <a href="{% url 'blog_film' show.film.name %}">{{ show.film.name }}</a>
@@ -44,6 +44,16 @@
                 <input type="number" name="credits" id="credits" min="1" required class="form-control">
             </div>
             <button type="submit" class="btn btn-success">Add Credits</button>
+           {% if messages %}
+                <div class="alert alert-dismissible fade show mt-3">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
         </form>
     </div>
     {% endif %}

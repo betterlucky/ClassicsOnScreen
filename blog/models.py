@@ -3,6 +3,9 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from datetime import timedelta
 from django.utils.timezone import now
+from django.core.mail import send_mail
+from django.conf import settings
+from django.template.loader import render_to_string
 
 
 class SiteUser(AbstractUser):
@@ -46,8 +49,8 @@ class Show(models.Model):
     credits = models.PositiveIntegerField(blank=True, null=True, default=0)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='inactive')
 
-    subtitles = models.BooleanField(default=False, help_text="Does this show have subtitles?")
-    relaxed_screening = models.BooleanField(default=False, help_text="Is this a relaxed screening?")
+    subtitles = models.BooleanField(default=False, help_text="  Do you want this show to have subtitles?")
+    relaxed_screening = models.BooleanField(default=False, help_text="  Will this be a relaxed screening?")
 
     class Meta:
         ordering = ['eventtime']
@@ -58,7 +61,7 @@ class Show(models.Model):
         if amount <= 0:
             raise ValidationError("Credits must be a positive number.")
         if user.credits < amount:
-            raise ValidationError("Insufficient credits.")
+            raise ValidationError(f"Insufficient credits. You have {user.credits} credits.")
 
         self.credits += amount
         user.credits -= amount
@@ -89,6 +92,59 @@ class Show(models.Model):
         # Update status to expired
         self.status = 'expired'
         self.save()
+
+    def confirm_show(self):
+        """Mark the show as confirmed and notify contributors."""
+        if self.status == 'tbc' or self.status == 'confirmed':  # Only allow confirmation from 'tbc' or 'confirmed' status
+            self.status = 'confirmed'
+            self.save()
+
+            # Notify all contributors
+            self.notify_contributors()
+
+    def notify_contributors(self, resend=False):
+        """
+        Send email notifications to all users who contributed credits.
+        If resend is True, indicate that the email is a re-confirmation.
+        Ensure each user only receives one email, even if they contributed to multiple shows.
+        """
+        # Track users who have already been emailed
+        emailed_users = set()
+
+        contributors = self.credit_logs.values_list('user__email', flat=True).distinct()
+
+        subject = f"Show Confirmed: {self.film.name} at {self.location.name}"
+
+        # Render email content using the template
+        for user_email in contributors:
+            if user_email in emailed_users:
+                continue  # Skip users who have already been emailed
+
+            users = SiteUser.objects.filter(email=user_email)  # Use filter to handle multiple users with the same email
+
+            # Send email to each user (even if there are multiple users with the same email)
+            for user in users:
+                message = render_to_string(
+                    'show_confirmation_email.html',
+                    {
+                        'user': user,
+                        'show': self,
+                        'domain': settings.SITE_DOMAIN  # Assuming you have SITE_DOMAIN in your settings
+                    }
+                )
+
+                # Send email
+                send_mail(
+                    subject,
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [user.email],  # Use user.email instead of user_email
+                    fail_silently=False,
+                )
+
+                # Mark this user as emailed
+                emailed_users.add(user_email)
+
 
     def mark_completed(self):
         """Mark the show as completed."""

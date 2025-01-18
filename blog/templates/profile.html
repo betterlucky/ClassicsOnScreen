@@ -11,9 +11,9 @@
     {% endif %}
 
     <h3>Shows Created</h3>
-    {% if created_shows %}
+    {% if shows %}
         <div class="show-listings">
-            {% include "show_listings.html" with exclude_user_filter=True exclude_location_filter=False exclude_film_filter=False %}
+            {% include "show_listings.html" %}
         </div>
     {% else %}
         <p>No shows created yet.</p>

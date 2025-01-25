@@ -21,6 +21,7 @@ urlpatterns = [
     path("faq/", views.blog_faq, name="blog_faq"),
     path("contact/", views.blog_contact, name="blog_contact"),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('__debug__/', include('debug_toolbar.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 # Add Django site authentication urls (for login, logout, password management)
 

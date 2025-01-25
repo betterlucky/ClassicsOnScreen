@@ -5,6 +5,47 @@
 {% endblock page_title %}
 
 {% block page_content %}
+    <!-- Hero Section -->
+    <div class="jumbotron mb-4">
+        <h1 class="display-4">Welcome to Classics on Screen</h1>
+        <p class="lead">Bringing classic films back to the big screen through community support.</p>
+        {% if not user.is_authenticated %}
+            <hr class="my-4">
+            <p>Join our community to help bring your favorite classics to life!</p>
+            <a class="btn btn-primary btn-lg" href="{% url 'register' %}" role="button">Sign Up Now</a>
+        {% endif %}
+    </div>
+
+    <!-- Stats Section -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Active Shows</h5>
+                    <p class="card-text">{{ active_shows_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Total Films</h5>
+                    <p class="card-text">{{ films_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Locations</h5>
+                    <p class="card-text">{{ locations_count }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shows Section -->
+    <h2 class="mb-4">Upcoming Shows</h2>
     <div class="show-listings">
         {% include "show_listings.html" with exclude_user_filter=True exclude_location_filter=False exclude_film_filter=False %}
     </div>
@@ -12,9 +53,20 @@
 
 {% block scripts %}
     <script>
+        // Auto-submit form on select change
         document.querySelectorAll('#filters-form select').forEach(function(select) {
             select.addEventListener('change', function() {
                 document.getElementById('filters-form').submit();
+            });
+        });
+
+        // Add smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
             });
         });
     </script>

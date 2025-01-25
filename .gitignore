@@ -26,7 +26,8 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-migration/
+**/migrations/__pycache__/
+**/migrations/*.pyc
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -171,3 +172,39 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Media files (if you're using Django's media uploads)
+media/
+
+# Static files collected by collectstatic
+staticfiles/
+
+# Local development settings
+**/settings/local.py
+
+# VS Code settings (if you're using VS Code)
+.vscode/
+
+# macOS system files (if you're using a Mac)
+.DS_Store
+
+# PythonAnywhere specific
+*.pythonanywhere.com
+/static/
+/media/
+*.pid
+
+# Local vs Production settings
+local_settings.py
+production_settings.py
+
+# Database backups
+*.dump
+*.sql
+*.sqlite3-backup
+
+# Log files
+*.log
+logs/
+error.log
+access.log

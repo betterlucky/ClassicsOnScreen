@@ -29,18 +29,19 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: keep the secret key used in production secret!
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = [
-    'daveharris.eu.pythonanywhere.com'
-]
+
+# Replace the current ALLOWED_HOSTS with:
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
 
 # Application definition
 
 INSTALLED_APPS = [
     'blog',
-  #  "blog.apps.BlogConfig",
+    'crispy_forms',
+    'crispy_bootstrap5',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.sites",
@@ -48,6 +49,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Remove debug_toolbar from here
 ]
 
 MIDDLEWARE = [
@@ -58,8 +60,17 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # Remove debug_toolbar from here
 ]
 
+# Keep the conditional additions
+if DEBUG:
+    INSTALLED_APPS += ['debug_toolbar']
+    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
 ROOT_URLCONF = "urls"
 
 TEMPLATES = [
@@ -77,6 +88,9 @@ TEMPLATES = [
         },
     },
 ]
+
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
 
 #WSGI_APPLICATION = "personal_blog.wsgi.application"
 

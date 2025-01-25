@@ -76,12 +76,13 @@ body {
 
 /* Footer */
 footer {
-    background: white;
+    background: transparent;
     padding: 3rem 0;
     margin-top: auto;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
     text-align: center;
     width: 100%;
+    box-shadow: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 footer .container {
@@ -97,7 +98,7 @@ footer .social-links {
 }
 
 footer .social-links a {
-    color: var(--text-color);
+    color: var(--primary-color);
     margin: 0 1rem;
     transition: var(--transition);
 }
@@ -470,7 +471,7 @@ footer .social-links a:hover {
         flex-direction: column;
         gap: 1rem;
     }
-
+    
     .filter-item {
         width: 100%;
     }

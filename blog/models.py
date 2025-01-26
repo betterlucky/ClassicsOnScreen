@@ -6,6 +6,9 @@ from django.utils.timezone import now
 from django.core.mail import send_mail
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.core.validators import RegexValidator
+import requests
+import re
 
 
 class SiteUser(AbstractUser):
@@ -27,9 +30,20 @@ class Film(models.Model):
     """
     Represents a film that can be screened at various locations.
     """
-    name = models.CharField(max_length=60, unique=True)
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True, null=True)
+    active = models.BooleanField(default=True)
     overridecapacity = models.IntegerField(blank=True, null=True)
-    imdb_code = models.CharField(max_length=10, blank=False, null=False, unique=True)
+    imdb_code = models.CharField(
+        max_length=20,
+        unique=True,
+        validators=[
+            RegexValidator(
+                regex=r'^tt\d{7,8}$',
+                message='IMDB code must be in the format "tt" followed by 7-8 digits (e.g., tt0111161)',
+            )
+        ]
+    )
 
     class Meta:
         verbose_name = "Film"
@@ -45,6 +59,53 @@ class Film(models.Model):
             eventtime__gt=now(),
             status__in=['tbc', 'confirmed']
         )
+
+    def clean(self):
+        if self.imdb_code:
+            # Convert to lowercase and clean up URL if pasted
+            self.imdb_code = self.imdb_code.lower()
+            if 'imdb.com' in self.imdb_code:
+                match = re.search(r'tt\d{7,8}', self.imdb_code)
+                if match:
+                    self.imdb_code = match.group(0)
+                else:
+                    raise ValidationError({
+                        'imdb_code': 'Invalid IMDB code format. Please enter just the ID (e.g., tt0111161)'
+                    })
+            
+            # Validate against OMDB API
+            try:
+                response = requests.get(
+                    'http://www.omdbapi.com/',
+                    params={
+                        'i': self.imdb_code,
+                        'apikey': settings.OMDB_API_KEY
+                    }
+                )
+                data = response.json()
+                
+                if data.get('Response') == 'False':
+                    raise ValidationError({
+                        'imdb_code': 'Invalid IMDB code: Movie not found'
+                    })
+                
+                # Compare movie title with our name (case-insensitive)
+                imdb_title = data.get('Title', '').lower()
+                our_title = self.name.lower()
+                
+                if not (imdb_title in our_title or our_title in imdb_title):
+                    raise ValidationError({
+                        'imdb_code': f'IMDB code is for "{data["Title"]}" but film name is "{self.name}"'
+                    })
+                
+            except requests.RequestException as e:
+                raise ValidationError({
+                    'imdb_code': 'Could not validate IMDB code: Network error'
+                })
+    
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
 
 class Location(models.Model):

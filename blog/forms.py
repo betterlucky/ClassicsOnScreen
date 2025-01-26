@@ -157,6 +157,8 @@ class ShowForm(forms.ModelForm):
             ),
             Submit('submit', 'Create Show', css_class='btn btn-primary')
         )
+        # Only show active films in the dropdown
+        self.fields['film'].queryset = Film.objects.filter(active=True)
 
     class Meta:
         model = Show

@@ -57,9 +57,26 @@ class ShowCreditLogAdmin(admin.ModelAdmin):
 # Admin configuration for Film
 @admin.register(Film)
 class FilmAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
+    list_display = ('name', 'active', 'imdb_code', 'description')
+    list_filter = ('active',)
+    search_fields = ('name', 'imdb_code')
     ordering = ('name',)
+    list_editable = ('active',)
+    
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'imdb_code', 'description')
+        }),
+        ('Status', {
+            'fields': ('active',),
+            'description': 'Active films will be shown in the available films count'
+        }),
+    )
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        form.base_fields['imdb_code'].required = True
+        return form
 
 
 # Admin configuration for Show

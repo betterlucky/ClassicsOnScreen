@@ -16,6 +16,7 @@ from blog.forms import (
     ContactForm, PasswordResetForm
 )
 from blog.models import SiteUser, Film, Show, Location, Comment
+from django.utils import timezone
 
 
 def reset(request):
@@ -132,11 +133,16 @@ def blog_index(request):
         if filters:
             shows = shows.filter(**filters)
 
+    # Update the context with correct stats
     context = {
-        'shows': shows,
         'form': form,
-        'active_shows_count': shows.filter(status__in=['tbc', 'confirmed']).count(),
-        'films_count': Film.objects.count(),
+        'shows': shows,
+        'active_shows_count': Show.objects.filter(
+            eventtime__gte=timezone.now()
+        ).exclude(
+            status__in=['COMPLETED', 'EXPIRED', 'CANCELLED']
+        ).count(),
+        'available_films_count': Film.objects.filter(active=True).count(),
         'locations_count': Location.objects.count(),
     }
     return render(request, 'index.html', context)

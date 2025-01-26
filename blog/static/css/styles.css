@@ -1,3 +1,35 @@
+/* Browser compatibility fixes */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+}
+
+/* Fix for column gaps */
+.row {
+    column-gap: 1.5rem;
+    -webkit-column-gap: 1.5rem;
+    gap: 1.5rem;
+}
+
+/* Fix for form range inputs */
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* Fix for transitions */
+.transition-all {
+    transition: all 0.3s ease;
+    -webkit-transition: all 0.3s ease;
+}
+
 /* 1. Variables and Base Styles */
 :root {
     --primary-color: #1a365d;
@@ -588,6 +620,55 @@ footer .social-links a:hover {
 
     .filter-grid {
         gap: 1.25rem;
+    }
+
+    /* Sidebar styles */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 100;
+        padding: 0;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        background-color: white;
+        width: 80%;
+        max-width: 300px;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    /* Adjust main content when sidebar is shown */
+    .sidebar.show + main {
+        opacity: 0.5;
+    }
+
+    /* Toggle button styles */
+    [data-bs-toggle="collapse"] {
+        margin: 1rem 0;
+        padding: 0.5rem 1rem;
+        font-size: 1.1rem;
+    }
+
+    /* Ensure main content doesn't overlap */
+    main {
+        width: 100%;
+        padding-top: 4rem;  /* Space for toggle button */
+    }
+
+    /* Make nav items larger for touch */
+    .nav-link {
+        padding: 1rem 1.5rem;
+        font-size: 1.2rem;
+    }
+
+    /* Add some visual feedback */
+    .nav-link:active {
+        background-color: rgba(0,0,0,0.05);
     }
 }
 

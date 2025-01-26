@@ -717,7 +717,7 @@ footer .social-links a:hover {
     flex: 1;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 0;
     width: 100%;
 }
 
@@ -768,5 +768,39 @@ footer .social-links a:hover {
     .row.mb-4 .col-md-4 {
         width: 100%;
         margin-bottom: 1rem;
+    }
+}
+
+/* Main content layout */
+.container-fluid {
+    padding: 0;
+}
+
+/* Sidebar layout */
+.sidebar {
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding-top: 1rem;
+}
+
+/* Main content alignment */
+main {
+    padding-top: 1rem !important;
+}
+
+/* Ensure proper column sizing */
+@media (min-width: 768px) {
+    .col-md-9.ms-sm-auto {
+        margin-left: auto !important;
+    }
+}
+
+/* Mobile adjustments */
+@media (max-width: 767.98px) {
+    main {
+        width: 100%;
+        margin-left: 0;
     }
 }

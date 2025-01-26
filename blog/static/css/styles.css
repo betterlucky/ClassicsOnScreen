@@ -721,19 +721,80 @@ footer .social-links a:hover {
     width: 100%;
 }
 
-/* Fixed toggle button styles */
-.sidebar-toggle {
+/* Sidebar tray effect */
+.sidebar {
     position: fixed;
-    top: 1rem;
-    left: 1rem;
-    z-index: 1030;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    bottom: 0;
+    left: 0;
+    height: 80vh; /* Tray height */
+    width: 100%;
+    max-width: 300px;
+    background: white;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    z-index: 1029;
 }
 
-/* Hide toggle on desktop */
+/* When sidebar is shown */
+.sidebar.show {
+    transform: translateX(0);
+}
+
+/* Toggle button */
+.sidebar-toggle {
+    position: fixed;
+    top: 50%;
+    left: 1rem;
+    transform: translateY(-50%);
+    z-index: 1030;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    background: #0d6efd;
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+/* Arrow icon */
+.sidebar-toggle i {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+/* Rotate arrow when sidebar is open */
+.sidebar-toggle[aria-expanded="true"] i {
+    transform: rotate(180deg);
+}
+
+/* Add some polish to the sidebar */
+.sidebar .nav {
+    padding: 1rem;
+}
+
+.sidebar .nav-link {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+}
+
+/* Only apply these styles on mobile */
 @media (min-width: 769px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        height: 100vh;
+        transform: none;
+        border-radius: 0;
+    }
+    
     .sidebar-toggle {
         display: none;
     }
@@ -774,15 +835,6 @@ footer .social-links a:hover {
 /* Main content layout */
 .container-fluid {
     padding: 0;
-}
-
-/* Sidebar layout */
-.sidebar {
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    padding-top: 1rem;
 }
 
 /* Main content alignment */

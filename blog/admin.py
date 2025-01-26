@@ -8,6 +8,8 @@ from django.conf import settings
 from django.urls import path
 from django.utils.html import format_html
 from django.shortcuts import render
+from django.http import JsonResponse
+import requests
 
 
 # Inline configuration for shows created by a user
@@ -57,9 +59,68 @@ class ShowCreditLogAdmin(admin.ModelAdmin):
 # Admin configuration for Film
 @admin.register(Film)
 class FilmAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
+    list_display = ('name', 'active', 'imdb_code', 'description')
+    list_filter = ('active',)
+    search_fields = ('name', 'imdb_code')
     ordering = ('name',)
+    list_editable = ('active',)
+    
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'imdb_code', 'description')
+        }),
+        ('Status', {
+            'fields': ('active',),
+            'description': 'Active films will be shown in the available films count'
+        }),
+    )
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        form.base_fields['imdb_code'].required = True
+        return form
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('imdb-search/', self.admin_site.admin_view(self.imdb_search), name='imdb-search'),
+        ]
+        return custom_urls + urls
+
+    def imdb_search(self, request):
+        if 'term' in request.GET:
+            try:
+                response = requests.get(
+                    'http://www.omdbapi.com/',
+                    params={
+                        's': request.GET['term'],
+                        'apikey': settings.OMDB_API_KEY,
+                        'type': 'movie'
+                    }
+                )
+                data = response.json()
+                if data.get('Response') == 'True':
+                    results = [
+                        {
+                            'id': movie['imdbID'],
+                            'text': f"{movie['Title']} ({movie['Year']})",
+                            'title': movie['Title']
+                        }
+                        for movie in data.get('Search', [])
+                    ]
+                    return JsonResponse({'results': results})
+            except Exception as e:
+                return JsonResponse({'error': str(e)}, status=500)
+        return JsonResponse({'results': []})
+
+    class Media:
+        css = {
+            'all': ('https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css',)
+        }
+        js = (
+            'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js',
+            'admin/js/imdb-search.js',
+        )
 
 
 # Admin configuration for Show

@@ -1,0 +1,14 @@
+Hello {{ user.username }},
+
+We regret to inform you that the show "{{ show.film.name }}" at "{{ show.location.name }}" on 
+{{ show.eventtime|date:"l, F j, Y at g:i A" }} has expired and did not meet the necessary requirements to proceed.
+
+{% if resend %}
+    This is a follow-up email to ensure you have the latest details about the expired show.
+{% endif %}
+
+Any credits you used to reserve tickets for this show have been refunded to your account.  
+We appreciate your support and hope to see you at other upcoming shows.
+
+Best regards,  
+The Classics Back on Screen Team

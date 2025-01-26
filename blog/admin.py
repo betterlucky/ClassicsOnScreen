@@ -128,7 +128,7 @@ class FilmAdmin(admin.ModelAdmin):
 class ShowAdmin(admin.ModelAdmin):
     list_display = ('film', 'location', 'eventtime', 'credits', 'status')
     list_filter = ('status', 'location', 'eventtime')
-    actions = ['mark_confirmed', 'mark_cancelled', 'mark_completed', 'refund_credits', 'email_guest_lists']
+    actions = ['mark_confirmed', 'mark_cancelled', 'mark_completed', 'refund_credits', 'email_guest_lists', 'mark_expired']
 
     def mark_confirmed(self, request, queryset):
         for show in queryset:
@@ -152,6 +152,15 @@ class ShowAdmin(admin.ModelAdmin):
         for show in queryset:
             show.refund_credits()
         self.message_user(request, "Credits have been refunded for selected shows.")
+
+    def mark_expired(self, request, queryset):
+        """Mark selected shows as expired if applicable."""
+        for show in queryset:
+            if show.status in ['tbc', 'inactive']: #and show.eventtime <= now():
+                show.mark_expired()
+                self.message_user(request, f"Show '{show}' has been marked as expired.")
+            else:
+                self.message_user(request, f"Show '{show}' cannot be marked as expired because it is not in 'tbc' or 'inactive' status, or it has not passed its event time.", level='error')
 
     def email_guest_lists(self, request, queryset):
         """Email the guest list for selected shows."""

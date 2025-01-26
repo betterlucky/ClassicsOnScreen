@@ -10,10 +10,15 @@
         <h1 class="display-4">Welcome to Classics on Screen</h1>
         <p class="lead">Bringing classic films back to the big screen through community support.</p>
         <p class="text-warning"><strong>Note: This is a test website. All shows and films listed are for demonstration purposes only.</strong></p>
-        {% if not user.is_authenticated %}
-            <hr class="my-4">
+        <hr class="my-4">
+        {% if user.is_authenticated %}
+            <p>Welcome back, {{ user.username }}! Ready to discover more classic films?</p>
+            <a class="btn btn-primary btn-lg" href="{% url 'create_show' %}" role="button">Create a Show</a>
+        {% else %}
             <p>Join our community to help bring your favorite classics to life!</p>
-            <a class="btn btn-primary btn-lg" href="{% url 'register' %}" role="button">Sign Up Now</a>
+            <div class="d-flex gap-2">
+                <a class="btn btn-primary btn-lg" href="{% url 'login' %}" role="button">Join In Now</a>
+            </div>
         {% endif %}
     </div>
 

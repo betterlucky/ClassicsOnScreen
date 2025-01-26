@@ -15,7 +15,7 @@
             <p>Welcome back, {{ user.username }}! Ready to discover more classic films?</p>
             <a class="btn btn-primary btn-lg" href="{% url 'create_show' %}" role="button">Create a Show</a>
         {% else %}
-            <p>Join our community to help bring your favorite classics to life!</p>
+            <p>Join our community to help bring your favorite classics to life! <a href="{% url 'blog_about' %}" class="text-warning">Learn how it works <i class="bi bi-arrow-right"></i></a></p>
             <div class="d-flex gap-2">
                 <a class="btn btn-primary btn-lg" href="{% url 'login' %}" role="button">Join In Now</a>
             </div>

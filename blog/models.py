@@ -214,22 +214,29 @@ class Show(models.Model):
         self.save()
 
     def refund_credits(self):
-        """Refund credits to all users if the show expires."""
-        if self.status not in ['inactive', 'tbc']:
-            return  # Refund only applies to unconfirmed shows
+        """Refund credits to all users if the show expires or is cancelled."""
+        if self.status == 'cancelled':
+            # Refund credits to users
+            for log in self.credit_logs.all():
+                log.user.credits += log.credits
+                log.user.save()
 
-        # Refund credits to users
-        for log in self.credit_logs.all():
-            log.user.credits += log.credits
-            log.user.save()
+                # Mark log as refunded instead of deleting it
+                log.refunded = True
+                log.save()
 
-            # Mark log as refunded instead of deleting it
-            log.refunded = True
-            log.save()
+        elif self.status == 'expired':
+            # Refund credits to users if the show expired
+            for log in self.credit_logs.all():
+                log.user.credits += log.credits
+                log.user.save()
 
-        # Update status to expired
-        self.status = 'expired'
-        self.save()
+                # Mark log as refunded instead of deleting it
+                log.refunded = True
+                log.save()
+
+
+
 
     def confirm_show(self):
         """Mark the show as confirmed and notify contributors."""
@@ -280,10 +287,72 @@ class Show(models.Model):
 
     def cancel_show(self):
         """Cancel the show and refund credits if applicable."""
-        if self.status in ['inactive', 'tbc']:
+        if self.status in ['inactive', 'tbc', 'confirmed']:
+            # Refund credits for cancelled shows
             self.refund_credits()
-        self.status = 'cancelled'
+
+            # Mark the show as cancelled
+            self.status = 'cancelled'
+            self.save()
+
+            # Send cancellation notification
+            self.notify_cancellation(
+                subject=f"Show Cancelled: {self.film.name} at {self.location.name}",
+                template_name='show_cancellation_email.html'
+            )
+
+
+    def notify_cancellation(self, subject, template_name):
+        """Send email notifications to all users who contributed credits."""
+        emailed_users = set()
+        contributors = self.credit_logs.values_list('user__email', flat=True).distinct()
+
+        for user_email in contributors:
+            if user_email in emailed_users:
+                continue
+
+            users = SiteUser.objects.filter(email=user_email)
+
+            for user in users:
+                message = render_to_string(
+                    template_name,
+                    {
+                        'user': user,
+                        'show': self,
+                        'domain': settings.SITE_DOMAIN
+                    }
+                )
+
+                send_mail(
+                    subject,
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [user.email],
+                    fail_silently=False,
+                )
+
+                emailed_users.add(user_email)
+
+    def mark_expired(self):
+        """Mark the show as expired if it hasn't been confirmed in time."""
+        # Check if the show is in 'tbc' or already 'expired' status
+        if self.status not in ['tbc', 'inactive']:
+            return  # Only process shows that are in 'tbc' or 'inactive' status
+
+        # Check if the show has passed its scheduled time and hasn't been confirmed
+        
+        # Refund credits as the show is considered expired
+        self.refund_credits()
+
+        # Mark the show as expired
+        self.status = 'expired'
         self.save()
+
+        # Send the expired show notification
+        self.notify_cancellation(
+            subject=f"Show Expired: {self.film.name} at {self.location.name}",
+            template_name='show_expired_email.html'
+        )
 
     def clean(self):
         """Validate show creation and updates."""

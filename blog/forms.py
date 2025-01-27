@@ -3,7 +3,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import SiteUser
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Submit, Row, Column, Field, Div
+from crispy_forms.layout import Layout, Submit, Row, Column, Field, Div, HTML
 
 
 class ShowFilterForm(forms.Form):
@@ -146,19 +146,20 @@ class ShowForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
+        self.helper.form_class = 'form-group'
         self.helper.layout = Layout(
-            Field('film', css_class='mb-3'),
-            Field('location', css_class='mb-3'),
-            Field('eventtime', css_class='mb-3'),
-            Field('body', css_class='mb-3'),
+            HTML("""<p class="mt-3">Please remember it takes time to book the film, so your show must be a *minimum* of 3 weeks in the future.</p>"""),
+            Field('film', wrapper_class='mb-3'),  # Use wrapper_class
+            Field('location', wrapper_class='mb-3'),
+            Field('eventtime', wrapper_class='mb-3'),
+            Field('body', wrapper_class='mb-3', rows=4),
             Row(
-                Column('subtitles', css_class='form-group col-md-6 mb-0'),
-                Column('relaxed_screening', css_class='form-group col-md-6 mb-0'),
-                css_class='form-row'
+                Column('subtitles', css_class='form-group col-md-6'),
+                Column('relaxed_screening', css_class='form-group col-md-6'),
+                css_class='mb-3'
             ),
-            Submit('submit', 'Create Show', css_class='btn btn-primary')
+            Submit('submit', 'Create Show', css_class='btn btn-primary mt-3')
         )
-        # Only show active films in the dropdown
         self.fields['film'].queryset = Film.objects.filter(active=True)
 
     class Meta:
@@ -166,6 +167,7 @@ class ShowForm(forms.ModelForm):
         fields = ['body', 'film', 'location', 'eventtime', 'subtitles', 'relaxed_screening']
         widgets = {
             'eventtime': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'body': forms.Textarea(attrs={'rows': 4}),
         }
         labels = {
             'body': 'Description',

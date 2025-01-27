@@ -5,6 +5,7 @@ from .models import SiteUser
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Row, Column, Field, HTML
 from datetime import datetime
+from django.utils import timezone
 
 
 class ShowFilterForm(forms.Form):
@@ -148,8 +149,8 @@ class ShowForm(forms.ModelForm):
         label="Event Date"
     )
     event_time = forms.TimeField(
-    widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
-    label="Event Time"
+        widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+        label="Event Time"
     )
 
     def __init__(self, *args, **kwargs):
@@ -170,7 +171,6 @@ class ShowForm(forms.ModelForm):
             
             Submit('submit', 'Create Show', css_class='btn btn-primary mt-3')
         )
-        print(str(self.helper.layout)) 
         self.fields['film'].queryset = Film.objects.filter(active=True)
 
     class Meta:
@@ -185,10 +185,15 @@ class ShowForm(forms.ModelForm):
         cleaned_data = super().clean()
         event_date = cleaned_data.get('event_date')
         event_time = cleaned_data.get('event_time')
-
         if event_date and event_time:
-            cleaned_data['eventtime'] = datetime.combine(event_date, event_time)
+            # Combine date and time into a single datetime object
+            naive_eventtime = datetime.combine(event_date, event_time)
+            # Make the datetime aware using Django's timezone
+            cleaned_data['eventtime'] = timezone.make_aware(naive_eventtime)
         else:
-            raise forms.ValidationError("Both date and time are required.")
+            if not event_date:
+                self.add_error('event_date', "Event date must be set.")
+            if not event_time:
+                self.add_error('event_time', "Event time must be set.")
 
         return cleaned_data

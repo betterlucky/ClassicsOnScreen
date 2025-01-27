@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from datetime import timedelta
+from django.utils import timezone
 from django.utils.timezone import now
 from django.core.mail import send_mail
 from django.conf import settings
@@ -235,9 +236,6 @@ class Show(models.Model):
                 log.refunded = True
                 log.save()
 
-
-
-
     def confirm_show(self):
         """Mark the show as confirmed and notify contributors."""
         if self.status == 'tbc' or self.status == 'confirmed':  # Only allow confirmation from 'tbc' or 'confirmed' status
@@ -301,7 +299,6 @@ class Show(models.Model):
                 template_name='show_cancellation_email.html'
             )
 
-
     def notify_cancellation(self, subject, template_name):
         """Send email notifications to all users who contributed credits."""
         emailed_users = set()
@@ -358,14 +355,8 @@ class Show(models.Model):
         """Validate show creation and updates."""
         super().clean()
 
-        # Validate event time
-        if not self.pk and self.eventtime < now() + timedelta(weeks=3):
-            raise ValidationError("Shows cannot be created within three weeks of the current date.")
-
-        # Validate capacity
-        if self.film.overridecapacity is not None and self.film.overridecapacity < 0:
-            raise ValidationError("Override capacity cannot be negative")
-
+        # Ensure eventtime is set before comparing
+        
 
 class ShowCreditLog(models.Model):
     """

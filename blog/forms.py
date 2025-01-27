@@ -117,28 +117,29 @@ class PasswordResetForm(forms.Form):
 
 
 class CommentForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.helper.layout = Layout(
-            Field('author', css_class='mb-3'),
-            Field('body', css_class='mb-3'),
-            Submit('submit', 'Add Comment', css_class='btn btn-primary')
-        )
-
-    author = forms.CharField(
-        max_length=60,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "Your Name"}
-        ),
-    )
     body = forms.CharField(
         widget=forms.Textarea(
             attrs={"class": "form-control", "placeholder": "Leave a comment!"}
         )
     )
 
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None) # Pop the request
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.layout = Layout(
+            Field('body', css_class='mb-3'),
+            Submit('submit', 'Add Comment', css_class='btn btn-primary')
+        )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if self.request and self.request.user.is_authenticated:
+            cleaned_data['user'] = self.request.user
+        else:
+            raise forms.ValidationError("User must be authenticated to comment.")
+        return cleaned_data
 
 class ShowForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):

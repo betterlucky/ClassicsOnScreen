@@ -213,20 +213,40 @@ def blog_detail(request, pk):
 @login_required
 def create_show(request):
     """Create a new show."""
+    
     if request.method == 'POST':
+        
         form = ShowForm(request.POST)
+        
         if form.is_valid():
-            show = form.save(commit=False)
+            print("form is valid")
+            show = form.save(commit=False)  # Create a Show instance but don't save it yet
             show.created_by = request.user
+            
+            # Check if the user has enough credits
+            if request.user.credits < 1:
+                messages.error(request, 'You do not have enough credits to create a show.')
+                return render(request, 'create_show.html', {'form': form})
+
+            # Set eventtime from cleaned data
+            show.eventtime = form.cleaned_data['eventtime']
+            print(show.eventtime)
             try:
-                show.full_clean()
-                show.save()
-                messages.success(request, 'Show created successfully!')
+                show.full_clean()  # Validate the model instance
+                show.save()  # Save the instance to the database
+                
+                # Deduct 1 credit from the user
+                request.user.credits -= 1
+                request.user.save()
+
+                messages.success(request, 'Show created successfully! You have been charged 1 credit.')
                 return redirect('blog_detail', pk=show.id)
             except ValidationError as e:
                 for field, errors in e.message_dict.items():
                     for error in errors:
                         form.add_error(field, error)
+        else:
+            print("form is not valid")  
     else:
         form = ShowForm()
     return render(request, 'create_show.html', {'form': form})

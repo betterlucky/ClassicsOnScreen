@@ -142,17 +142,29 @@ class CommentForm(forms.Form):
         return cleaned_data
 
 class ShowForm(forms.ModelForm):
+    event_date = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        label="Event Date"
+    )
+    event_time = forms.TimeField(
+    widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+    label="Event Time"
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
-        self.helper.form_class = 'form-group'
         self.helper.layout = Layout(
             HTML("""<p class="mt-3">Please remember it takes time to book the film, so your show must be a *minimum* of 3 weeks in the future.</p>"""),
-            Field('film', wrapper_class='mb-3'),  # Use wrapper_class
-            Field('location', wrapper_class='mb-3'),
-            Field('eventtime', wrapper_class='mb-3'),
-            Field('body', wrapper_class='mb-3', rows=4),
+            Field('film', css_class='mb-3'),
+            Field('location', css_class='mb-3'),
+            Row(
+                Column('event_date', css_class='form-group col-md-6'),
+                Column('event_time', css_class='form-group col-md-6'),
+                css_class='mb-3'
+            ),
+            Field('body', css_class='mb-3', rows=4),
             Row(
                 Column('subtitles', css_class='form-group col-md-6'),
                 Column('relaxed_screening', css_class='form-group col-md-6'),
@@ -164,16 +176,17 @@ class ShowForm(forms.ModelForm):
 
     class Meta:
         model = Show
-        fields = ['body', 'film', 'location', 'eventtime', 'subtitles', 'relaxed_screening']
-        widgets = {
-            'eventtime': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'body': forms.Textarea(attrs={'rows': 4}),
-        }
-        labels = {
-            'body': 'Description',
-            'film': 'Film',
-            'location': 'Location',
-            'eventtime': 'Event Time',
-            'subtitles': 'Subtitled',
-            'relaxed_screening': 'Relaxed Screening'
-        }
+        fields = ['film', 'location', 'event_date', 'event_time', 'body', 'subtitles', 'relaxed_screening']
+        labels = {'body': 'Tell us about your show'}
+
+    def clean(self):
+        cleaned_data = super().clean()
+        event_date = cleaned_data.get('event_date')
+        event_time = cleaned_data.get('event_time')
+
+        if event_date and event_time:
+            cleaned_data['eventtime'] = datetime.combine(event_date, event_time)
+        else:
+            raise forms.ValidationError("Both date and time are required.")
+
+        return cleaned_data

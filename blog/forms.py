@@ -3,7 +3,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import SiteUser
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Submit, Row, Column, Field, Div, HTML
+from crispy_forms.layout import Layout, Submit, Row, Column, Field, HTML
+from datetime import datetime
 
 
 class ShowFilterForm(forms.Form):
@@ -166,13 +167,10 @@ class ShowForm(forms.ModelForm):
             ),
             Field('body', css_class='mb-3 form-control', rows=2),
 
-            Row(
-                Column('subtitles', css_class='form-group col-md-6'),
-                Column('relaxed_screening', css_class='form-group col-md-6'),
-                css_class='mb-3'
-            ),
+            
             Submit('submit', 'Create Show', css_class='btn btn-primary mt-3')
         )
+        print(str(self.helper.layout)) 
         self.fields['film'].queryset = Film.objects.filter(active=True)
 
     class Meta:

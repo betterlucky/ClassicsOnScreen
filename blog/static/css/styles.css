@@ -724,18 +724,17 @@ footer .social-links a:hover {
 /* Sidebar tray effect */
 .sidebar {
     position: fixed;
-    bottom: 0;
+    top: 0; /* Changed from bottom: 0; */
     left: 0;
-    height: 80vh; /* Tray height */
+    height: 100vh; /* Changed from 80vh; */
     width: 100%;
     max-width: 300px;
     background: white;
     transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
-    border-top-right-radius: 15px;
-    border-bottom-right-radius: 15px;
     box-shadow: 2px 0 10px rgba(0,0,0,0.1);
     z-index: 1029;
+    overflow-y: auto; /* Added for scroll if content overflows */
 }
 
 /* When sidebar is shown */
@@ -746,9 +745,9 @@ footer .social-links a:hover {
 /* Toggle button */
 .sidebar-toggle {
     position: fixed;
-    top: 50%;
+    top: 50%; /* Position vertically in the middle */
     left: 1rem;
-    transform: translateY(-50%);
+    transform: translateY(-50%); /* Center vertically */
     z-index: 1030;
     width: 40px;
     height: 40px;
@@ -761,6 +760,15 @@ footer .social-links a:hover {
     align-items: center;
     justify-content: center;
     padding: 0;
+}
+
+.sidebar-toggle:hover {
+    background-color: #0b5ed7; /* Slightly darker blue */
+    cursor: pointer;
+}
+
+.sidebar-toggle:focus {
+    outline: 2px solid rgba(0, 123, 255, 0.5); /* Blue outline */
 }
 
 /* Arrow icon */
@@ -785,20 +793,26 @@ footer .social-links a:hover {
     margin-bottom: 0.5rem;
 }
 
-/* Only apply these styles on mobile */
-@media (min-width: 769px) {
-    .sidebar {
-        position: fixed;
-        top: 0;
-        height: 100vh;
-        transform: none;
-        border-radius: 0;
-    }
-    
-    .sidebar-toggle {
-        display: none;
-    }
+/* Overlay for main content when sidebar is open */
+body.sidebar-open::before { /* Important: Add this class to body when sidebar is open (JS) */
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1028; /* Below the sidebar */
+    opacity: 1;
+    transition: opacity 0.3s ease;
 }
+
+/* Hide the overlay when sidebar is closed */
+body:not(.sidebar-open)::before {
+    opacity: 0;
+    pointer-events: none; /* Prevent clicks on the overlay */
+}
+
 
 /* Desktop specific filter layout */
 @media (min-width: 769px) {

@@ -183,24 +183,24 @@ def blog_location(request, location_name):
     }
     return render(request, "show_list.html", context)
 
-
 def blog_detail(request, pk):
     """Display show details and handle comments."""
     show = get_object_or_404(Show.objects.select_related('film', 'location', 'created_by'), pk=pk)
     comments = Comment.objects.filter(show=show).select_related('author')
-    
+
     if request.method == "POST":
-        form = CommentForm(request.POST)
+        form = CommentForm(request.POST, request=request)
         if form.is_valid():
             comment = Comment(
-                author=form.cleaned_data["author"],
+                author=form.cleaned_data["user"],
                 body=form.cleaned_data["body"],
                 show=show,
             )
             comment.save()
             return redirect(request.path_info)
-    else:
-        form = CommentForm()
+        # No else here. Form errors will be handled in the template
+    else:  # This else is for GET requests
+        form = CommentForm(request=request)
 
     context = {
         "show": show,
@@ -209,7 +209,6 @@ def blog_detail(request, pk):
         "can_add_credits": show.status in ['inactive', 'tbc']
     }
     return render(request, "detail.html", context)
-
 
 @login_required
 def create_show(request):

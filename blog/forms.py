@@ -164,7 +164,8 @@ class ShowForm(forms.ModelForm):
                 Column('event_time', css_class='form-group col-md-6'),
                 css_class='mb-3'
             ),
-            Field('body', css_class='mb-3', rows=4),
+            Field('body', css_class='mb-3 form-control', rows=2),
+
             Row(
                 Column('subtitles', css_class='form-group col-md-6'),
                 Column('relaxed_screening', css_class='form-group col-md-6'),
@@ -178,6 +179,9 @@ class ShowForm(forms.ModelForm):
         model = Show
         fields = ['film', 'location', 'event_date', 'event_time', 'body', 'subtitles', 'relaxed_screening']
         labels = {'body': 'Tell us about your show'}
+        widgets = {
+            'body': forms.Textarea(attrs={'class': 'form-control mb-3', 'rows': 4}),
+        }
 
     def clean(self):
         cleaned_data = super().clean()

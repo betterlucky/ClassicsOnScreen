@@ -15,8 +15,9 @@ from blog.forms import (
     SiteUserCreationForm, ShowForm, CommentForm, ShowFilterForm,
     ContactForm, PasswordResetForm
 )
-from blog.models import SiteUser, Film, Show, Location, Comment, ShowCreditLog
+from blog.models import SiteUser, Film, Show, Location, Comment, ShowCreditLog, ShowOption
 from django.utils import timezone
+from django.db import connection
 
 
 def reset(request):
@@ -114,9 +115,22 @@ def activate(request, uidb64, token):
         return HttpResponse('Activation link is invalid or has expired.')
 
 
-def blog_index(request):
-    """Display and filter shows."""
-    shows = Show.objects.select_related('film', 'location', 'created_by')
+def index(request):
+    # Initial queryset with all necessary relations
+    shows = Show.objects.select_related(
+        'film', 
+        'location'
+    ).prefetch_related(
+        'options'
+    ).order_by('eventtime')
+
+    # Base filtering for active shows
+    shows = shows.filter(
+        eventtime__gte=timezone.now()
+    ).exclude(
+        status__in=['completed', 'expired', 'cancelled']
+    )
+
     form = ShowFilterForm(request.GET)
 
     if form.is_valid():
@@ -127,20 +141,17 @@ def blog_index(request):
             filters['film'] = form.cleaned_data['film']
         if form.cleaned_data.get('status') and form.cleaned_data['status'] != 'all':
             filters['status'] = form.cleaned_data['status']
-        else:
-            shows = shows.exclude(status__in=['completed', 'expired', 'cancelled'])
             
         if filters:
             shows = shows.filter(**filters)
 
-    # Update the context with correct stats
     context = {
         'form': form,
         'shows': shows,
         'active_shows_count': Show.objects.filter(
             eventtime__gte=timezone.now()
         ).exclude(
-            status__in=['COMPLETED', 'EXPIRED', 'CANCELLED']
+            status__in=['completed', 'expired', 'cancelled']
         ).count(),
         'available_films_count': Film.objects.filter(active=True).count(),
         'locations_count': Location.objects.count(),

@@ -1,144 +1,124 @@
 {% load custom_filters %}
 
 <div class="filter-section">
-    <div class="filter-header">
-        <h3>Filter Shows</h3>
-        <button class="filter-reset" onclick="resetFilters()">Reset Filters</button>
-    </div>
+    {% if form %}
+        <div class="filter-header">
+            <h3>Filter Shows</h3>
+            <button class="filter-reset" onclick="resetFilters()">Reset Filters</button>
+        </div>
 
-    <form method="get" id="filters-form">
-        <div class="filter-grid">
-            {% if exclude_location_filter != True %}
+        <form method="get" id="filters-form">
+            <div class="filter-grid">
+                {% if exclude_location_filter != True %}
+                    <div class="filter-item">
+                        <label class="filter-label" for="id_location">Location</label>
+                        {{ form.location|add_class:"filter-select" }}
+                    </div>
+                {% endif %}
+                
+                {% if exclude_film_filter != True %}
+                    <div class="filter-item">
+                        <label class="filter-label" for="id_film">Film</label>
+                        {{ form.film|add_class:"filter-select" }}
+                    </div>
+                {% endif %}
+                
                 <div class="filter-item">
-                    <label class="filter-label" for="id_location">Location</label>
-                    {{ form.location|add_class:"filter-select" }}
+                    <label class="filter-label" for="id_status">Status</label>
+                    {{ form.status|add_class:"filter-select" }}
                 </div>
-            {% endif %}
-            
-            {% if exclude_film_filter != True %}
-                <div class="filter-item">
-                    <label class="filter-label" for="id_film">Film</label>
-                    {{ form.film|add_class:"filter-select" }}
-                </div>
-            {% endif %}
-            
-            <div class="filter-item">
-                <label class="filter-label" for="id_status">Status</label>
-                {{ form.status|add_class:"filter-select" }}
             </div>
-        </div>
 
-        <div class="active-filters">
-            {% if form.location.value and form.location|get_selected_object %}
-                <div class="filter-tag">
-                    {{ form.location|get_selected_object }}
-                    <button type="button" onclick="clearFilter('location')" aria-label="Remove filter">
-                        &times;
-                    </button>
+            {% if form.location.value or form.film.value or form.status.value %}
+                <div class="active-filters mt-3">
+                    {% if form.location.value %}
+                        <span class="filter-tag">
+                            Location: {{ form.location|get_selected_object }}
+                            <button type="button" onclick="clearFilter('location')" class="btn-close" aria-label="Remove filter"></button>
+                        </span>
+                    {% endif %}
+
+                    {% if form.film.value %}
+                        <span class="filter-tag">
+                            Film: {{ form.film|get_selected_object }}
+                            <button type="button" onclick="clearFilter('film')" class="btn-close" aria-label="Remove filter"></button>
+                        </span>
+                    {% endif %}
+
+                    {% if form.status.value and form.status.value != 'all' %}
+                        <span class="filter-tag">
+                            Status: {{ form.status|get_selected_object }}
+                            <button type="button" onclick="clearFilter('status')" class="btn-close" aria-label="Remove filter"></button>
+                        </span>
+                    {% endif %}
                 </div>
             {% endif %}
-            
-            {% if form.film.value and form.film|get_selected_object %}
-                <div class="filter-tag">
-                    {{ form.film|get_selected_object }}
-                    <button type="button" onclick="clearFilter('film')" aria-label="Remove filter">
-                        &times;
-                    </button>
-                </div>
-            {% endif %}
-            
-            {% if form.status.value and form.status.value != 'all' and form.status|get_selected_object %}
-                <div class="filter-tag">
-                    {{ form.status|get_selected_object }}
-                    <button type="button" onclick="clearFilter('status')" aria-label="Remove filter">
-                        &times;
-                    </button>
-                </div>
-            {% endif %}
-        </div>
-    </form>
+        </form>
+    {% endif %}
 </div>
 
+<!-- Debug output -->
+<p>Total shows: {{ shows|length }}</p>
+
 <div class="show-listings">
-    {% regroup shows by eventtime.date as shows_by_date %}
-    {% for date_group in shows_by_date %}
-        <h3>{{ date_group.grouper|date:"l, F j, Y" }}</h3>
-        <div class="shows-grid">
-            {% for show in date_group.list %}
-                <div class="show-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <h5 class="card-title">
-                                <a href="{% url 'blog_detail' pk=show.id %}">{{ show.film.name }}</a>
-                                {% if show.is_sold_out %}
-                                    <span class="badge bg-danger ms-2">SOLD OUT</span>
-                                {% endif %}
-                            </h5>
-                            <span class="text-muted">{{ show.get_status_display }}</span>
-                        </div>
-                        <div class="show-time">{{ show.eventtime|time:"g:i A" }}</div>
-                        <h4 class="show-title">
-                            <a href="{% url 'blog_location' show.location.name %}">
-                                {{ show.location.name }}
-                            </a>
-                        </h4>
-                        <div class="show-film-container">
-                            <div class="show-film">
-                                <a href="{% url 'blog_film' show.film.name %}">
-                                    {{ show.film.name }}
-                                </a>
-                            </div>
-                            {% if show.film.imdb_code %}
-                                <a href="https://www.imdb.com/title/{{ show.film.imdb_code }}" 
-                                   target="_blank" 
-                                   class="btn btn-info btn-sm">
-                                    View on IMDb
-                                </a>
-                            {% endif %}
-                        </div>
+    {% for show in shows %}
+        <div class="card show-card mb-4">
+            <!-- Debug output -->
+            <p>Show: {{ show.film.name }} - {{ show.eventtime }}</p>
+            
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a href="{% url 'blog_detail' show.pk %}">{{ show.film.name }}</a>
+                    {% if show.is_sold_out %}
+                        <span class="badge bg-danger ms-2">SOLD OUT</span>
+                    {% endif %}
+                </h5>
+                <h6 class="card-subtitle mb-2 text-muted">
+                    {{ show.eventtime|date:"l, F j, Y" }} at {{ show.eventtime|time:"g:i A" }}
+                </h6>
+                <p class="card-text">
+                    <strong>Location:</strong> {{ show.location }}<br>
+                    <strong>Status:</strong> {{ show.get_status_display }}
+                </p>
+                
+                <!-- Debug output -->
+                {% if debug %}
+                    <p>Debug - Options: {{ show.options.all }}</p>
+                {% endif %}
 
-                        <div class="show-description">
-                            {{ show.body|slice:":200" }}...
-                        </div>
+                <!-- Show options display -->
+                <div class="show-options mb-2">
+                    {% for option in show.options.all %}
+                        <span class="badge bg-success">
+                            <i class="bi bi-check-circle me-1"></i>{{ option.name }}
+                        </span>
+                    {% endfor %}
+                </div>
 
-                        <div class="show-details">
-                            <div class="detail-item">
-                                <strong>Subtitles:</strong> 
-                                <span class="badge {% if show.subtitles %}badge-success{% else %}badge-secondary{% endif %}">
-                                    {{ show.subtitles|yesno:"Yes,No" }}
-                                </span>
-                            </div>
-                            <div class="detail-item">
-                                <strong>Relaxed Screening:</strong>
-                                <span class="badge {% if show.relaxed_screening %}badge-success{% else %}badge-secondary{% endif %}">
-                                    {{ show.relaxed_screening|yesno:"Yes,No" }}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="show-footer">
-                            <a href="{% url 'blog_detail' show.id %}" class="btn btn-primary">View Details</a>
-                            <div class="show-meta">
-                                <small>
-                                    Suggested by 
-                                    <a href="{% url 'profile' show.created_by.username %}">
-                                        {{ show.created_by.username }}
-                                    </a>
-                                    on {{ show.created_on|date:"F j, Y" }}
-                                </small>
-                            </div>
-                            <div class="show-stats">
-                                <span class="tickets">Tickets: {{ show.credits }}</span>
-                                <span class="status">Status: {{ show.status }}</span>
-                            </div>
-                        </div>
+                <div class="progress mt-3">
+                    <div class="progress-bar {% if show.is_sold_out %}bg-danger{% elif show.credits >= show.location.min_capacity %}bg-success{% endif %}" 
+                         role="progressbar" 
+                         style="width:'{% if show.credits < show.location.min_capacity %}{{ show.credits|default:0|multiply:100|divide:show.location.min_capacity }}{% else %}100{% endif %}%'"
+                         aria-valuenow="{{ show.credits|default:0 }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="{{ show.location.min_capacity }}">
+                        {% if show.is_sold_out %}
+                            SOLD OUT
+                        {% elif show.credits >= show.location.min_capacity %}
+                            ON SALE
+                        {% else %}
+                            {{ show.credits|default:0 }}/{{ show.location.min_capacity }} credits needed
+                        {% endif %}
                     </div>
                 </div>
-            {% endfor %}
+            </div>
         </div>
+    {% empty %}
+        <div class="alert alert-info">No shows found.</div>
     {% endfor %}
 </div>
 
+{% block scripts %}
 <script>
 function clearFilter(filterName) {
     document.querySelector(`select[name="${filterName}"]`).value = '';
@@ -152,10 +132,10 @@ function resetFilters() {
     document.getElementById('filters-form').submit();
 }
 
-// Auto-submit form on select change
 document.querySelectorAll('.filter-select').forEach(function(select) {
     select.addEventListener('change', function() {
         document.getElementById('filters-form').submit();
     });
 });
 </script>
+{% endblock %}

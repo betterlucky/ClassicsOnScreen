@@ -7,7 +7,7 @@ from . import views
 
 urlpatterns = [
     path('reset/', views.reset, name='reset'),
-    path("", views.blog_index, name="blog_index"),
+    path("", views.index, name="index"),
     path('register/', views.register, name='register'),
     path('confirm/<uidb64>/<token>/', views.activate, name='activate'),
     path('show/create/', views.create_show, name='create_show'),

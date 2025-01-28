@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block page_title %}
-    <h2>{{ show.title }}</h2>
-{% endblock page_title %}
+
+
 
 {% block page_content %}
 <div class="container">
     <!-- Show Information -->
     <div class="mb-4">
+        <h2>Event Details</h2>
         <p><strong>Location:</strong>
             <a href="{% url 'blog_location' show.location.name %}">{{ show.location }}</a>
         </p>

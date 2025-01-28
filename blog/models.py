@@ -195,6 +195,28 @@ class Show(models.Model):
         }
         return new_status in valid_transitions.get(self.status, [])
 
+    def notify_credit_purchase(self):
+        """Send email notifications to user who contributed credits."""
+        subject = f"Credit Purchase Confirmation: {self.film.name}"
+        
+        message = render_to_string(
+            'credit_purchase_email.html',
+            {
+                'user': self.credit_logs.last().user,  # Get the most recent credit log's user
+                'show': self,
+                'credits': self.credit_logs.last().credits,  # Get the number of credits from the most recent log
+                'domain': settings.SITE_DOMAIN
+            }
+        )
+
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [self.credit_logs.last().user.email],
+            fail_silently=False,
+        )
+
     def add_credits(self, user, amount):
         """Add credits to the show and update status if needed."""
         if amount <= 0:
@@ -208,6 +230,9 @@ class Show(models.Model):
 
         # Log the contribution
         ShowCreditLog.objects.create(user=user, show=self, credits=amount)
+
+        # Send purchase confirmation email
+        self.notify_credit_purchase()
 
         # Update status to TBC if the threshold is met
         if self.credits >= self.location.min_capacity and self.status == 'inactive':

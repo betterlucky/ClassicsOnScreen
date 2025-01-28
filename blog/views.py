@@ -215,11 +215,10 @@ def create_show(request):
     """Create a new show."""
     
     if request.method == 'POST':
-        
         form = ShowForm(request.POST)
         
         if form.is_valid():
-            print("form is valid")
+            
             show = form.save(commit=False)  # Create a Show instance but don't save it yet
             show.created_by = request.user
             
@@ -230,23 +229,26 @@ def create_show(request):
 
             # Set eventtime from cleaned data
             show.eventtime = form.cleaned_data['eventtime']
-            print(show.eventtime)
+            
             try:
                 show.full_clean()  # Validate the model instance
                 show.save()  # Save the instance to the database
+                
+                # Add the creator as an attendee with 1 credit
+                show.add_credits(request.user, 1)
                 
                 # Deduct 1 credit from the user
                 request.user.credits -= 1
                 request.user.save()
 
-                messages.success(request, 'Show created successfully! You have been charged 1 credit.')
+                messages.success(request, 'Show created successfully! You have been charged 1 credit and automatically added as an attendee.')
                 return redirect('blog_detail', pk=show.id)
             except ValidationError as e:
                 for field, errors in e.message_dict.items():
                     for error in errors:
                         form.add_error(field, error)
-        else:
-            print("form is not valid")  
+        
+            
     else:
         form = ShowForm()
     return render(request, 'create_show.html', {'form': form})

@@ -225,30 +225,29 @@ def blog_detail(request, pk):
 def create_show(request):
     """Create a new show."""
     
+    if request.user.credits < 1:
+        messages.error(request, 'You need at least 1 credit to create a show.')
+        return render(request, 'create_show.html', {'form': ShowForm()})
+    
     if request.method == 'POST':
         form = ShowForm(request.POST)
         
         if form.is_valid():
-            
-            show = form.save(commit=False)  # Create a Show instance but don't save it yet
+            show = form.save(commit=False)
             show.created_by = request.user
             
-            # Check if the user has enough credits
+            # Double-check credits (in case they changed while form was open)
             if request.user.credits < 1:
                 messages.error(request, 'You do not have enough credits to create a show.')
                 return render(request, 'create_show.html', {'form': form})
 
-            # Set eventtime from cleaned data
             show.eventtime = form.cleaned_data['eventtime']
             
             try:
-                show.full_clean()  # Validate the model instance
-                show.save()  # Save the instance to the database
+                show.full_clean()
+                show.save()
                 
-                # Add the creator as an attendee with 1 credit
                 show.add_credits(request.user, 1)
-                
-                # Deduct 1 credit from the user
                 request.user.credits -= 1
                 request.user.save()
 
@@ -258,10 +257,9 @@ def create_show(request):
                 for field, errors in e.message_dict.items():
                     for error in errors:
                         form.add_error(field, error)
-        
-            
     else:
         form = ShowForm()
+    
     return render(request, 'create_show.html', {'form': form})
 
 
@@ -357,24 +355,6 @@ def update_show_status(request, pk):
     return redirect('blog_detail', pk=pk)
 
 
-@login_required
-def buy_credits(request):
-    """Handle credit purchase."""
-    try:
-        credits_to_add = 10  # You might want to make this configurable
-        if credits_to_add <= 0:
-            raise ValueError("Credits must be a positive number.")
-
-        request.user.credits += credits_to_add
-        request.user.save()
-
-        messages.success(request, f'You have successfully purchased {credits_to_add} credits!')
-    except ValueError as e:
-        messages.error(request, str(e))
-
-    return redirect('profile', username=request.user.username)
-
-
 def blog_about(request):
     """Display about page."""
     return render(request, 'about.html')
@@ -429,3 +409,14 @@ def refund_credits_view(request, show_id):
         messages.error(request, "Unable to refund credits. They may have already been refunded.")
     
     return redirect('profile', username=request.user.username)
+
+
+@login_required
+def buy_credits(request):
+    """Temporary placeholder for credit purchase system."""
+    if request.method == 'POST':
+        # Add 10 credits to user's account
+        request.user.credits += 10
+        request.user.save()
+        messages.success(request, 'Added 10 credits to your account.')
+    return redirect(request.META.get('HTTP_REFERER', 'index'))

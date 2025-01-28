@@ -27,14 +27,19 @@ def create_test_data():
     # Create locations
     locations = [
         Location.objects.create(
-            name='Royal Cinema',
-            max_capacity=200,
-            min_capacity=50
+            name='Royal',
+            max_capacity=100,
+            min_capacity=40
         ),
         Location.objects.create(
-            name='Plaza Theatre',
-            max_capacity=150,
-            min_capacity=30
+            name='Regal',
+            max_capacity=70,
+            min_capacity=40
+        ),
+        Location.objects.create(
+            name='Plaza',
+            max_capacity=80,
+            min_capacity=40
         )
     ]
     print("Created locations:", [loc.name for loc in locations])
@@ -66,7 +71,8 @@ def create_test_data():
     options = [
         ShowOption.objects.create(name='Subtitles'),
         ShowOption.objects.create(name='Relaxed Screening'),
-        ShowOption.objects.create(name='Director\'s Cut')
+        ShowOption.objects.create(name='Party Show'),
+        ShowOption.objects.create(name='Q&A')
     ]
     print("Created show options:", [opt.name for opt in options])
 

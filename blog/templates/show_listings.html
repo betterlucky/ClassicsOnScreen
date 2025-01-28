@@ -63,7 +63,14 @@
             
             <div class="card-body">
                 <h5 class="card-title">
-                    <a href="{% url 'blog_detail' show.pk %}">{{ show.film.name }}</a>
+                    <a href="{% url 'blog_film' show.film.name %}">{{ show.film.name }}</a>
+                    <a href="https://www.imdb.com/title/{{ show.film.imdb_code }}" 
+                       class="btn btn-sm ms-2 py-0 px-1"
+                       style="background-color: #f5c518; color: #000000; border: 1px solid #000000;"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        <i class="bi bi-film"></i> IMDb
+                    </a>
                     {% if show.is_sold_out %}
                         <span class="badge bg-danger ms-2">SOLD OUT</span>
                     {% endif %}
@@ -72,9 +79,13 @@
                     {{ show.eventtime|date:"l, F j, Y" }} at {{ show.eventtime|time:"g:i A" }}
                 </h6>
                 <p class="card-text">
-                    <strong>Location:</strong> {{ show.location }}<br>
+                    <strong>Location:</strong> <a href="{% url 'blog_location' show.location.name %}">{{ show.location }}</a><br>
                     <strong>Status:</strong> {{ show.get_status_display }}
                 </p>
+
+                <a href="{% url 'blog_detail' show.id %}" class="btn btn-primary btn-sm mb-2">
+                    <i class="bi bi-info-circle"></i> Event Information
+                </a>
                 
                 <!-- Show options display -->
                 <div class="show-options mb-2">
@@ -97,7 +108,17 @@
                         {% elif show.credits >= show.location.min_capacity %}
                             ON SALE
                         {% else %}
-                            {{ show.credits|default:0 }}/{{ show.location.min_capacity }} credits needed
+                            {{ show.credits|default:0 }}/{{ show.location.min_capacity }} attendees required
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div class="text-muted small">
+                        {% if show.creator %}
+                            Suggested by <a href="{% url 'profile' show.creator.username %}">{{ show.creator.username }}</a>
+                        {% else %}
+                            Suggested by Anonymous
                         {% endif %}
                     </div>
                 </div>

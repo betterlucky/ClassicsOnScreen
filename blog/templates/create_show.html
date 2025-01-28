@@ -4,12 +4,20 @@
 
 {% block page_content %}
 <h2>Create a New Show</h2>
-    <form method="post">
-        {% csrf_token %}
-        {% crispy form %}
-    </form>
-    <p class="mt-3">Please remember it takes time to book the film, so your show must be a *minimum* of 3 weeks in the future.</p>
-    <a href="{% url 'index' %}">Go Back To Front Page</a>
+
+{% if user.credits < 1 %}
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        You need at least 1 credit to create a show. You currently have {{ user.credits }} credits.
+    </div>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    {% crispy form %}
+</form>
+<p class="mt-3">Please remember it takes time to book the film, so your show must be a *minimum* of 3 weeks in the future.</p>
+<a href="{% url 'index' %}">Go Back To Front Page</a>
 {% endblock page_content %}
 
 {% block scripts %}

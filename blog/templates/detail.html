@@ -1,65 +1,96 @@
 {% extends "base.html" %}
 {% load custom_filters %}
+{% load crispy_forms_tags %}
 
 {% block page_content %}
 <div class="container">
-    <!-- Show Information -->
-    <div class="mb-4">
-        <h2>
-            Event Details
-            {% if show.is_sold_out %}
-                <span class="badge bg-danger ms-2">SOLD OUT</span>
-            {% endif %}
-        </h2>
-        <p><strong>Location:</strong>
-            <a href="{% url 'blog_location' show.location.name %}">{{ show.location }}</a>
-        </p>
-        <p><strong>Date & Time:</strong> {{ show.eventtime.date }} at {{ show.eventtime.time }}</p>
-
-        <p><strong>Films:</strong>
-            {% if show.film %}
+    <h2>Event Information</h2>
+    <div class="card show-card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">
                 <a href="{% url 'blog_film' show.film.name %}">{{ show.film.name }}</a>
-            {% else %}
-                No Films
-            {% endif %}
-        </p>
-    </div>
+                <a href="https://www.imdb.com/title/{{ show.film.imdb_code }}" 
+                   class="btn btn-sm ms-2 py-0 px-1"
+                   style="background-color: #f5c518; color: #000000; border: 1px solid #000000;"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    <i class="bi bi-film"></i> IMDb
+                </a>
+                {% if show.is_sold_out %}
+                    <span class="badge bg-danger ms-2">SOLD OUT</span>
+                {% endif %}
+            </h5>
+            
+            <h6 class="card-subtitle mb-2 text-muted">
+                {{ show.eventtime|date:"l, F j, Y" }} at {{ show.eventtime|time:"g:i A" }}
+            </h6>
+            
+            <p class="card-text">
+                <strong>Location:</strong> <a href="{% url 'blog_location' show.location.name %}">{{ show.location }}</a><br>
+                <strong>Status:</strong> {{ show.get_status_display }}
+            </p>
 
-    <!-- Show Description -->
-    <div class="mb-4">
-        <p><strong>Description:</strong></p>
-        <p>{{ show.body | linebreaks }}</p>
-    </div>
+            <!-- Show options display -->
+            <div class="show-options mb-2">
+                {% for option in show.options.all %}
+                    <span class="badge bg-success">
+                        <i class="bi bi-check-circle me-1"></i>{{ option.name }}
+                    </span>
+                {% endfor %}
+            </div>
 
-    <!-- Event Creator -->
-    <div class="mb-4">
-        <p>Event suggested by <a href="{% url 'profile' show.created_by %}">{{ show.created_by }}</a> on {{ show.created_on.date }}</p>
+            <div class="progress mt-3 mb-3">
+                <div class="progress-bar {% if show.is_sold_out %}bg-danger{% elif show.credits >= show.location.min_capacity %}bg-success{% endif %}" 
+                     role="progressbar" 
+                     style="width: '{% if show.credits < show.location.min_capacity %}{{ show.credits|default:0|multiply:100|divide:show.location.min_capacity }}{% else %}100{% endif %}%'"
+                     aria-valuenow="{{ show.credits|default:0 }}" 
+                     aria-valuemin="0" 
+                     aria-valuemax="{{ show.location.min_capacity }}">
+                    {% if show.is_sold_out %}
+                        SOLD OUT
+                    {% elif show.credits >= show.location.min_capacity %}
+                        ON SALE
+                    {% else %}
+                        {{ show.credits|default:0 }}/{{ show.location.min_capacity }} attendees required
+                    {% endif %}
+                </div>
+            </div>
+            <div class="text-muted small mb-3">
+                Maximum capacity: {{ show.location.max_capacity }}
+            </div>
+
+            <!-- Show Description -->
+            <div class="mb-4">
+                <p><strong>Description:</strong></p>
+                <p>{{ show.body | linebreaks }}</p>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="text-muted small">
+                    Suggested by <a href="{% url 'profile' show.created_by.username %}">{{ show.created_by.username }}</a>
+                    on {{ show.created_on|date:"F j, Y" }}
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Add Credits Section -->
     {% if user.is_authenticated and show.can_add_credits %}
-        <div class="mb-4">
-            <h3>Add Credits</h3>
-            <form method="post" action="{% url 'add_credits_to_show' show.id %}">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="credits">Credits to add:</label>
-                    <input type="number" name="credits" id="credits" min="1" required class="form-control">
-                    <small class="text-muted">
-                        Maximum credits available: {{ show.location.max_capacity|subtract:show.credits }}
-                    </small>
-                </div>
-                <button type="submit" class="btn btn-success">Add Credits</button>
-                {% if messages %}
-                    <div class="alert alert-dismissible fade show mt-3">
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }}" role="alert">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Add Credits</h5>
+                <form method="post" action="{% url 'add_credits_to_show' show.id %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="credits">Credits to add:</label>
+                        <input type="number" name="credits" id="credits" min="1" required class="form-control">
+                        <small class="text-muted">
+                            Maximum credits available: {{ show.location.max_capacity|subtract:show.credits }}
+                        </small>
                     </div>
-                {% endif %}
-            </form>
+                    <button type="submit" class="btn btn-success mt-3">Add Credits</button>
+                </form>
+            </div>
         </div>
     {% elif user.is_authenticated %}
         <div class="alert alert-warning">
@@ -73,33 +104,36 @@
         </div>
     {% endif %}
 
-    <!-- Comments Section (Moved above the comment form) -->
-    <div>
-        <h3>Comments</h3>
-        {% if comments %}
-            {% for comment in comments %}
-                <div class="mb-3">
-                    <p><strong>On {{ comment.created_on.date }}:</strong> <b><a href="{% url 'profile' comment.author.username %}">{{ comment.author }}</a></b> wrote:</p>
-                    <p>{{ comment.body | linebreaks }}</p>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>No comments yet.</p>
-        {% endif %}
-    </div>
+    <!-- Comments Section -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Comments</h5>
+            {% if comments %}
+                {% for comment in comments %}
+                    <div class="mb-3">
+                        <p><strong>On {{ comment.created_on|date:"F j, Y" }}:</strong> 
+                            <a href="{% url 'profile' comment.author.username %}">{{ comment.author }}</a> wrote:
+                        </p>
+                        <p>{{ comment.body | linebreaks }}</p>
+                        <hr>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No comments yet.</p>
+            {% endif %}
 
-    <!-- Leave a Comment Section -->
-    <div class="mb-4">
-        <h3>Leave a Comment</h3>
-        {% if user.is_authenticated %}
-            <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
-        {% else %}
-            <p> <a href="{% url 'login' %}?next={{request.path}}">Log in</a> to leave a comment.</p>
-        {% endif %}
+            <!-- Leave a Comment Section -->
+            
+            {% if user.is_authenticated %}
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                </form>
+            {% else %}
+                <p><a href="{% url 'login' %}?next={{request.path}}">Log in</a> to leave a comment.</p>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endblock page_content %}

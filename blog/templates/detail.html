@@ -1,13 +1,16 @@
 {% extends "base.html" %}
-
-
-
+{% load custom_filters %}
 
 {% block page_content %}
 <div class="container">
     <!-- Show Information -->
     <div class="mb-4">
-        <h2>Event Details</h2>
+        <h2>
+            Event Details
+            {% if show.is_sold_out %}
+                <span class="badge bg-danger ms-2">SOLD OUT</span>
+            {% endif %}
+        </h2>
         <p><strong>Location:</strong>
             <a href="{% url 'blog_location' show.location.name %}">{{ show.location }}</a>
         </p>
@@ -33,29 +36,35 @@
         <p>Event suggested by <a href="{% url 'profile' show.created_by %}">{{ show.created_by }}</a> on {{ show.created_on.date }}</p>
     </div>
 
-    <!-- Add Credits Section (Only for authenticated users) -->
-    {% if user.is_authenticated %}
-    <div class="mb-4">
-        <h3>Add Credits</h3>
-        <form method="post" action="{% url 'add_credits_to_show' show.id %}">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="credits">Credits to add:</label>
-                <input type="number" name="credits" id="credits" min="1" required class="form-control">
-            </div>
-            <button type="submit" class="btn btn-success">Add Credits</button>
-           {% if messages %}
-                <div class="alert alert-dismissible fade show mt-3">
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}" role="alert">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
+    <!-- Add Credits Section (Only for authenticated users and non-sold-out shows) -->
+    {% if user.is_authenticated and not show.is_sold_out %}
+        <div class="mb-4">
+            <h3>Add Credits</h3>
+            <form method="post" action="{% url 'add_credits_to_show' show.id %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="credits">Credits to add:</label>
+                    <input type="number" name="credits" id="credits" min="1" required class="form-control">
+                    <small class="text-muted">
+                        Maximum credits available: {{ show.location.max_capacity|subtract:show.credits }}
+                    </small>
                 </div>
-            {% endif %}
-
-        </form>
-    </div>
+                <button type="submit" class="btn btn-success">Add Credits</button>
+                {% if messages %}
+                    <div class="alert alert-dismissible fade show mt-3">
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+    {% elif user.is_authenticated and show.is_sold_out %}
+        <div class="alert alert-warning">
+            This show is sold out and cannot accept any more credits.
+        </div>
     {% endif %}
 
     <!-- Comments Section (Moved above the comment form) -->

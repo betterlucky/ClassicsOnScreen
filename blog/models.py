@@ -120,6 +120,18 @@ class Location(models.Model):
         null=False,
         help_text="Minimum number of credits required for show confirmation"
     )
+    max_capacity = models.IntegerField(
+        default=100,
+        blank=False,
+        null=False,
+        help_text="Maximum number of credits allowed for this venue"
+    )
+
+    def clean(self):
+        if self.max_capacity <= self.min_capacity:
+            raise ValidationError({
+                'max_capacity': 'Maximum capacity must be greater than minimum capacity'
+            })
 
     class Meta:
         verbose_name = "Location"
@@ -183,6 +195,11 @@ class Show(models.Model):
         """Get total credits including refunded ones."""
         return self.credit_logs.aggregate(models.Sum('credits'))['credits__sum'] or 0
 
+    @property
+    def is_sold_out(self):
+        """Check if the show has reached maximum capacity."""
+        return self.credits >= self.location.max_capacity
+
     def can_transition_to(self, new_status):
         """Validate if the show can transition to the given status."""
         valid_transitions = {
@@ -223,6 +240,11 @@ class Show(models.Model):
             raise ValidationError("Credits must be a positive number.")
         if user.credits < amount:
             raise ValidationError(f"Insufficient credits. You have {user.credits} credits.")
+        if self.credits + amount > self.location.max_capacity:
+            remaining = self.location.max_capacity - self.credits
+            raise ValidationError(
+                f"This would exceed the venue's capacity. Maximum {remaining} credits can be added."
+            )
 
         self.credits += amount
         user.credits -= amount

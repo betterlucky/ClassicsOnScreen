@@ -57,14 +57,9 @@
     {% endif %}
 </div>
 
-<!-- Debug output -->
-<p>Total shows: {{ shows|length }}</p>
-
 <div class="show-listings">
     {% for show in shows %}
         <div class="card show-card mb-4">
-            <!-- Debug output -->
-            <p>Show: {{ show.film.name }} - {{ show.eventtime }}</p>
             
             <div class="card-body">
                 <h5 class="card-title">
@@ -81,11 +76,6 @@
                     <strong>Status:</strong> {{ show.get_status_display }}
                 </p>
                 
-                <!-- Debug output -->
-                {% if debug %}
-                    <p>Debug - Options: {{ show.options.all }}</p>
-                {% endif %}
-
                 <!-- Show options display -->
                 <div class="show-options mb-2">
                     {% for option in show.options.all %}

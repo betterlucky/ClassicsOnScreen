@@ -109,11 +109,49 @@ class Film(models.Model):
         super().save(*args, **kwargs)
 
 
+class VenueOwner(models.Model):
+    """
+    Represents a company or individual that owns one or more venues.
+    """
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True, null=True)
+    website = models.URLField(blank=True, null=True)
+    contact_email = models.EmailField(
+        verbose_name="Head Office Email",
+        help_text="Primary contact email for the company"
+    )
+
+    class Meta:
+        verbose_name = "Venue Owner"
+        verbose_name_plural = "Venue Owners"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def active_locations(self):
+        """Return all active locations owned by this company."""
+        return self.locations.filter(active=True)
+
+
 class Location(models.Model):
     """
     Represents a venue where shows can be screened.
     """
     name = models.CharField(max_length=60, unique=True)
+    owner = models.ForeignKey(
+        VenueOwner,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='locations',
+        help_text="The company or individual that owns this venue (optional for independent venues)"
+    )
+    contact_email = models.EmailField(
+        verbose_name="Venue Manager Email",
+        help_text="Direct contact email for the venue manager"
+    )
     min_capacity = models.IntegerField(
         default=40,
         blank=False,
@@ -126,6 +164,11 @@ class Location(models.Model):
         null=False,
         help_text="Maximum number of credits allowed for this venue"
     )
+    active = models.BooleanField(
+        default=True,
+        blank=False,
+        help_text="Whether this venue is currently available for shows"
+    )
 
     def clean(self):
         if self.max_capacity <= self.min_capacity:
@@ -133,11 +176,24 @@ class Location(models.Model):
                 'max_capacity': 'Maximum capacity must be greater than minimum capacity'
             })
 
+    def get_contact_emails(self):
+        """
+        Get all relevant contact emails for the venue.
+        Returns both venue manager and owner emails if owner exists.
+        """
+        emails = [self.contact_email]
+        if self.owner and self.owner.contact_email:
+            emails.append(self.owner.contact_email)
+        return list(set(emails))  # Remove any duplicates
+
     class Meta:
         verbose_name = "Location"
         verbose_name_plural = "Locations"
+        ordering = ['name']
 
     def __str__(self):
+        if self.owner:
+            return f"{self.name} ({self.owner.name})"
         return self.name
 
 

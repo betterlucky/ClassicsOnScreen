@@ -69,7 +69,12 @@ class SiteUserCreationForm(UserCreationForm):
             Field('email', css_class='mb-3'),
             Field('password1', css_class='mb-3'),
             Field('password2', css_class='mb-3'),
-            Submit('submit', 'Register', css_class='btn btn-primary')
+            Submit('submit', 'Register', css_class='btn btn-primary'),
+            HTML("""
+                <div class="alert alert-info mt-3">
+                    After registration, please check your email for a verification link.
+                </div>
+            """)
         )
 
     first_name = forms.CharField(
@@ -84,7 +89,7 @@ class SiteUserCreationForm(UserCreationForm):
     )
     email = forms.EmailField(
         required=True,
-        help_text="Enter a valid email address."
+        help_text="Enter a valid email address. You'll receive a verification email at this address."
     )
 
     class Meta:

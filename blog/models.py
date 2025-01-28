@@ -200,6 +200,18 @@ class Show(models.Model):
         """Check if the show has reached maximum capacity."""
         return self.credits >= self.location.max_capacity
 
+    @property
+    def can_add_credits(self):
+        """Check if credits can be added to this show."""
+        return (
+            # Show must be inactive, tbc, or confirmed
+            self.status in ['inactive', 'tbc', 'confirmed'] and
+            # Show must not be sold out
+            not self.is_sold_out and
+            # Show must not have passed
+            self.eventtime > timezone.now()
+        )
+
     def can_transition_to(self, new_status):
         """Validate if the show can transition to the given status."""
         valid_transitions = {

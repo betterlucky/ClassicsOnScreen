@@ -36,8 +36,8 @@
         <p>Event suggested by <a href="{% url 'profile' show.created_by %}">{{ show.created_by }}</a> on {{ show.created_on.date }}</p>
     </div>
 
-    <!-- Add Credits Section (Only for authenticated users and non-sold-out shows) -->
-    {% if user.is_authenticated and not show.is_sold_out %}
+    <!-- Add Credits Section -->
+    {% if user.is_authenticated and show.can_add_credits %}
         <div class="mb-4">
             <h3>Add Credits</h3>
             <form method="post" action="{% url 'add_credits_to_show' show.id %}">
@@ -61,9 +61,15 @@
                 {% endif %}
             </form>
         </div>
-    {% elif user.is_authenticated and show.is_sold_out %}
+    {% elif user.is_authenticated %}
         <div class="alert alert-warning">
-            This show is sold out and cannot accept any more credits.
+            {% if show.is_sold_out %}
+                This show is sold out and cannot accept any more credits.
+            {% elif show.eventtime <= now %}
+                This show has already taken place.
+            {% else %}
+                Credits cannot be added to this show in its current state.
+            {% endif %}
         </div>
     {% endif %}
 

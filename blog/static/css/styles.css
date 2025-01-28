@@ -624,27 +624,11 @@ footer .social-links a:hover {
 
     /* Sidebar styles */
     .sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        z-index: 100;
-        padding: 0;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        background-color: white;
-        width: 80%;
-        max-width: 300px;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease-in-out;
+        transform: translateX(-100%); /* Start hidden on mobile */
     }
 
     .sidebar.show {
         transform: translateX(0);
-    }
-
-    /* Adjust main content when sidebar is shown */
-    .sidebar.show + main {
-        opacity: 0.5;
     }
 
     /* Toggle button styles */
@@ -724,17 +708,28 @@ footer .social-links a:hover {
 /* Sidebar tray effect */
 .sidebar {
     position: fixed;
-    top: 0; /* Changed from bottom: 0; */
+    top: 0;
     left: 0;
-    height: 100vh; /* Changed from 80vh; */
+    height: 100vh;
     width: 100%;
     max-width: 300px;
     background: white;
-    transform: translateX(-100%);
+    transform: translateX(0); /* Changed from translateX(-100%) to show by default */
     transition: transform 0.3s ease-in-out;
     box-shadow: 2px 0 10px rgba(0,0,0,0.1);
     z-index: 1029;
-    overflow-y: auto; /* Added for scroll if content overflows */
+    overflow-y: auto;
+}
+
+/* Mobile-specific sidebar behavior */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%); /* Start hidden on mobile */
+    }
+    
+    .sidebar.show {
+        transform: translateX(0);
+    }
 }
 
 /* When sidebar is shown */
@@ -742,12 +737,12 @@ footer .social-links a:hover {
     transform: translateX(0);
 }
 
-/* Toggle button */
+/* Toggle button - hide on desktop */
 .sidebar-toggle {
     position: fixed;
-    top: 50%; /* Position vertically in the middle */
+    top: 50%;
     left: 1rem;
-    transform: translateY(-50%); /* Center vertically */
+    transform: translateY(-50%);
     z-index: 1030;
     width: 40px;
     height: 40px;
@@ -756,19 +751,17 @@ footer .social-links a:hover {
     background: #0d6efd;
     color: white;
     border: none;
-    display: flex;
+    display: none; /* Hide by default on desktop */
     align-items: center;
     justify-content: center;
     padding: 0;
 }
 
-.sidebar-toggle:hover {
-    background-color: #0b5ed7; /* Slightly darker blue */
-    cursor: pointer;
-}
-
-.sidebar-toggle:focus {
-    outline: 2px solid rgba(0, 123, 255, 0.5); /* Blue outline */
+/* Show toggle button only on mobile */
+@media (max-width: 768px) {
+    .sidebar-toggle {
+        display: flex;
+    }
 }
 
 /* Arrow icon */

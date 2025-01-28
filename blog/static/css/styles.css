@@ -714,7 +714,7 @@ footer .social-links a:hover {
     width: 100%;
     max-width: 300px;
     background: white;
-    transform: translateX(-100%); /* Start hidden by default */
+    transform: translateX(-100%) !important; /* Force hidden by default with !important */
     transition: transform 0.3s ease-in-out;
     box-shadow: 2px 0 10px rgba(0,0,0,0.1);
     z-index: 1029;
@@ -724,13 +724,13 @@ footer .social-links a:hover {
 /* Desktop-specific sidebar behavior */
 @media (min-width: 769px) {
     .sidebar {
-        transform: translateX(0); /* Start visible on desktop */
+        transform: translateX(0) !important; /* Force visible on desktop */
     }
 }
 
 /* When sidebar is shown */
 .sidebar.show {
-    transform: translateX(0);
+    transform: translateX(0) !important;
 }
 
 /* Toggle button - show on all devices */

@@ -16,3 +16,14 @@ def get_selected_object(field):
             if str(value) == str(field.value()):
                 return label
     return None
+
+@register.filter
+def subtract(value, arg):
+    """
+    Subtracts the arg from the value.
+    Usage: {{ show.location.max_capacity|subtract:show.credits }}
+    """
+    try:
+        return int(value) - int(arg)
+    except (ValueError, TypeError):
+        return ''

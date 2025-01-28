@@ -67,6 +67,15 @@
             {% for show in date_group.list %}
                 <div class="show-card">
                     <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h5 class="card-title">
+                                <a href="{% url 'blog_detail' pk=show.id %}">{{ show.film.name }}</a>
+                                {% if show.is_sold_out %}
+                                    <span class="badge bg-danger ms-2">SOLD OUT</span>
+                                {% endif %}
+                            </h5>
+                            <span class="text-muted">{{ show.get_status_display }}</span>
+                        </div>
                         <div class="show-time">{{ show.eventtime|time:"g:i A" }}</div>
                         <h4 class="show-title">
                             <a href="{% url 'blog_location' show.location.name %}">

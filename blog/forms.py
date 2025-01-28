@@ -1,4 +1,4 @@
-from .models import Show, Location, Film
+from .models import Show, Location, Film, ShowOption
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import SiteUser
@@ -157,11 +157,39 @@ class ShowForm(forms.ModelForm):
         widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
         label="Event Time"
     )
+    available_options = forms.ModelChoiceField(
+        queryset=ShowOption.objects.filter(active=True),
+        required=False,
+        empty_label="Add show option...",
+        widget=forms.Select(attrs={'class': 'form-control'}),
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
+        
+        # Get current options if editing
+        current_options = []
+        if self.instance.pk:
+            current_options = self.instance.options.all()
+        
+        # Create the options display div
+        options_html = """
+            <div id="selected-options" class="mb-3">
+                {% for option in current_options %}
+                    <span class="badge bg-primary me-2 mb-2">
+                        {{ option.name }}
+                        <button type="button" class="btn-close btn-close-white" 
+                                aria-label="Remove" 
+                                onclick="removeOption('{{ option.id }}')">
+                        </button>
+                        <input type="hidden" name="selected_options" value="{{ option.id }}">
+                    </span>
+                {% endfor %}
+            </div>
+        """
+
         self.helper.layout = Layout(
             HTML("""<p class="mt-3">Please remember it takes time to book the film, so your show must be a *minimum* of 3 weeks in the future.</p>"""),
             Field('film', css_class='mb-3'),
@@ -172,15 +200,15 @@ class ShowForm(forms.ModelForm):
                 css_class='mb-3'
             ),
             Field('body', css_class='mb-3 form-control', rows=2),
-
-            
+            Field('available_options', css_class='mb-2'),
+            HTML('<div id="selected-options"></div>'), HTML(options_html),
             Submit('submit', 'Create Show', css_class='btn btn-primary mt-3')
         )
         self.fields['film'].queryset = Film.objects.filter(active=True)
 
     class Meta:
         model = Show
-        fields = ['film', 'location', 'event_date', 'event_time', 'body', 'subtitles', 'relaxed_screening']
+        fields = ['film', 'location', 'event_date', 'event_time', 'body']
         labels = {'body': 'Tell us about your show'}
         widgets = {
             'body': forms.Textarea(attrs={'class': 'form-control mb-3', 'rows': 4}),

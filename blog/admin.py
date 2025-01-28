@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from blog.models import Film, Comment, Show, Location, SiteUser, ShowCreditLog, VenueOwner
+from blog.models import Film, Comment, Show, Location, SiteUser, ShowCreditLog, VenueOwner, ShowOption
 from django.utils.timezone import now
 from django.core.mail import send_mail
 from django.db.models import Sum
@@ -255,3 +255,22 @@ class SiteUserAdmin(UserAdmin):
         if not request.user.is_superuser:
             readonly_fields += ('credits',)
         return readonly_fields
+
+
+@admin.register(ShowOption)
+class ShowOptionAdmin(admin.ModelAdmin):
+    list_display = ('name', 'active', 'description')
+    list_filter = ('active',)
+    search_fields = ('name', 'description')
+    list_editable = ('active',)
+    ordering = ('name',)
+
+    def get_queryset(self, request):
+        """Show all options to admins."""
+        return super().get_queryset(request)
+
+    def has_delete_permission(self, request, obj=None):
+        """Only allow deletion if option isn't used by any shows."""
+        if obj and obj.shows.exists():
+            return False
+        return super().has_delete_permission(request, obj)

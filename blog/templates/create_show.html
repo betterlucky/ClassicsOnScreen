@@ -1,8 +1,6 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}  
-
-
-
+{% load crispy_forms_tags %}
+{% load static %}
 
 {% block page_content %}
 <h2>Create a New Show</h2>
@@ -11,5 +9,9 @@
         {% crispy form %}
     </form>
     <p class="mt-3">Please remember it takes time to book the film, so your show must be a *minimum* of 3 weeks in the future.</p>
-    <a href="{% url 'blog_index' %}">Go Back To Front Page</a>
+    <a href="{% url 'index' %}">Go Back To Front Page</a>
 {% endblock page_content %}
+
+{% block scripts %}
+<script src="{% static 'js/show_options.js' %}"></script>
+{% endblock scripts %}

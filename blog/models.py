@@ -197,6 +197,29 @@ class Location(models.Model):
         return self.name
 
 
+class ShowOption(models.Model):
+    """
+    Represents different types of show options (e.g., Subtitles, Q&A, etc.)
+    """
+    name = models.CharField(max_length=50, unique=True)
+    description = models.TextField(
+        help_text="Explain what this option means for the show",
+        blank=True
+    )
+    active = models.BooleanField(
+        default=True,
+        help_text="Whether this option is currently available"
+    )
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = "Show Option"
+        verbose_name_plural = "Show Options"
+
+    def __str__(self):
+        return self.name
+
+
 class Show(models.Model):
     """
     Represents a movie screening event with credit-based booking system.
@@ -228,9 +251,12 @@ class Show(models.Model):
     eventtime = models.DateTimeField(help_text="Scheduled date and time of the show")
     credits = models.PositiveIntegerField(blank=True, null=True, default=0)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='inactive')
-
-    subtitles = models.BooleanField(default=False, help_text="Do you want this show to have subtitles?")
-    relaxed_screening = models.BooleanField(default=False, help_text="Will this be a relaxed screening?")
+    options = models.ManyToManyField(
+        ShowOption,
+        blank=True,
+        related_name='shows',
+        help_text="Special features for this show"
+    )
 
     class Meta:
         ordering = ['eventtime']
@@ -491,6 +517,17 @@ class Show(models.Model):
 
         # Ensure eventtime is set before comparing
         
+
+    @property
+    def has_subtitles(self):
+        """Check if this show has subtitles option."""
+        return self.options.filter(name__iexact='Subtitles').exists()
+
+    @property
+    def is_relaxed_screening(self):
+        """Check if this is a relaxed screening."""
+        return self.options.filter(name__iexact='Relaxed').exists()
+
 
 class ShowCreditLog(models.Model):
     """

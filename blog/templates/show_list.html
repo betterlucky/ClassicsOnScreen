@@ -1,11 +1,11 @@
 {% extends "base.html" %}
+{% load static %}
+{% load custom_filters %}
 
 {% block page_title %}
     <h2 class="mb-4">{{ title }}</h2>
 {% endblock page_title %}
 
 {% block page_content %}
-    <div class="show-listings">
-        {% include "show_listings.html" %}
-    </div>
+    {% include "show_listings.html" %}
 {% endblock page_content %}

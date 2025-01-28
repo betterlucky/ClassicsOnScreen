@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from blog.models import Film, Comment, Show, Location, SiteUser, ShowCreditLog
+from blog.models import Film, Comment, Show, Location, SiteUser, ShowCreditLog, VenueOwner
 from django.utils.timezone import now
 from django.core.mail import send_mail
 from django.db.models import Sum
@@ -212,12 +212,27 @@ class CommentAdmin(admin.ModelAdmin):
     ordering = ('-created_on',)
 
 
+# Admin configuration for VenueOwner
+@admin.register(VenueOwner)
+class VenueOwnerAdmin(admin.ModelAdmin):
+    list_display = ('name', 'contact_email', 'website')
+    search_fields = ('name', 'description', 'contact_email')
+    list_filter = ('locations__active',)
+
+
 # Admin configuration for Location
 @admin.register(Location)
 class LocationAdmin(admin.ModelAdmin):
-    list_display = ('name', 'min_capacity')
-    search_fields = ('name',)
-    ordering = ('name',)
+    list_display = ('name', 'owner', 'contact_email', 'min_capacity', 'max_capacity', 'active')
+    list_filter = ('active', 'owner')
+    search_fields = ('name', 'owner__name', 'contact_email')
+    readonly_fields = ('get_contact_emails',)
+
+    def get_contact_emails(self, obj):
+        emails = obj.get_contact_emails()
+        return "\n".join(emails)
+    get_contact_emails.short_description = "All Contact Emails"
+
 
 # Admin configuration for SiteUser
 @admin.register(SiteUser)

@@ -299,8 +299,8 @@ def add_credits_to_show(request, show_id):
     """Add credits to a show."""
     show = get_object_or_404(Show, id=show_id)
 
-    if show.status not in ['inactive', 'tbc']:
-        messages.error(request, "Credits can only be added to inactive or TBC shows.")
+    if not show.can_add_credits:
+        messages.error(request, "Credits cannot be added to this show.")
         return redirect('blog_detail', pk=show.id)
 
     if request.method == 'POST':

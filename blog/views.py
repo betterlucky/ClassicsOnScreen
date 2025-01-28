@@ -225,10 +225,6 @@ def blog_detail(request, pk):
 def create_show(request):
     """Create a new show."""
     
-    if request.user.credits < 1:
-        messages.error(request, 'You need at least 1 credit to create a show.')
-        return render(request, 'create_show.html', {'form': ShowForm()})
-    
     if request.method == 'POST':
         form = ShowForm(request.POST)
         
@@ -236,7 +232,6 @@ def create_show(request):
             show = form.save(commit=False)
             show.created_by = request.user
             
-            # Double-check credits (in case they changed while form was open)
             if request.user.credits < 1:
                 messages.error(request, 'You do not have enough credits to create a show.')
                 return render(request, 'create_show.html', {'form': form})
@@ -247,11 +242,15 @@ def create_show(request):
                 show.full_clean()
                 show.save()
                 
+                selected_options = form.cleaned_data.get('selected_options')
+                if selected_options:
+                    show.options.set(selected_options)
+                
                 show.add_credits(request.user, 1)
                 request.user.credits -= 1
                 request.user.save()
 
-                messages.success(request, 'Show created successfully! You have been charged 1 credit and automatically added as an attendee.')
+                messages.success(request, 'Show created successfully!')
                 return redirect('blog_detail', pk=show.id)
             except ValidationError as e:
                 for field, errors in e.message_dict.items():

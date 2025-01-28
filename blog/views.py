@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseNotAllowed
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
@@ -15,7 +15,7 @@ from blog.forms import (
     SiteUserCreationForm, ShowForm, CommentForm, ShowFilterForm,
     ContactForm, PasswordResetForm
 )
-from blog.models import SiteUser, Film, Show, Location, Comment
+from blog.models import SiteUser, Film, Show, Location, Comment, ShowCreditLog
 from django.utils import timezone
 
 
@@ -260,23 +260,35 @@ def profile(request, username):
     profile_user = get_object_or_404(SiteUser, username=username)
     is_own_profile = request.user == profile_user
     
-    created_shows = Show.objects.filter(created_by=profile_user)\
-        .select_related('film', 'location')\
-        .prefetch_related('credit_logs')\
-        .order_by('-eventtime')
+    # Get shows created by user
+    shows = Show.objects.filter(created_by=profile_user)
+    
+    # Get shows user has contributed credits to
+    now = timezone.now()
+    upcoming_credited_shows = ShowCreditLog.objects.filter(
+        user=profile_user,
+        show__eventtime__gt=now
+    ).select_related('show', 'show__film', 'show__location').order_by('show__eventtime')
+    
+    past_credited_shows = ShowCreditLog.objects.filter(
+        user=profile_user,
+        show__eventtime__lte=now
+    ).select_related('show', 'show__film', 'show__location').order_by('-show__eventtime')
 
     form = ShowFilterForm(request.GET)
     if form.is_valid() and form.cleaned_data.get('status') and form.cleaned_data['status'] != 'all':
-        created_shows = created_shows.filter(status=form.cleaned_data['status'])
+        shows = shows.filter(status=form.cleaned_data['status'])
 
     context = {
         'profile_user': profile_user,
         'is_own_profile': is_own_profile,
-        'shows': created_shows,
+        'shows': shows,
+        'upcoming_credited_shows': upcoming_credited_shows,
+        'past_credited_shows': past_credited_shows,
         'form': form,
         'title': f"{profile_user.username}'s Shows",
         'total_credits': profile_user.credits,
-        'active_shows_count': created_shows.filter(status__in=['tbc', 'confirmed']).count(),
+        'active_shows_count': shows.filter(status__in=['tbc', 'confirmed']).count(),
         'contributed_shows': profile_user.get_active_contributions().count() if is_own_profile else None
     }
     return render(request, 'profile.html', context)
@@ -385,3 +397,24 @@ def blog_contact(request):
     else:
         form = ContactForm()
     return render(request, 'contact.html', {'form': form})
+
+
+@login_required
+def refund_credits_view(request, show_id):
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+    
+    show = get_object_or_404(Show, id=show_id)
+    
+    # Check if show is confirmed
+    if show.is_confirmed:
+        messages.error(request, "Cannot refund credits for confirmed shows.")
+        return redirect('profile', username=request.user.username)
+    
+    # Refund the requesting user's credits
+    if show.refund_credits(user=request.user):
+        messages.success(request, "Your credits have been refunded successfully.")
+    else:
+        messages.error(request, "Unable to refund credits. They may have already been refunded.")
+    
+    return redirect('profile', username=request.user.username)

@@ -239,27 +239,46 @@ class Show(models.Model):
             self.status = 'tbc'
         self.save()
 
-    def refund_credits(self):
-        """Refund credits to all users if the show expires or is cancelled."""
-        if self.status == 'cancelled':
-            # Refund credits to users
-            for log in self.credit_logs.all():
-                log.user.credits += log.credits
-                log.user.save()
-
-                # Mark log as refunded instead of deleting it
+    def refund_credits(self, user=None):
+        """
+        Refund credits to users.
+        If user is specified, refund only that user's credits.
+        If no user is specified, refund all users (for show expiry/cancellation via admin).
+        """
+        if user:
+            # Individual refund
+            try:
+                log = self.credit_logs.get(user=user, refunded=False)
+                user.credits += log.credits
+                user.save()
+                
+                # Mark log as refunded
                 log.refunded = True
                 log.save()
-
-        elif self.status == 'expired':
-            # Refund credits to users if the show expired
-            for log in self.credit_logs.all():
-                log.user.credits += log.credits
-                log.user.save()
-
-                # Mark log as refunded instead of deleting it
-                log.refunded = True
-                log.save()
+                
+                # Update show's total credits
+                self.credits -= log.credits
+                self.save()
+                
+                return True
+                
+            except ShowCreditLog.DoesNotExist:
+                return False
+                
+        else:
+            # Group refund (for expired or cancelled shows via admin)
+            if self.status in ['cancelled', 'expired']:
+                for log in self.credit_logs.filter(refunded=False):
+                    log.user.credits += log.credits
+                    log.user.save()
+                    
+                    # Mark log as refunded
+                    log.refunded = True
+                    log.save()
+                
+                return True
+                
+            return False
 
     def confirm_show(self):
         """Mark the show as confirmed and notify contributors."""

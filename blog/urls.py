@@ -22,6 +22,7 @@ urlpatterns = [
     path("contact/", views.blog_contact, name="blog_contact"),
     path('accounts/', include('django.contrib.auth.urls')),
     path('__debug__/', include('debug_toolbar.urls')),
+    path('refund-credits/<int:show_id>/', views.refund_credits_view, name='refund_credits'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 # Add Django site authentication urls (for login, logout, password management)
 

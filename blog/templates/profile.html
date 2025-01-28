@@ -10,13 +10,124 @@
         <p><strong>Credits:</strong> {{ profile_user.credits }}</p>
     {% endif %}
 
-    <h3>Shows Created</h3>
+    <!-- Upcoming Shows Section -->
+    {% if is_own_profile %}
+        <h3 class="mt-4">Upcoming Shows You're Attending</h3>
+    {% else %}
+        <h3 class="mt-4">Upcoming Shows {{ profile_user.username }} is Attending</h3>
+    {% endif %}
+    {% if upcoming_credited_shows %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Film</th>
+                        <th>Venue</th>
+                        <th>Date</th>
+                        <th>Credits</th>
+                        <th>Status</th>
+                        {% if is_own_profile %}
+                            <th>Actions</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for credit_log in upcoming_credited_shows %}
+                    <tr>
+                        <td><a href="{% url 'blog_detail' pk=credit_log.show.id %}">{{ credit_log.show.film.name }}</a></td>
+                        <td>{{ credit_log.show.location.name }}</td>
+                        <td>{{ credit_log.show.eventtime|date:"D, M j, Y" }}</td>
+                        <td>{{ credit_log.credits }}</td>
+                        <td>{{ credit_log.show.get_status_display }}</td>
+                        {% if is_own_profile %}
+                            <td>
+                                {% if credit_log.show.status == 'inactive' or credit_log.show.status == 'tbc' %}
+                                    <form method="post" action="{% url 'refund_credits' show_id=credit_log.show.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-warning btn-sm" 
+                                                onclick="return confirm('Are you sure you want to refund your credits for this show?')">
+                                            Refund Credits
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        {% if is_own_profile %}
+            <p>You're not attending any upcoming shows.</p>
+        {% else %}
+            <p>{{ profile_user.username }} is not attending any upcoming shows.</p>
+        {% endif %}
+    {% endif %}
+
+    <!-- Shows Created Section -->
+    <h3 class="mt-5">Shows that {{ profile_user.username }} has Created</h3>
+    <p class="text-muted">Shows that {{ profile_user.username }} has organized and is responsible for.</p>
     {% if shows %}
         <div class="show-listings">
             {% include "show_listings.html" %}
         </div>
     {% else %}
-        <p>No shows created yet.</p>
+        {% if is_own_profile %}
+            <p>You haven't created any shows yet.</p>
+        {% else %}
+            <p>{{ profile_user.username }} hasn't created any shows yet.</p>
+        {% endif %}
     {% endif %}
+
+    <!-- Past Shows Section (Collapsible) -->
+    <div class="mt-4">
+        <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#pastShows">
+            {% if is_own_profile %}
+                View Your Past Shows
+            {% else %}
+                View {{ profile_user.username }}'s Past Shows
+            {% endif %}
+        </button>
+        <div class="collapse mt-3" id="pastShows">
+            {% if is_own_profile %}
+                <h4>Past Shows You've Attended</h4>
+            {% else %}
+                <h4>Past Shows {{ profile_user.username }} has Attended</h4>
+            {% endif %}
+            {% if past_credited_shows %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Film</th>
+                                <th>Venue</th>
+                                <th>Date</th>
+                                <th>Credits Used</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for credit_log in past_credited_shows %}
+                            <tr>
+                                <td><a href="{% url 'blog_detail' pk=credit_log.show.id %}">{{ credit_log.show.film.name }}</a></td>
+                                <td>{{ credit_log.show.location.name }}</td>
+                                <td>{{ credit_log.show.eventtime|date:"D, M j, Y" }}</td>
+                                <td>{{ credit_log.credits }}</td>
+                                <td>{{ credit_log.show.get_status_display }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                {% if is_own_profile %}
+                    <p>You haven't attended any past shows.</p>
+                {% else %}
+                    <p>{{ profile_user.username }} hasn't attended any past shows.</p>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
 </div>
 {% endblock page_content %}

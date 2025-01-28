@@ -1,0 +1,19 @@
+{% block content %}
+Hello {{ user.username }},
+
+Thank you for contributing {{ credits }} credit{% if credits > 1 %}s{% endif %} to the show "{{ show.film.name }}" at "{{ show.location.name }}" on
+{{ show.eventtime|date:"l, F j, Y at g:i A" }}.
+
+Show Details:
+- Film: {{ show.film.name }}
+- Location: {{ show.location.name }}
+- Date & Time: {{ show.eventtime|date:"l, F j, Y at g:i A" }}
+- Credits Spent: {{ credits }}
+
+The show currently has {{ show.credits }} out of {{ show.location.min_capacity }} required credits.
+
+You can view the show details at: http://{{ domain }}{% url 'blog_detail' pk=show.id %}
+
+Thank you for your support in making this happen!
+
+{% endblock %} 

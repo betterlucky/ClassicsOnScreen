@@ -1,0 +1,91 @@
+rules:
+  - description: "Ensure responsive design across all devices"
+    matches:
+      - "layout"
+      - "design"
+      - "template"
+      - "css"
+    always_consider:
+      - "Mobile-first approach"
+      - "Tablet breakpoints"
+      - "Desktop optimization"
+      - "Touch-friendly interfaces"
+      - "Readable font sizes"
+      - "Button/input sizing for touch"
+
+  - description: "Provide context-aware suggestions for cinema crowdfunding platform"
+    matches:
+      - "show"
+      - "film"
+      - "venue"
+      - "credit"
+      - "ticket"
+    actions:
+      - "Consider venue capacity and minimum ticket thresholds"
+      - "Check film licensing and availability"
+      - "Verify credit system implications"
+      - "Consider user notification requirements"
+
+  - description: "Ask for clarifying information when needed"
+    when: "Information seems incomplete"
+    ask_about:
+      - "Target audience size"
+      - "Venue requirements"
+      - "Film licensing details"
+      - "Payment processing needs"
+      - "Notification preferences"
+      - "Device usage patterns"
+
+  - description: "Suggest alternative approaches"
+    when: "Better solutions might exist"
+    consider:
+      - "Simpler user flows"
+      - "More automated processes"
+      - "Better user engagement methods"
+      - "Risk mitigation strategies"
+      - "Scalability improvements"
+      - "Cross-device optimization"
+
+  - description: "Focus on Django and Bootstrap best practices"
+    matches:
+      - "view"
+      - "model"
+      - "template"
+      - "form"
+    suggest:
+      - "Django model relationships"
+      - "Form validation approaches"
+      - "Bootstrap responsive components"
+      - "Template inheritance patterns"
+      - "View optimization methods"
+      - "Mobile-friendly form layouts"
+
+  - description: "Maintain security and validation focus"
+    always_consider:
+      - "User authentication requirements"
+      - "Credit transaction security"
+      - "Show creation validation"
+      - "Venue capacity constraints"
+      - "Refund process integrity"
+      - "Touch-friendly security measures"
+
+  - description: "Emphasize user experience across devices"
+    prioritize:
+      - "Clear user feedback"
+      - "Intuitive navigation"
+      - "Mobile-first design"
+      - "Touch-friendly interfaces"
+      - "Loading performance"
+      - "Error handling clarity"
+      - "Responsive images and media"
+      - "Cross-device testing suggestions"
+
+  - description: "Device-specific considerations"
+    check_for:
+      - "Touch targets (minimum 44x44px)"
+      - "Viewport settings"
+      - "Media query breakpoints"
+      - "Font scaling"
+      - "Image optimization"
+      - "Navigation patterns"
+      - "Form input methods" 

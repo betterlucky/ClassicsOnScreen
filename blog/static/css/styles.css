@@ -714,21 +714,17 @@ footer .social-links a:hover {
     width: 100%;
     max-width: 300px;
     background: white;
-    transform: translateX(0); /* Changed from translateX(-100%) to show by default */
+    transform: translateX(-100%); /* Start hidden by default */
     transition: transform 0.3s ease-in-out;
     box-shadow: 2px 0 10px rgba(0,0,0,0.1);
     z-index: 1029;
     overflow-y: auto;
 }
 
-/* Mobile-specific sidebar behavior */
-@media (max-width: 768px) {
+/* Desktop-specific sidebar behavior */
+@media (min-width: 769px) {
     .sidebar {
-        transform: translateX(-100%); /* Start hidden on mobile */
-    }
-    
-    .sidebar.show {
-        transform: translateX(0);
+        transform: translateX(0); /* Start visible on desktop */
     }
 }
 
@@ -737,7 +733,7 @@ footer .social-links a:hover {
     transform: translateX(0);
 }
 
-/* Toggle button - hide on desktop */
+/* Toggle button - show on all devices */
 .sidebar-toggle {
     position: fixed;
     top: 50%;
@@ -751,17 +747,10 @@ footer .social-links a:hover {
     background: #0d6efd;
     color: white;
     border: none;
-    display: none; /* Hide by default on desktop */
+    display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
-}
-
-/* Show toggle button only on mobile */
-@media (max-width: 768px) {
-    .sidebar-toggle {
-        display: flex;
-    }
 }
 
 /* Arrow icon */

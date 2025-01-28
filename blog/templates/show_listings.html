@@ -108,7 +108,7 @@
                         {% elif show.credits >= show.location.min_capacity %}
                             ON SALE
                         {% else %}
-                            {{ show.credits|default:0 }}/{{ show.location.min_capacity }} credits needed
+                            {{ show.credits|default:0 }}/{{ show.location.min_capacity }} attendees required
                         {% endif %}
                     </div>
                 </div>

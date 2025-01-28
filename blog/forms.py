@@ -125,13 +125,18 @@ class PasswordResetForm(forms.Form):
 
 class CommentForm(forms.Form):
     body = forms.CharField(
+        label='',
         widget=forms.Textarea(
-            attrs={"class": "form-control", "placeholder": "Leave a comment!"}
+            attrs={
+                "class": "form-control", 
+                "placeholder": "Leave a comment!",
+                "rows": "3"
+            }
         )
     )
 
     def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop('request', None) # Pop the request
+        self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = 'post'

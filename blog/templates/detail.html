@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load custom_filters %}
+{% load crispy_forms_tags %}
 
 {% block page_content %}
 <div class="container">
@@ -41,7 +42,7 @@
             <div class="progress mt-3 mb-3">
                 <div class="progress-bar {% if show.is_sold_out %}bg-danger{% elif show.credits >= show.location.min_capacity %}bg-success{% endif %}" 
                      role="progressbar" 
-                     style="width: {% if show.credits < show.location.min_capacity %}{{ show.credits|default:0|multiply:100|divide:show.location.min_capacity }}{% else %}100{% endif %}%"
+                     style="width: '{% if show.credits < show.location.min_capacity %}{{ show.credits|default:0|multiply:100|divide:show.location.min_capacity }}{% else %}100{% endif %}%'"
                      aria-valuenow="{{ show.credits|default:0 }}" 
                      aria-valuemin="0" 
                      aria-valuemax="{{ show.location.min_capacity }}">
@@ -50,9 +51,12 @@
                     {% elif show.credits >= show.location.min_capacity %}
                         ON SALE
                     {% else %}
-                        {{ show.credits|default:0 }}/{{ show.location.min_capacity }} credits needed
+                        {{ show.credits|default:0 }}/{{ show.location.min_capacity }} attendees required
                     {% endif %}
                 </div>
+            </div>
+            <div class="text-muted small mb-3">
+                Maximum capacity: {{ show.location.max_capacity }}
             </div>
 
             <!-- Show Description -->
@@ -119,12 +123,12 @@
             {% endif %}
 
             <!-- Leave a Comment Section -->
-            <h5 class="card-title mt-4">Leave a Comment</h5>
+            
             {% if user.is_authenticated %}
                 <form method="post">
                     {% csrf_token %}
-                    {{ form.as_p }}
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary mt-3">Submit</button>
                 </form>
             {% else %}
                 <p><a href="{% url 'login' %}?next={{request.path}}">Log in</a> to leave a comment.</p>

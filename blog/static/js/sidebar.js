@@ -10,12 +10,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize state based on screen size
     function updateInitialState() {
-        if (window.innerWidth >= 768) {
-            sidebar.classList.remove('collapsed');
-            mainContent.classList.remove('sidebar-collapsed');
-        } else {
+        const isMobile = window.innerWidth < 768;
+        if (isMobile) {
             sidebar.classList.add('collapsed');
             mainContent.classList.add('sidebar-collapsed');
+            document.body.classList.add('sidebar-collapsed');
+        } else {
+            sidebar.classList.remove('collapsed');
+            mainContent.classList.remove('sidebar-collapsed');
+            document.body.classList.remove('sidebar-collapsed');
         }
     }
 
@@ -24,20 +27,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Toggle sidebar function
     function toggleSidebar() {
+        const isCollapsed = sidebar.classList.contains('collapsed');
+        
         sidebar.classList.toggle('collapsed');
         mainContent.classList.toggle('sidebar-collapsed');
         document.body.classList.toggle('sidebar-collapsed');
         
-        const isCollapsed = sidebar.classList.contains('collapsed');
-        toggleButton.setAttribute('aria-expanded', !isCollapsed);
+        toggleButton.setAttribute('aria-expanded', isCollapsed);
     }
 
     // Add click event listener
     toggleButton.addEventListener('click', toggleSidebar);
     
     // Handle window resize
+    let resizeTimer;
     window.addEventListener('resize', function() {
-        updateInitialState();
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(updateInitialState, 250);
     });
     
     // Close sidebar when clicking outside on mobile

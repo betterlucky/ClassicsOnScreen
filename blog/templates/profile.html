@@ -12,59 +12,56 @@
 
     <!-- Upcoming Shows Section -->
     {% if is_own_profile %}
-        <h3 class="mt-4">Upcoming Shows You're Attending</h3>
-    {% else %}
-        <h3 class="mt-4">Upcoming Shows {{ profile_user.username }} is Attending</h3>
-    {% endif %}
-    {% if upcoming_credited_shows %}
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Film</th>
-                        <th>Venue</th>
-                        <th>Date</th>
-                        <th>Credits</th>
-                        <th>Status</th>
-                        {% if is_own_profile %}
-                            <th>Actions</th>
-                        {% endif %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for credit_log in upcoming_credited_shows %}
-                    <tr>
-                        <td><a href="{% url 'blog_detail' pk=credit_log.show.id %}">{{ credit_log.show.film.name }}</a></td>
-                        <td>{{ credit_log.show.location.name }}</td>
-                        <td>{{ credit_log.show.eventtime|date:"D, M j, Y" }}</td>
-                        <td>{{ credit_log.credits }}</td>
-                        <td>{{ credit_log.show.get_status_display }}</td>
-                        {% if is_own_profile %}
-                            <td>
-                                {% if credit_log.show.status == 'inactive' or credit_log.show.status == 'tbc' %}
-                                    <form method="post" action="{% url 'refund_credits' show_id=credit_log.show.id %}" class="d-inline">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-warning btn-sm" 
-                                                onclick="return confirm('Are you sure you want to refund your credits for this show?')">
-                                            Refund Credits
-                                        </button>
-                                    </form>
-                                {% endif %}
-                            </td>
-                        {% endif %}
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% else %}
-        {% if is_own_profile %}
-            <p>You're not attending any upcoming shows.</p>
+        <h3 class="mt-4">Tickets You've Bought For Upcoming Shows</h3>
+   
+        {% if upcoming_credited_shows %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Film</th>
+                            <th>Venue</th>
+                            <th>Show Date</th>
+                            <th>Credits</th>
+                            <th>Status</th>
+                            <th>Purchased</th>
+                            {% if is_own_profile %}
+                                <th>Actions</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for credit_log in upcoming_credited_shows %}
+                        <tr>
+                            <td><a href="{% url 'blog_detail' pk=credit_log.show.id %}">{{ credit_log.show.film.name }}</a></td>
+                            <td>{{ credit_log.show.location.name }}</td>
+                            <td>{{ credit_log.show.eventtime|date:"D, M j, Y" }}</td>
+                            <td>{{ credit_log.credits }}</td>
+                            <td>{{ credit_log.show.get_status_display }}</td>
+                            <td>{{ credit_log.created_on|date:"M j, Y" }} at {{ credit_log.created_on|time:"g:i A" }}</td>
+                            {% if is_own_profile %}
+                                <td>
+                                    {% if credit_log.show.status == 'inactive' or credit_log.show.status == 'tbc' %}
+                                        <form method="post" action="{% url 'refund_credits' show_id=credit_log.show.id %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-warning btn-sm" 
+                                                    onclick="return confirm('Are you sure you want to refund your credits for this show?')">
+                                                Refund Credits
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         {% else %}
-            <p>{{ profile_user.username }} is not attending any upcoming shows.</p>
+            <p>You're not attending any upcoming shows.</p>
         {% endif %}
+        
     {% endif %}
-
     <!-- Shows Created Section -->
     <h3 class="mt-5">Shows that {{ profile_user.username }} has Created</h3>
     <p class="text-muted">Shows that {{ profile_user.username }} has organized and is responsible for.</p>

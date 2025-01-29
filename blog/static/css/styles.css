@@ -824,14 +824,8 @@ body:not(.sidebar-collapsed) .sidebar-toggle i {
         transition: opacity 0.3s ease, visibility 0.3s ease;
     }
 
-    /* Show overlay when sidebar is visible (not collapsed) */
-    body.sidebar-collapsed::after {
-        opacity: 0;
-        visibility: hidden;
-    }
-
-    /* Hide overlay when sidebar is hidden (collapsed) */
-    body:not(.sidebar-collapsed)::after {
+    /* Show overlay only when sidebar is open */
+    .sidebar:not(.collapsed) + .row::before {
         opacity: 1;
         visibility: visible;
     }

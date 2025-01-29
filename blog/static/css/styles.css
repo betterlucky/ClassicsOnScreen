@@ -1052,3 +1052,31 @@ main {
     color: #6c757d;
     font-style: italic;
 }
+
+/* Sidebar nav links */
+.sidebar .nav-link,
+.sidebar .nav-link button {
+    font-weight: 500;
+    color: var(--text-color);
+    transition: var(--transition);
+    text-transform: none;
+    padding: 0.5rem 1rem;  /* Match padding of other nav items */
+    width: 100%;  /* Full width */
+    text-align: left;
+}
+
+.sidebar form {
+    margin: 0;  /* Remove any form margins */
+    padding: 0;  /* Remove any form padding */
+}
+
+.sidebar form .btn-link {
+    text-transform: none;
+    font-weight: 500;
+    padding: 0.5rem 1rem;  /* Match padding of other nav items */
+    text-align: left;
+    width: 100%;  /* Full width */
+    display: flex;  /* For icon alignment */
+    align-items: center;  /* For icon alignment */
+    gap: 0.5rem;  /* Space between icon and text */
+}

@@ -15,7 +15,7 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'profile' user.username %}">
-                        <i class="bi bi-person-circle"></i> View your profile
+                        <i class="bi bi-person-circle"></i> View Your Profile
                     </a>
                 </li>
                 <li class="nav-item">
@@ -27,7 +27,9 @@
                 <li class="nav-item">
                     <form id="logout-form" method="post" action="{% url 'logout' %}">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-link nav-link">Logout</button>
+                        <button type="submit" class="btn btn-link nav-link">
+                            <i class="bi bi-box-arrow-in-left"></i> Logout
+                        </button>
                     </form>
                 </li>
             {% else %}

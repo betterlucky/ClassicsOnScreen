@@ -115,11 +115,9 @@
 
                 <div class="d-flex justify-content-between align-items-center mt-3">
                     <div class="text-muted small">
-                        {% if show.creator %}
-                            Suggested by <a href="{% url 'profile' show.creator.username %}">{{ show.creator.username }}</a>
-                        {% else %}
-                            Suggested by Anonymous
-                        {% endif %}
+
+                        Suggested by <a href="{% url 'profile' show.created_by.username %}">{{ show.created_by.username }}</a>
+
                     </div>
                 </div>
             </div>

@@ -9,7 +9,7 @@
         <div class="card-body">
             <h5 class="card-title">
                 <a href="{% url 'blog_film' show.film.name %}">{{ show.film.name }}</a>
-                <a href="https://www.imdb.com/title/{{ show.film.imdb_code }}" 
+                <a href="https://www.imdb.com/title/{{ show.film.imdb_code }}"
                    class="btn btn-sm ms-2 py-0 px-1"
                    style="background-color: #f5c518; color: #000000; border: 1px solid #000000;"
                    target="_blank"
@@ -20,11 +20,11 @@
                     <span class="badge bg-danger ms-2">SOLD OUT</span>
                 {% endif %}
             </h5>
-            
+
             <h6 class="card-subtitle mb-2 text-muted">
                 {{ show.eventtime|date:"l, F j, Y" }} at {{ show.eventtime|time:"g:i A" }}
             </h6>
-            
+
             <p class="card-text">
                 <strong>Location:</strong> <a href="{% url 'blog_location' show.location.name %}">{{ show.location }}</a><br>
                 <strong>Status:</strong> {{ show.get_status_display }}
@@ -40,11 +40,11 @@
             </div>
 
             <div class="progress mt-3 mb-3">
-                <div class="progress-bar {% if show.is_sold_out %}bg-danger{% elif show.credits >= show.location.min_capacity %}bg-success{% endif %}" 
-                     role="progressbar" 
-                     style="width: '{% if show.credits < show.location.min_capacity %}{{ show.credits|default:0|multiply:100|divide:show.location.min_capacity }}{% else %}100{% endif %}%'"
-                     aria-valuenow="{{ show.credits|default:0 }}" 
-                     aria-valuemin="0" 
+                <div class="progress-bar {% if show.is_sold_out %}bg-danger{% elif show.credits >= show.location.min_capacity %}bg-success{% endif %}"
+                     role="progressbar"
+                     style="width: {% if show.credits < show.location.min_capacity %}{{ show.credits|default:0|multiply:100|divide:show.location.min_capacity }}{% else %}100{% endif %}%"
+                     aria-valuenow="{{ show.credits|default:0 }}"
+                     aria-valuemin="0"
                      aria-valuemax="{{ show.location.min_capacity }}">
                     {% if show.is_sold_out %}
                         SOLD OUT
@@ -111,7 +111,7 @@
             {% if comments %}
                 {% for comment in comments %}
                     <div class="mb-3">
-                        <p><strong>On {{ comment.created_on|date:"F j, Y" }}:</strong> 
+                        <p><strong>On {{ comment.created_on|date:"F j, Y" }}:</strong>
                             <a href="{% url 'profile' comment.author.username %}">{{ comment.author }}</a> wrote:
                         </p>
                         <p>{{ comment.body | linebreaks }}</p>
@@ -123,7 +123,7 @@
             {% endif %}
 
             <!-- Leave a Comment Section -->
-            
+
             {% if user.is_authenticated %}
                 <form method="post">
                     {% csrf_token %}

@@ -15,14 +15,14 @@
                         {{ form.location|add_class:"filter-select" }}
                     </div>
                 {% endif %}
-                
+
                 {% if exclude_film_filter != True %}
                     <div class="filter-item">
                         <label class="filter-label" for="id_film">Film</label>
                         {{ form.film|add_class:"filter-select" }}
                     </div>
                 {% endif %}
-                
+
                 <div class="filter-item">
                     <label class="filter-label" for="id_status">Status</label>
                     {{ form.status|add_class:"filter-select" }}
@@ -60,11 +60,11 @@
 <div class="show-listings">
     {% for show in shows %}
         <div class="card show-card mb-4">
-            
+
             <div class="card-body">
                 <h5 class="card-title">
                     <a href="{% url 'blog_film' show.film.name %}">{{ show.film.name }}</a>
-                    <a href="https://www.imdb.com/title/{{ show.film.imdb_code }}" 
+                    <a href="https://www.imdb.com/title/{{ show.film.imdb_code }}"
                        class="btn btn-sm ms-2 py-0 px-1"
                        style="background-color: #f5c518; color: #000000; border: 1px solid #000000;"
                        target="_blank"
@@ -86,7 +86,7 @@
                 <a href="{% url 'blog_detail' show.id %}" class="btn btn-primary btn-sm mb-2">
                     <i class="bi bi-info-circle"></i> Event Information
                 </a>
-                
+
                 <!-- Show options display -->
                 <div class="show-options mb-2">
                     {% for option in show.options.all %}
@@ -97,11 +97,11 @@
                 </div>
 
                 <div class="progress mt-3">
-                    <div class="progress-bar {% if show.is_sold_out %}bg-danger{% elif show.credits >= show.location.min_capacity %}bg-success{% endif %}" 
-                         role="progressbar" 
-                         style="width:'{% if show.credits < show.location.min_capacity %}{{ show.credits|default:0|multiply:100|divide:show.location.min_capacity }}{% else %}100{% endif %}%'"
-                         aria-valuenow="{{ show.credits|default:0 }}" 
-                         aria-valuemin="0" 
+                    <div class="progress-bar {% if show.is_sold_out %}bg-danger{% elif show.credits >= show.location.min_capacity %}bg-success{% endif %}"
+                         role="progressbar"
+                         style="width:{% if show.credits < show.location.min_capacity %}{{ show.credits|default:0|multiply:100|divide:show.location.min_capacity }}{% else %}100{% endif %}%"
+                         aria-valuenow="{{ show.credits|default:0 }}"
+                         aria-valuemin="0"
                          aria-valuemax="{{ show.location.min_capacity }}">
                         {% if show.is_sold_out %}
                             SOLD OUT
@@ -112,7 +112,7 @@
                         {% endif %}
                     </div>
                 </div>
-                
+
                 <div class="d-flex justify-content-between align-items-center mt-3">
                     <div class="text-muted small">
                         {% if show.creator %}

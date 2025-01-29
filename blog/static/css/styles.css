@@ -710,91 +710,125 @@ footer .social-links a:hover {
     position: fixed;
     top: 0;
     left: 0;
-    height: 100vh;
-    width: 100%;
-    max-width: 300px;
+    bottom: 0;
+    width: 250px;
     background: white;
-    transform: translateX(-100%) !important; /* Force hidden by default with !important */
     transition: transform 0.3s ease-in-out;
     box-shadow: 2px 0 10px rgba(0,0,0,0.1);
     z-index: 1029;
-    overflow-y: auto;
+    padding: 1rem;
+    padding-top: 4rem; /* Make room for the toggle button */
 }
 
-/* Desktop-specific sidebar behavior */
-@media (min-width: 769px) {
+/* Mobile styles */
+@media (max-width: 767.98px) {
     .sidebar {
-        transform: translateX(0) !important; /* Force visible on desktop */
+        transform: translateX(-100%);
+    }
+    
+    .sidebar:not(.collapsed) {
+        transform: translateX(0);
+    }
+    
+    main {
+        width: 100%;
+        margin-left: 0;
+        padding-top: 4rem;
     }
 }
 
-/* When sidebar is shown */
-.sidebar.show {
-    transform: translateX(0) !important;
+/* Desktop styles */
+@media (min-width: 768px) {
+    .sidebar {
+        transform: translateX(0);
+    }
+    
+    .sidebar.collapsed {
+        transform: translateX(-250px);
+    }
+    
+    main {
+        margin-left: 250px;
+        transition: margin-left 0.3s ease-in-out;
+        padding-top: 1rem;
+    }
+    
+    main.sidebar-collapsed {
+        margin-left: 0;
+    }
 }
 
-/* Toggle button - show on all devices */
+/* Sidebar Toggle Button */
 .sidebar-toggle {
     position: fixed;
-    top: 50%;
-    left: 1rem;
+    top: 50vh;
     transform: translateY(-50%);
-    z-index: 1030;
+    left: 1rem;
+    z-index: 1040;
     width: 40px;
     height: 40px;
-    border-radius: 50%;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    background: #0d6efd;
+    background: var(--primary-color);
     color: white;
     border: none;
+    border-radius: 50%;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
     padding: 0;
 }
 
-/* Arrow icon */
+.sidebar-toggle:hover {
+    background-color: var(--secondary-color);
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
 .sidebar-toggle i {
     font-size: 1.2rem;
     transition: transform 0.3s ease;
 }
 
-/* Rotate arrow when sidebar is open */
-.sidebar-toggle[aria-expanded="true"] i {
+/* Rotate arrow when sidebar is not collapsed */
+body:not(.sidebar-collapsed) .sidebar-toggle i {
     transform: rotate(180deg);
 }
 
-/* Add some polish to the sidebar */
-.sidebar .nav {
-    padding: 1rem;
+/* Desktop toggle button position */
+@media (min-width: 768px) {
+    .sidebar-toggle {
+        left: 270px;
+        transition: left 0.3s ease-in-out;
+    }
+
+    body.sidebar-collapsed .sidebar-toggle {
+        left: 1rem;
+    }
 }
 
-.sidebar .nav-link {
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    margin-bottom: 0.5rem;
-}
+/* Mobile overlay */
+@media (max-width: 767.98px) {
+    body::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 1025;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
 
-/* Overlay for main content when sidebar is open */
-body.sidebar-open::before { /* Important: Add this class to body when sidebar is open (JS) */
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1028; /* Below the sidebar */
-    opacity: 1;
-    transition: opacity 0.3s ease;
+    body:not(.sidebar-collapsed)::after {
+        opacity: 1;
+        visibility: visible;
+    }
 }
-
-/* Hide the overlay when sidebar is closed */
-body:not(.sidebar-open)::before {
-    opacity: 0;
-    pointer-events: none; /* Prevent clicks on the overlay */
-}
-
 
 /* Desktop specific filter layout */
 @media (min-width: 769px) {

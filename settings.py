@@ -167,3 +167,6 @@ ADMIN_EMAIL = 'classicsbackonscreen+admin@gmail.com'
 SITE_DOMAIN = 'daveharris.eu.pythonanywhere.com'
 
 OMDB_API_KEY = os.getenv('OMDB_API_KEY')
+
+# Film voting settings
+MAX_FILM_VOTES = 5

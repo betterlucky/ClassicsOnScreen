@@ -20,7 +20,7 @@
         <p class="mb-0">
             Due to licensing agreements, we can only maintain a limited number of films as active on our platform. 
             {% if user.is_authenticated %}
-                You can vote to keep your favorite films available - each user gets up to 10 votes, and votes expire after 30 days.
+                You can vote to keep your favorite films available - each user gets up to {{ MAX_FILM_VOTES }} votes, and votes expire after 30 days.
             {% else %}
                 <a href="{% url 'login' %}">Log in</a> to vote for your favorite films and help keep them available.
             {% endif %}

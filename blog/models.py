@@ -598,6 +598,8 @@ class FilmVote(models.Model):
     """
     Tracks user votes for films they want to keep available.
     """
+    MAX_VOTES_PER_USER = 5  # Add this constant
+    
     user = models.ForeignKey("SiteUser", on_delete=models.CASCADE)
     film = models.ForeignKey("Film", on_delete=models.CASCADE, related_name="votes")
     created_on = models.DateTimeField(auto_now_add=True)

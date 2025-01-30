@@ -452,7 +452,7 @@ def film_list(request):
         user_vote_count = user_votes.count()
         user_voted_films = set(vote.film_id for vote in user_votes)
         days_remaining = {vote.film_id: vote.days_remaining for vote in user_votes}
-        votes_remaining = 10 - user_vote_count
+        votes_remaining = settings.MAX_FILM_VOTES - user_vote_count
 
     # Get top 5 most desired films
     top_films = Film.objects.filter(active=True).annotate(
@@ -466,6 +466,7 @@ def film_list(request):
         'votes_remaining': votes_remaining,
         'days_remaining': days_remaining,
         'search_query': search_query,
+        'MAX_FILM_VOTES': settings.MAX_FILM_VOTES,
     }
     return render(request, 'film_list.html', context)
 
@@ -497,8 +498,8 @@ def toggle_film_vote(request, film_id):
         messages.success(request, f'Vote removed for {film.name}')
     else:
         # Add new vote if user hasn't reached limit
-        if user_votes.count() >= 10:
-            messages.error(request, 'You can only vote for up to 10 films at a time')
+        if user_votes.count() >= settings.MAX_FILM_VOTES:
+            messages.error(request, f'You can only vote for up to {settings.MAX_FILM_VOTES} films at a time')
         else:
             FilmVote.objects.create(user=request.user, film=film)
             messages.success(request, f'Vote added for {film.name}')

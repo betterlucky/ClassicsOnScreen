@@ -33,11 +33,15 @@ document.addEventListener('DOMContentLoaded', function() {
         mainContent.classList.toggle('sidebar-collapsed');
         document.body.classList.toggle('sidebar-collapsed');
         
-        toggleButton.setAttribute('aria-expanded', isCollapsed);
+        toggleButton.setAttribute('aria-expanded', !isCollapsed);
     }
 
     // Add click event listener
-    toggleButton.addEventListener('click', toggleSidebar);
+    toggleButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleSidebar();
+    });
     
     // Handle window resize
     let resizeTimer;

@@ -9,6 +9,8 @@
     --hover-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --sidebar-width: 250px;
+    --gradient-start: #1a365d;
+    --gradient-end: #2c5282;
 }
 
 * {
@@ -67,11 +69,10 @@ body {
 }
 
 .sidebar-toggle {
-    position: fixed;
-    top: 50vh;
+    position: absolute;
+    top: 50%;
     transform: translateY(-50%);
-    left: 1rem;
-    z-index: 1040;
+    right: -40px;
     width: 40px;
     height: 40px;
     background: var(--primary-color);
@@ -84,6 +85,16 @@ body {
     justify-content: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     transition: var(--transition);
+    z-index: 1030;
+}
+
+/* Add icon rotation */
+.sidebar-toggle i {
+    transition: transform 0.3s ease-in-out;
+}
+
+.sidebar.collapsed .sidebar-toggle i {
+    transform: rotate(180deg);
 }
 
 /* 4. Card Styles */
@@ -153,6 +164,10 @@ body {
         transform: translateX(0);
     }
     
+    .sidebar-toggle {
+        right: -40px;
+    }
+    
     main {
         width: 100%;
         margin-left: 0;
@@ -189,14 +204,6 @@ body {
     
     main.sidebar-collapsed {
         margin-left: 0;
-    }
-
-    .sidebar-toggle {
-        left: calc(var(--sidebar-width) + 20px);
-    }
-
-    body.sidebar-collapsed .sidebar-toggle {
-        left: 1rem;
     }
 }
 
@@ -254,6 +261,7 @@ input[type="range"]::-webkit-slider-thumb {
 /* Hero Section */
 .jumbotron {
     background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    color: white;
     padding: 5rem 2rem;
     border-radius: 20px;
     position: relative;
@@ -456,7 +464,7 @@ footer .social-links a:hover {
 
 /* Filter Components */
 .filter-section {
-    background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
     border-radius: 20px;
     padding: 2rem;
     margin-bottom: 2rem;

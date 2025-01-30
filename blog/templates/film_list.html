@@ -3,14 +3,12 @@
 {% load custom_filters %}
 
 {% block page_content %}
-<div class="container-fluid p-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Available Films</h2>
         {% if user.is_authenticated %}
-            <div>
-                <span class="text-muted">
-                    You have {{ votes_remaining }} votes remaining
-                </span>
+            <div class="badge bg-primary p-2">
+                <i class="bi bi-star-fill me-2"></i>
+                {{ votes_remaining }} votes remaining
             </div>
         {% endif %}
     </div>
@@ -30,8 +28,8 @@
 
     {% if top_films %}
     <div class="card mb-4">
-        <div class="card-header">
-            <h3 class="h5 mb-0">Most Popular Films</h3>
+        <div class="card-header bg-primary text-white">
+            <h3 class="h5 mb-0"><i class="bi bi-trophy me-2"></i>Most Popular Films</h3>
         </div>
         <div class="card-body">
             <p class="text-muted mb-3">
@@ -41,15 +39,18 @@
             <div class="list-group list-group-flush">
                 {% for film in top_films %}
                     <div class="list-group-item d-flex justify-content-between align-items-center">
-                        {{ film.name }}
+                        <div>
+                            <i class="bi bi-film me-2"></i>
+                            {{ film.name }}
+                        </div>
                         <span class="badge bg-primary rounded-pill">{{ film.vote_count }} votes</span>
                     </div>
                 {% endfor %}
             </div>
             <div class="text-center mt-3">
-                <small class="text-muted">
-                    For the complete list, <a href="{% url 'most_desired_films' %}">click here</a>
-                </small>
+                <a href="{% url 'most_desired_films' %}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-list-ul me-1"></i>View Complete List
+                </a>
             </div>
         </div>
     </div>
@@ -68,6 +69,9 @@
                 {% endif %}
             </p>
             <div class="input-group">
+                <span class="input-group-text bg-white">
+                    <i class="bi bi-search"></i>
+                </span>
                 <input type="text" 
                        id="filmSearch" 
                        class="form-control" 
@@ -83,57 +87,32 @@
         </div>
     </div>
     
-    <!-- Films grid with no extra containers -->
-    <div class="row justify-content-center g-3">  <!-- Added justify-content-center -->
+    <!-- Films grid -->
+    <div class="row justify-content-center g-3">
         {% for film in films %}
-            <div class="col-12 col-sm-6 col-lg-4" style="max-width: 450px;">  <!-- Added max-width -->
-                <div class="card h-100 shadow-sm">
+            <div class="col-12 col-md-4" style="max-width: 450px;">
+                <div class="card show-card h-100">
                     <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <h5 class="card-title">{{ film.name }}</h5>
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 class="card-title mb-0">{{ film.name }}</h5>
                             <a href="https://www.imdb.com/title/{{ film.imdb_code }}" 
-                               class="badge bg-warning text-dark text-decoration-none" 
-                               target="_blank">
-                                IMDB
+                               class="btn btn-sm ms-2 py-0 px-1"
+                               style="background-color: #f5c518; color: #000000; border: 1px solid #000000;"
+                               target="_blank"
+                               rel="noopener noreferrer">
+                                <i class="bi bi-film"></i> IMDb
                             </a>
                         </div>
                         <p class="card-text text-muted">{{ film.description }}</p>
-                        <div class="vote-container">
-                            {% if user.is_authenticated %}
-                                {% if film.id in user_voted_films %}
-                                    <form method="post" action="{% url 'toggle_film_vote' film.id %}" class="d-inline">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-vote voted">
-                                            <i class="bi bi-heart-fill"></i> 
-                                            <span class="vote-text">Remove Vote</span>
-                                        </button>
-                                    </form>
-                                    <div class="vote-expiry">
-                                        Vote expires in {{ days_remaining|get_item:film.id }} days
-                                    </div>
-                                {% else %}
-                                    <form method="post" action="{% url 'toggle_film_vote' film.id %}" class="d-inline">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-vote" {% if votes_remaining == 0 %}disabled{% endif %}>
-                                            <i class="bi bi-heart"></i>
-                                            <span class="vote-text">Vote to Keep</span>
-                                        </button>
-                                    </form>
-                                {% endif %}
-                            {% else %}
-                                <small class="text-muted">
-                                    <a href="{% url 'login' %}?next={{ request.path }}">Login to vote</a>
-                                </small>
-                            {% endif %}
-                        </div>
-
+                        
                         {% if film.upcoming_shows.exists %}
-                            <div class="mt-3">
-                                <strong>Upcoming Shows:</strong>
+                            <div class="mb-3">
+                                <h6 class="mb-2"><i class="bi bi-calendar-event me-2"></i>Upcoming Shows</h6>
                                 <ul class="list-unstyled">
                                     {% for show in film.upcoming_shows|slice:":3" %}
-                                        <li>
-                                            <a href="{% url 'blog_detail' show.id %}">
+                                        <li class="mb-1">
+                                            <a href="{% url 'blog_detail' show.id %}" class="text-decoration-none">
+                                                <i class="bi bi-arrow-right-circle me-1"></i>
                                                 {{ show.eventtime|date:"D, M j" }} at {{ show.location.name }}
                                             </a>
                                         </li>
@@ -141,16 +120,46 @@
                                 </ul>
                             </div>
                         {% endif %}
+
+                        <div class="vote-container mt-auto">
+                            {% if user.is_authenticated %}
+                                {% if film.id in user_voted_films %}
+                                    <form method="post" action="{% url 'toggle_film_vote' film.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-vote voted w-100">
+                                            <i class="bi bi-heart-fill"></i> 
+                                            <span class="vote-text">Remove Vote</span>
+                                        </button>
+                                    </form>
+                                    <div class="days-remaining text-center">
+                                        Vote expires in {{ days_remaining|get_item:film.id }} days
+                                    </div>
+                                {% else %}
+                                    <form method="post" action="{% url 'toggle_film_vote' film.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-vote w-100" {% if votes_remaining == 0 %}disabled{% endif %}>
+                                            <i class="bi bi-heart"></i>
+                                            <span class="vote-text">Vote to Keep</span>
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            {% else %}
+                                <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-outline-primary w-100">
+                                    <i class="bi bi-box-arrow-in-right me-1"></i>Login to Vote
+                                </a>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
         {% empty %}
             <div class="col-12 no-results">
-                <div class="alert alert-info">No films currently available.</div>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>No films currently available.
+                </div>
             </div>
         {% endfor %}
     </div>
-</div>
 {% endblock %}
 
 {% block scripts %}

@@ -15,7 +15,7 @@ from blog.forms import (
     SiteUserCreationForm, ShowForm, CommentForm, ShowFilterForm,
     ContactForm, PasswordResetForm
 )
-from blog.models import SiteUser, Film, Show, Location, Comment, ShowCreditLog, ShowOption, FilmVote
+from blog.models import SiteUser, Film, Show, Location, Comment, ShowCreditLog, ShowOption, FilmVote, FAQ
 from django.utils import timezone
 from django.db import connection
 from datetime import timedelta
@@ -363,7 +363,15 @@ def blog_about(request):
 
 def blog_faq(request):
     """Display FAQ page."""
-    return render(request, 'faq.html')
+    faqs = FAQ.objects.filter(active=True).order_by('category', 'order', 'created_on')
+    faqs_by_category = {}
+    for faq in faqs:
+        category = faq.get_category_display()
+        if category not in faqs_by_category:
+            faqs_by_category[category] = []
+        faqs_by_category[category].append(faq)
+    
+    return render(request, 'faq.html', {'faqs_by_category': faqs_by_category})
 
 
 def blog_contact(request):

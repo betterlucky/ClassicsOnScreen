@@ -625,3 +625,30 @@ class FilmVote(models.Model):
     def is_expired(self):
         """Check if vote has expired"""
         return self.days_remaining == 0
+
+
+class FAQ(models.Model):
+    """
+    Stores Frequently Asked Questions and their answers.
+    """
+    CATEGORY_CHOICES = [
+        ('general', 'General Questions'),
+        ('tickets', 'Tickets and Booking'),
+        ('other', 'Other Questions'),
+    ]
+
+    question = models.CharField(max_length=255)
+    answer = models.TextField()
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    order = models.IntegerField(default=0)
+    active = models.BooleanField(default=True)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['category', 'order', 'created_on']
+        verbose_name = "FAQ"
+        verbose_name_plural = "FAQs"
+
+    def __str__(self):
+        return self.question

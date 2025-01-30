@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from blog.models import Film, Comment, Show, Location, SiteUser, ShowCreditLog, VenueOwner, ShowOption
+from blog.models import Film, Comment, Show, Location, SiteUser, ShowCreditLog, VenueOwner, ShowOption, FAQ
 from django.utils.timezone import now
 from django.core.mail import send_mail
 from django.db.models import Sum
@@ -393,3 +393,12 @@ class ShowOptionAdmin(admin.ModelAdmin):
         if obj and obj.shows.exists():
             return False
         return super().has_delete_permission(request, obj)
+
+
+@admin.register(FAQ)
+class FAQAdmin(admin.ModelAdmin):
+    list_display = ('question', 'category', 'order', 'active')
+    list_filter = ('category', 'active')
+    search_fields = ('question', 'answer')
+    list_editable = ('order', 'active')
+    ordering = ('category', 'order', 'created_on')

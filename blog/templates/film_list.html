@@ -3,7 +3,7 @@
 {% load custom_filters %}
 
 {% block page_content %}
-<div class="container">
+<div class="container-fluid p-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Available Films</h2>
         {% if user.is_authenticated %}
@@ -83,53 +83,48 @@
         </div>
     </div>
     
-    <!-- Films grid -->
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="filmsContainer">
+    <!-- Films grid with no extra containers -->
+    <div class="row g-3">  <!-- Using g-3 for gap -->
         {% for film in films %}
-            <div class="col film-item" data-film-name="{{ film.name|lower }}">
-                <div class="card h-100">
+            <div class="col-12 col-sm-6 col-lg-4">  <!-- Changed breakpoint to lg -->
+                <div class="card h-100 shadow-sm">
                     <div class="card-body">
-                        <h5 class="card-title d-flex justify-content-between align-items-start">
-                            {{ film.name }}
-                            <a href="https://www.imdb.com/title/{{ film.imdb_code }}"
-                               class="btn btn-sm ms-2 py-0 px-1"
-                               style="background-color: #f5c518; color: #000000; border: 1px solid #000000;"
-                               target="_blank"
-                               rel="noopener noreferrer">
-                                <i class="bi bi-film"></i> IMDb
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h5 class="card-title">{{ film.name }}</h5>
+                            <a href="https://www.imdb.com/title/{{ film.imdb_code }}" 
+                               class="badge bg-warning text-dark text-decoration-none" 
+                               target="_blank">
+                                IMDB
                             </a>
-                        </h5>
-                        {% if film.description %}
-                            <p class="card-text">{{ film.description }}</p>
-                        {% endif %}
-                        
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <span class="text-muted">{{ film.vote_count }} votes</span>
-                            <form method="post" action="{% url 'toggle_film_vote' film.id %}" class="d-inline">
-                                {% csrf_token %}
-                                <div class="vote-container">
-                                    {% if user.is_authenticated %}
-                                        {% if film.id in user_voted_films %}
-                                            <button type="submit" class="btn btn-vote voted">
-                                                <i class="bi bi-heart-fill"></i> 
-                                                <span class="vote-text">Remove Vote</span>
-                                            </button>
-                                            <div class="vote-expiry">
-                                                Vote expires in {{ days_remaining|get_item:film.id }} days
-                                            </div>
-                                        {% else %}
-                                            <button type="submit" class="btn btn-vote" {% if votes_remaining == 0 %}disabled{% endif %}>
-                                                <i class="bi bi-heart"></i>
-                                                <span class="vote-text">Vote to Keep</span>
-                                            </button>
-                                        {% endif %}
-                                    {% else %}
-                                        <small class="text-muted">
-                                            <a href="{% url 'login' %}?next={{ request.path }}">Login to vote</a>
-                                        </small>
-                                    {% endif %}
-                                </div>
-                            </form>
+                        </div>
+                        <p class="card-text text-muted">{{ film.description }}</p>
+                        <div class="vote-container">
+                            {% if user.is_authenticated %}
+                                {% if film.id in user_voted_films %}
+                                    <form method="post" action="{% url 'toggle_film_vote' film.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-vote voted">
+                                            <i class="bi bi-heart-fill"></i> 
+                                            <span class="vote-text">Remove Vote</span>
+                                        </button>
+                                    </form>
+                                    <div class="vote-expiry">
+                                        Vote expires in {{ days_remaining|get_item:film.id }} days
+                                    </div>
+                                {% else %}
+                                    <form method="post" action="{% url 'toggle_film_vote' film.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-vote" {% if votes_remaining == 0 %}disabled{% endif %}>
+                                            <i class="bi bi-heart"></i>
+                                            <span class="vote-text">Vote to Keep</span>
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            {% else %}
+                                <small class="text-muted">
+                                    <a href="{% url 'login' %}?next={{ request.path }}">Login to vote</a>
+                                </small>
+                            {% endif %}
                         </div>
 
                         {% if film.upcoming_shows.exists %}
@@ -156,41 +151,6 @@
         {% endfor %}
     </div>
 </div>
-
-<script>
-    // Your JavaScript code here
-    document.getElementById('filmSearch').addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        const films = document.getElementsByClassName('film-item');
-        let hasVisibleFilms = false;
-
-        Array.from(films).forEach(film => {
-            const filmName = film.dataset.filmName;
-            if (filmName.includes(searchTerm)) {
-                film.style.display = '';
-                hasVisibleFilms = true;
-            } else {
-                film.style.display = 'none';
-            }
-        });
-
-        // Show/hide no results message
-        const noResults = document.querySelector('.no-results');
-        if (noResults) {
-            if (!hasVisibleFilms) {
-                if (!document.querySelector('.no-results-message')) {
-                    const message = document.createElement('div');
-                    message.className = 'col-12 no-results-message';
-                    message.innerHTML = '<div class="alert alert-info">No films match your search.</div>';
-                    document.getElementById('filmsContainer').appendChild(message);
-                }
-            } else {
-                const message = document.querySelector('.no-results-message');
-                if (message) message.remove();
-            }
-        }
-    });
-</script>
 {% endblock %}
 
 {% block scripts %}

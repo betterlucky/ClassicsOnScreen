@@ -1213,3 +1213,70 @@ html {
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
+
+/* Container and grid adjustments */
+.container {
+    max-width: 1400px;
+    width: 100%;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+/* Film card adjustments */
+.film-item {
+    padding: 8px;
+}
+
+.film-item .card {
+    border-radius: 8px;
+    transition: transform 0.2s;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+}
+
+.film-item .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.film-item .card-body {
+    padding: 1rem;
+}
+
+#filmsContainer {
+    margin: 0 -8px;
+    width: calc(100% + 16px);
+}
+
+.vote-container {
+    margin-top: auto;
+    text-align: center;
+}
+
+/* Remove any extra spacing */
+#filmsContainer {
+    --bs-gutter-x: 1.5rem;
+    --bs-gutter-y: 1.5rem;
+}
+
+.film-item {
+    margin-bottom: 1.5rem;
+}
+
+/* Only keep essential card styling */
+.card {
+    height: 100%;
+    border-radius: 8px;
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.vote-container {
+    margin-top: auto;
+    text-align: center;
+}

@@ -8,8 +8,11 @@ from django.conf import settings
 from django.urls import path
 from django.utils.html import format_html
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 import requests
+import csv
+from io import StringIO
+from django.contrib import messages
 
 
 # Inline configuration for shows created by a user
@@ -59,15 +62,16 @@ class ShowCreditLogAdmin(admin.ModelAdmin):
 # Admin configuration for Film
 @admin.register(Film)
 class FilmAdmin(admin.ModelAdmin):
-    list_display = ('name', 'active', 'imdb_code', 'description')
+    list_display = ('name', 'active', 'imdb_code', 'EDI_number')
     list_filter = ('active',)
-    search_fields = ('name', 'imdb_code')
+    search_fields = ('name', 'imdb_code', 'EDI_number')
     ordering = ('name',)
     list_editable = ('active',)
+    actions = ['deactivate_films', 'export_active_films']
     
     fieldsets = (
         (None, {
-            'fields': ('name', 'imdb_code', 'description')
+            'fields': ('name', 'imdb_code', 'EDI_number')
         }),
         ('Status', {
             'fields': ('active',),
@@ -112,6 +116,121 @@ class FilmAdmin(admin.ModelAdmin):
             except Exception as e:
                 return JsonResponse({'error': str(e)}, status=500)
         return JsonResponse({'results': []})
+
+    def deactivate_films(self, request, queryset):
+        """Admin action to deactivate selected films"""
+        success_films = []
+        error_messages = []
+
+        # Process all films
+        for film in queryset:
+            if film.has_active_shows():
+                error_messages.append(f"Cannot remove '{film.name}' - has active shows")
+                continue
+
+            # Cancel all votes
+            film.votes.all().delete()
+            
+            # Deactivate film
+            film.active = False
+            film.save()
+
+            success_films.append(film)
+
+        # Send consolidated email if any films were deactivated
+        if success_films:
+            subject = f"Films Removed: {len(success_films)} films deactivated"
+            
+            # Create CSV in memory
+            output = StringIO()
+            writer = csv.writer(output)
+            writer.writerow(['Film', 'EDI', 'IMDB'])  # Header row
+            
+            for film in success_films:
+                writer.writerow([
+                    film.name,
+                    film.EDI_number or 'N/A',
+                    film.imdb_code
+                ])
+            
+            # Prepare email message
+            message_parts = []
+            if error_messages:
+                message_parts.append("The following errors occurred:")
+                message_parts.extend(error_messages)
+                message_parts.append("\n")
+            
+            message_parts.append(output.getvalue())
+            message = "\n".join(message_parts)
+
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[settings.ADMIN_EMAIL],
+                fail_silently=True,
+            )
+
+        # Show admin messages
+        if success_films:
+            self.message_user(
+                request,
+                f"Successfully removed {len(success_films)} film(s)",
+                messages.SUCCESS
+            )
+        
+        for error in error_messages:
+            self.message_user(request, error, messages.ERROR)
+
+    def export_active_films(self, request, queryset=None):
+        """Admin action to export all active films"""
+        # Get all active films, ignoring the queryset
+        active_films = Film.objects.filter(active=True).order_by('name')
+        
+        if not active_films.exists():
+            self.message_user(request, "No active films found to export", messages.WARNING)
+            return
+
+        # Create CSV in memory
+        output = StringIO()
+        writer = csv.writer(output)
+        writer.writerow(['Film', 'EDI', 'IMDB'])  # Header row
+        
+        for film in active_films:
+            writer.writerow([
+                film.name,
+                film.EDI_number or 'N/A',
+                film.imdb_code
+            ])
+        
+        # Send email
+        subject = f"Active Films Export: {active_films.count()} films"
+        message = output.getvalue()
+
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[settings.ADMIN_EMAIL],
+            fail_silently=True,
+        )
+
+        self.message_user(
+            request,
+            f"Exported {active_films.count()} active films to {settings.ADMIN_EMAIL}",
+            messages.SUCCESS
+        )
+
+    def changelist_view(self, request, extra_context=None):
+        """Add export button to changelist view"""
+        if 'action' in request.POST and request.POST['action'] == 'export_active_films':
+            if not request.POST.getlist('_selected_action'):
+                # No films selected, still perform export
+                self.export_active_films(request)
+                return HttpResponseRedirect(request.get_full_path())
+        return super().changelist_view(request, extra_context)
+
+    export_active_films.short_description = "Export active films list"
 
     class Media:
         css = {

@@ -23,6 +23,9 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('__debug__/', include('debug_toolbar.urls')),
     path('refund-credits/<int:show_id>/', views.refund_credits_view, name='refund_credits'),
+    path('films/', views.film_list, name='film_list'),
+    path('films/most-desired/', views.most_desired_films, name='most_desired_films'),
+    path('film/vote/<int:film_id>/', views.toggle_film_vote, name='toggle_film_vote'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 # Add Django site authentication urls (for login, logout, password management)
 

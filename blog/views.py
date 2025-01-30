@@ -15,9 +15,11 @@ from blog.forms import (
     SiteUserCreationForm, ShowForm, CommentForm, ShowFilterForm,
     ContactForm, PasswordResetForm
 )
-from blog.models import SiteUser, Film, Show, Location, Comment, ShowCreditLog, ShowOption
+from blog.models import SiteUser, Film, Show, Location, Comment, ShowCreditLog, ShowOption, FilmVote
 from django.utils import timezone
 from django.db import connection
+from datetime import timedelta
+from django.db import models
 
 
 def reset(request):
@@ -419,3 +421,86 @@ def buy_credits(request):
         request.user.save()
         messages.success(request, 'Added 10 credits to your account.')
     return redirect(request.META.get('HTTP_REFERER', 'index'))
+
+
+def film_list(request):
+    # Get search query
+    search_query = request.GET.get('search', '').strip()
+    
+    # Get all active films with their vote counts
+    films = Film.objects.filter(active=True).annotate(
+        vote_count=Count('votes', filter=models.Q(votes__created_on__gt=timezone.now() - timedelta(days=30)))
+    )
+    
+    # Apply search filter if query exists
+    if search_query:
+        films = films.filter(name__icontains=search_query)
+    
+    films = films.order_by('name')
+    
+    # Initialize voting-related variables
+    user_voted_films = set()
+    days_remaining = {}
+    votes_remaining = 0
+
+    # Only process voting data for authenticated users
+    if request.user.is_authenticated:
+        user_votes = FilmVote.objects.filter(
+            user=request.user,
+            created_on__gt=timezone.now() - timedelta(days=30)
+        )
+        user_vote_count = user_votes.count()
+        user_voted_films = set(vote.film_id for vote in user_votes)
+        days_remaining = {vote.film_id: vote.days_remaining for vote in user_votes}
+        votes_remaining = 10 - user_vote_count
+
+    # Get top 5 most desired films
+    top_films = Film.objects.filter(active=True).annotate(
+        vote_count=Count('votes', filter=models.Q(votes__created_on__gt=timezone.now() - timedelta(days=30)))
+    ).order_by('-vote_count')[:5]
+
+    context = {
+        'films': films,
+        'top_films': top_films,
+        'user_voted_films': user_voted_films,
+        'votes_remaining': votes_remaining,
+        'days_remaining': days_remaining,
+        'search_query': search_query,
+    }
+    return render(request, 'film_list.html', context)
+
+@login_required
+def most_desired_films(request):
+    films = Film.objects.filter(active=True).annotate(
+        vote_count=Count('votes', filter=Q(votes__created_on__gt=timezone.now() - timedelta(days=30)))
+    ).order_by('-vote_count')
+    
+    return render(request, 'most_desired_films.html', {'films': films})
+
+@login_required
+def toggle_film_vote(request, film_id):
+    if request.method != 'POST':
+        return redirect('film_list')
+
+    film = get_object_or_404(Film, id=film_id, active=True)
+    user_votes = FilmVote.objects.filter(
+        user=request.user,
+        created_on__gt=timezone.now() - timedelta(days=30)
+    )
+    
+    # Check if user already voted for this film
+    existing_vote = user_votes.filter(film=film).first()
+    
+    if existing_vote:
+        # Remove vote if it exists
+        existing_vote.delete()
+        messages.success(request, f'Vote removed for {film.name}')
+    else:
+        # Add new vote if user hasn't reached limit
+        if user_votes.count() >= 10:
+            messages.error(request, 'You can only vote for up to 10 films at a time')
+        else:
+            FilmVote.objects.create(user=request.user, film=film)
+            messages.success(request, f'Vote added for {film.name}')
+    
+    return redirect('film_list')

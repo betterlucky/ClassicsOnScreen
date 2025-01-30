@@ -43,3 +43,7 @@ def divide(value, arg):
         return float(value) / float(arg)
     except (ValueError, TypeError, ZeroDivisionError):
         return 0
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)

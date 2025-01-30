@@ -45,6 +45,13 @@ class Film(models.Model):
             )
         ]
     )
+    EDI_number = models.CharField(
+        max_length=50,
+        unique=True,
+        blank=True,
+        null=True,
+        help_text="Third party reference number for film booking"
+    )
 
     class Meta:
         verbose_name = "Film"
@@ -107,6 +114,27 @@ class Film(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
+
+    def has_active_shows(self):
+        """Check if film has any active shows"""
+        return self.upcoming_shows.filter(status__in=['tbc', 'confirmed']).exists()
+
+    def deactivate(self):
+        """
+        Deactivate film if possible.
+        Returns (success, message) tuple.
+        """
+        if self.has_active_shows():
+            return False, f"Cannot remove '{self.name}' - has active shows"
+
+        # Cancel all votes
+        self.votes.all().delete()
+        
+        # Deactivate film
+        self.active = False
+        self.save()
+
+        return True, f"Successfully removed '{self.name}'"
 
 
 class VenueOwner(models.Model):
@@ -564,3 +592,34 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"{self.author.username} on '{self.show}'"
+
+
+class FilmVote(models.Model):
+    """
+    Tracks user votes for films they want to keep available.
+    """
+    user = models.ForeignKey("SiteUser", on_delete=models.CASCADE)
+    film = models.ForeignKey("Film", on_delete=models.CASCADE, related_name="votes")
+    created_on = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'film')  # Prevent duplicate votes
+        ordering = ['-created_on']
+
+    def __str__(self):
+        return f"{self.user.username}'s vote for {self.film.name}"
+
+    @property
+    def days_remaining(self):
+        """Returns number of days until vote expires"""
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        expiry_date = self.created_on + timedelta(days=30)
+        remaining = expiry_date - timezone.now()
+        return max(0, remaining.days)
+
+    @property
+    def is_expired(self):
+        """Check if vote has expired"""
+        return self.days_remaining == 0

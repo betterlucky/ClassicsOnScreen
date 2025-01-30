@@ -46,19 +46,25 @@
             </div>
         {% endif %}
 
-        <div id="filmsContainer" class="row g-3">  {% for film in films %}
-                <div class="col-12 col-md-4 film-item" data-film-name="{{ film.name|lower }}">  <div class="card h-100">  <div class="card-body d-flex flex-column">  <div class="d-flex justify-content-between align-items-start mb-3">
-                                <h5 class="card-title mb-0">
-                                    <a href="{% url 'blog_film' film.name %}" class="text-decoration-none">{{ film.name }}</a>
-                                </h5>
+        <div id="filmsContainer" class="row justify-content-center g-3">
+            {% for film in films %}
+                <div class="col-12 col-md-4 film-item" style="max-width: 450px;" data-film-name="{{ film.name|lower }}">
+                    <div class="card show-card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{% url 'blog_film' film.name %}" class="text-decoration-none">{{ film.name }}</a>
                                 <a href="https://www.imdb.com/title/{{ film.imdb_code }}" 
-                                   class="btn btn-sm ms-2 py-0 px-1 imdb-link"  target="_blank"
+                                   class="btn btn-sm ms-2 py-0 px-1"
+                                   style="background-color: #f5c518; color: #000000; border: 1px solid #000000;"
+                                   target="_blank"
                                    rel="noopener noreferrer">
                                     <i class="bi bi-film"></i> IMDb
                                 </a>
-                            </div>
+                            </h5>
                             
-                            <p class="card-text text-muted flex-grow-1">{{ film.description }}</p>  {% if film.upcoming_shows.exists %}
+                            <p class="card-text text-muted">{{ film.description }}</p>
+                            
+                            {% if film.upcoming_shows.exists %}
                                 <div class="mb-3">
                                     <h6 class="mb-2">
                                         <i class="bi bi-calendar-event me-2"></i>Upcoming Shows
@@ -76,9 +82,11 @@
                                 </div>
                             {% endif %}
 
-                            <div class="mt-auto">  {% if user.is_authenticated %}
+                            <div class="vote-container mt-auto">
+                                {% if user.is_authenticated %}
                                     {% if film.id in user_voted_films %}
-                                        <form method="post" action="{% url 'toggle_film_vote' film.id %}" class="d-inline w-100">  {% csrf_token %}
+                                        <form method="post" action="{% url 'toggle_film_vote' film.id %}" class="d-inline">
+                                            {% csrf_token %}
                                             <button type="submit" class="btn btn-vote voted w-100">
                                                 <i class="bi bi-heart-fill"></i> 
                                                 <span class="vote-text">Remove Vote</span>
@@ -88,7 +96,8 @@
                                             Vote expires in {{ days_remaining|get_item:film.id }} days
                                         </div>
                                     {% else %}
-                                        <form method="post" action="{% url 'toggle_film_vote' film.id %}" class="d-inline w-100">  {% csrf_token %}
+                                        <form method="post" action="{% url 'toggle_film_vote' film.id %}" class="d-inline">
+                                            {% csrf_token %}
                                             <button type="submit" class="btn btn-vote w-100" {% if votes_remaining == 0 %}disabled{% endif %}>
                                                 <i class="bi bi-heart"></i>
                                                 <span class="vote-text">Vote to Keep</span>

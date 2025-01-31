@@ -79,9 +79,9 @@
     </div>
 
     <!-- Films Section -->
-    <div class="row justify-content-center g-3">
+    <div class="row justify-content-center g-3" id="filmsContainer">
         {% for film in films %}
-            <div class="col-12 col-md-4" style="max-width: 450px;">
+            <div class="col-12 col-md-4 film-item" style="max-width: 450px;" data-film-name="{{ film.name|lower }}">
                 <div class="card show-card h-100">
                     <div class="card-body">
                         <h5 class="card-title">

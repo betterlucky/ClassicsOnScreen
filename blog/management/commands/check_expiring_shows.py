@@ -8,10 +8,5 @@ class Command(BaseCommand):
     help = 'Check and expire shows that have not received enough credits'
 
     def handle(self, *args, **kwargs):
-        logger.info('Starting expiry check command')
-        try:
-            check_show_expiry()
-            self.stdout.write(self.style.SUCCESS('Show expiry check completed successfully'))
-        except Exception as e:
-            logger.error(f'Command failed: {str(e)}')
-            self.stdout.write(self.style.ERROR('Show expiry check failed')) 
+        logger.info('Running show expiry check')
+        check_show_expiry() 

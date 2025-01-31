@@ -1,4 +1,5 @@
 from django import template
+from datetime import datetime, timedelta
 
 register = template.Library()
 
@@ -47,3 +48,9 @@ def divide(value, arg):
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)
+
+@register.filter
+def timeuntil_weeks(value, weeks):
+    """Returns a date that's a certain number of weeks before the given date"""
+    target_date = value - timedelta(weeks=int(weeks))
+    return target_date.strftime("%B %d, %Y")

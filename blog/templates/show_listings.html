@@ -114,6 +114,17 @@
                         </div>
                     </div>
 
+                    {% if show.status == 'inactive' and show.days_until_expiry %}
+                        <div class="text-danger small mt-1">
+                            <i class="bi bi-clock"></i> 
+                            {% if show.days_until_expiry == 0 %}
+                                Expires today!
+                            {% else %}
+                                {{ show.days_until_expiry }} days to reach minimum credits
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
                     <div class="d-flex justify-content-between align-items-center mt-3">
                         <div class="text-muted small">
                             {% if show.created_by %}

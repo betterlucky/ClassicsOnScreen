@@ -55,8 +55,26 @@
                     {% endif %}
                 </div>
             </div>
+            {% if show.status == 'inactive' and show.days_until_expiry %}
+                <div class="alert alert-warning mt-2">
+                    <i class="bi bi-clock"></i> 
+                    {% if show.days_until_expiry == 0 %}
+                        <strong>This show expires today!</strong> 
+                    {% else %}
+                        <strong>{{ show.days_until_expiry }} days remaining</strong> 
+                    {% endif %}
+                    to reach the minimum number of credits needed. If the minimum isn't reached by 
+                    {{ show.eventtime|timeuntil_weeks:2 }}, the show will expire and all credits will be refunded.
+                    <a href="{% url 'blog_faq' %}#show-timing">Learn more about show timing requirements</a>
+                </div>
+            {% endif %}
             <div class="text-muted small mb-3">
-                Maximum capacity: {{ show.location.max_capacity }}
+                <strong>Important Dates:</strong><br>
+                • Event Date: {{ show.eventtime|date:"l, F j, Y" }} at {{ show.eventtime|time:"g:i A" }}<br>
+                {% if show.status == 'inactive' %}
+                    • Credit Collection Deadline: {{ show.eventtime|timeuntil_weeks:2 }}<br>
+                {% endif %}
+                • Maximum capacity: {{ show.location.max_capacity }}
             </div>
 
             <!-- Show Description -->

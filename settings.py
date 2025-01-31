@@ -202,3 +202,7 @@ LOGGING = {
         },
     },
 }
+
+# Show timing settings
+SHOW_CREATION_MIN_DAYS = 21  # Must create shows at least 3 weeks before event
+SHOW_EXPIRY_DAYS = 14       # Shows expire 2 weeks before event if not enough credits

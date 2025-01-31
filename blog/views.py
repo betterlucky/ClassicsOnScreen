@@ -226,10 +226,8 @@ def blog_detail(request, pk):
 @login_required
 def create_show(request):
     """Create a new show."""
-    
     if request.method == 'POST':
         form = ShowForm(request.POST)
-        
         if form.is_valid():
             show = form.save(commit=False)
             show.created_by = request.user
@@ -240,6 +238,21 @@ def create_show(request):
 
             show.eventtime = form.cleaned_data['eventtime']
             
+            # Check timing for warning
+            min_creation_days = settings.SHOW_CREATION_MIN_DAYS
+            min_creation_date = show.eventtime - timedelta(days=min_creation_days)
+            
+            if timezone.now() > min_creation_date:
+                if request.user.is_staff:
+                    # Add warning but allow creation
+                    messages.warning(
+                        request, 
+                        f'This show is being created with less than {min_creation_days} days until the event. '
+                        'This would normally not be allowed to ensure enough time for ticket sales and film booking, '
+                        'but has been permitted due to admin privileges.'
+                    )
+                    show._skip_timing_validation = True
+            
             try:
                 show.full_clean()
                 show.save()
@@ -249,9 +262,6 @@ def create_show(request):
                     show.options.set(selected_options)
                 
                 show.add_credits(request.user, 1)
-                request.user.credits -= 1
-                request.user.save()
-
                 messages.success(request, 'Show created successfully!')
                 return redirect('blog_detail', pk=show.id)
             except ValidationError as e:
@@ -261,7 +271,12 @@ def create_show(request):
     else:
         form = ShowForm()
     
-    return render(request, 'create_show.html', {'form': form})
+    context = {
+        'form': form,
+        'min_days_before_event': settings.SHOW_CREATION_MIN_DAYS,
+        'is_admin': request.user.is_staff
+    }
+    return render(request, 'create_show.html', context)
 
 
 @login_required

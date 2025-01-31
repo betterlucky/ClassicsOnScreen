@@ -1,6 +1,7 @@
 from django.utils import timezone
 from datetime import timedelta
 from .models import Show
+from django.conf import settings
 import logging
 
 logger = logging.getLogger(__name__)
@@ -9,15 +10,15 @@ def check_show_expiry():
     """
     Check for shows that should expire:
     - Status is 'inactive' or 'tbc'
-    - Less than 2 weeks until show date
+    - Less than SHOW_EXPIRY_DAYS before show date
     - Not enough credits
     """
-    two_weeks_from_now = timezone.now() + timedelta(weeks=2)
+    expiry_threshold = timezone.now() + timedelta(days=settings.SHOW_EXPIRY_DAYS)
     
     # Get shows that might expire
     expiring_shows = Show.objects.filter(
         status__in=['inactive', 'tbc'],
-        eventtime__lte=two_weeks_from_now
+        eventtime__lte=expiry_threshold
     )
     
     for show in expiring_shows:

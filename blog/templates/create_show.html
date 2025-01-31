@@ -12,6 +12,14 @@
     </div>
 {% endif %}
 
+<div class="alert {% if is_admin %}alert-warning{% else %}alert-info{% endif %}">
+    <i class="bi bi-info-circle"></i>
+    Shows must be created at least {{ min_days_before_event }} days before the event date to allow enough time for ticket sales and film booking.
+    {% if is_admin %}
+    <br><strong>As an admin, you can override this restriction if needed.</strong>
+    {% endif %}
+</div>
+
 <form method="post">
     {% csrf_token %}
     {% crispy form %}

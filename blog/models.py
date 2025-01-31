@@ -424,6 +424,16 @@ class Show(models.Model):
                 
             return False
 
+    @property
+    def days_until_expiry(self):
+        """Returns days until show expires (based on SHOW_EXPIRY_DAYS setting)"""
+        if self.status not in ['inactive', 'tbc']:
+            return None
+        
+        expiry_date = self.eventtime - timedelta(days=settings.SHOW_EXPIRY_DAYS)
+        remaining = expiry_date - timezone.now()
+        return max(0, remaining.days)
+
     def confirm_show(self):
         """Mark the show as confirmed and notify contributors."""
         if self.status == 'tbc' or self.status == 'confirmed':  # Only allow confirmation from 'tbc' or 'confirmed' status
@@ -520,12 +530,10 @@ class Show(models.Model):
 
     def mark_expired(self):
         """Mark the show as expired if it hasn't been confirmed in time."""
-        # Check if the show is in 'tbc' or already 'expired' status
+        # Check if the show is in 'tbc' or 'inactive' status
         if self.status not in ['tbc', 'inactive']:
-            return  # Only process shows that are in 'tbc' or 'inactive' status
+            return
 
-        # Check if the show has passed its scheduled time and hasn't been confirmed
-        
         # Refund credits as the show is considered expired
         self.refund_credits()
 
@@ -543,8 +551,16 @@ class Show(models.Model):
         """Validate show creation and updates."""
         super().clean()
 
-        # Ensure eventtime is set before comparing
-        
+        if self.eventtime:
+            # Check if show is being created with enough advance notice
+            min_creation_days = settings.SHOW_CREATION_MIN_DAYS
+            min_creation_date = self.eventtime - timedelta(days=min_creation_days)
+            
+            if timezone.now() > min_creation_date:
+                if not (hasattr(self, '_skip_timing_validation') and self._skip_timing_validation):
+                    raise ValidationError({
+                        'eventtime': f'Shows must be created at least {min_creation_days} days before the event date to allow time for ticket sales and film booking'
+                    })
 
     @property
     def has_subtitles(self):

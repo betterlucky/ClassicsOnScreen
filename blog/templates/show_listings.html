@@ -1,14 +1,16 @@
 {% load static %}
 {% load custom_filters %}
 
-<div class="filter-section mb-4">
-    {% if form %}
-        <div class="filter-header">
-            <h3>Filter Shows</h3>
-            <button class="filter-reset" onclick="resetFilters()">Reset Filters</button>
-        </div>
-
-        <form method="get" id="filters-form">
+<div class="filters-and-shows">
+    <div class="filter-section mb-4">
+        <form id="filters-form" 
+              hx-get="{{ request.path }}" 
+              hx-trigger="change from:.filter-select" 
+              hx-target=".filters-and-shows"
+              hx-swap="outerHTML"
+              action=""
+              method="get">
+            
             <div class="filter-grid">
                 {% if exclude_location_filter != True %}
                     <div class="filter-item">
@@ -30,120 +32,117 @@
                 </div>
             </div>
 
-            {% if form.location.value or form.film.value or form.status.value %}
-                <div class="active-filters mt-3">
-                    {% if form.location.value %}
-                        <span class="filter-tag">
-                            Location: {{ form.location|get_selected_object }}
-                            <button type="button" onclick="clearFilter('location')" class="btn-close" aria-label="Remove filter"></button>
-                        </span>
-                    {% endif %}
+            <!-- Active Filters -->
+            <div class="active-filters mt-3">
+                {% if form.location.value and exclude_location_filter != True %}
+                    <span class="badge bg-secondary me-2">
+                        Location: {{ form.location|get_selected_object }}
+                        <button type="button" 
+                                class="btn-close btn-close-white ms-2"
+                                hx-get="{{ request.path }}"
+                                hx-target=".filters-and-shows"
+                                hx-vals='{"location": "", "film": "{{ form.film.value|default:"" }}", "status": "{{ form.status.value|default:"" }}"}'
+                                onclick="document.getElementById('id_location').value = ''"></button>
+                    </span>
+                {% endif %}
 
-                    {% if form.film.value %}
-                        <span class="filter-tag">
-                            Film: {{ form.film|get_selected_object }}
-                            <button type="button" onclick="clearFilter('film')" class="btn-close" aria-label="Remove filter"></button>
-                        </span>
-                    {% endif %}
+                {% if form.film.value and exclude_film_filter != True %}
+                    <span class="badge bg-secondary me-2">
+                        Film: {{ form.film|get_selected_object }}
+                        <button type="button" 
+                                class="btn-close btn-close-white ms-2"
+                                hx-get="{{ request.path }}"
+                                hx-target=".filters-and-shows"
+                                hx-vals='{"film": "", "location": "{{ form.location.value|default:"" }}", "status": "{{ form.status.value|default:"" }}"}'
+                                onclick="document.getElementById('id_film').value = ''"></button>
+                    </span>
+                {% endif %}
 
-                    {% if form.status.value and form.status.value != 'all' %}
-                        <span class="filter-tag">
-                            Status: {{ form.status|get_selected_object }}
-                            <button type="button" onclick="clearFilter('status')" class="btn-close" aria-label="Remove filter"></button>
-                        </span>
-                    {% endif %}
-                </div>
-            {% endif %}
+                {% if form.status.value and form.status.value != 'all' %}
+                    <span class="badge bg-secondary me-2">
+                        Status: {{ form.status|get_selected_object }}
+                        <button type="button" 
+                                class="btn-close btn-close-white ms-2"
+                                hx-get="{{ request.path }}"
+                                hx-target=".filters-and-shows"
+                                hx-vals='{"status": "", "location": "{{ form.location.value|default:"" }}", "film": "{{ form.film.value|default:"" }}"}'
+                                onclick="document.getElementById('id_status').value = ''"></button>
+                    </span>
+                {% endif %}
+            </div>
         </form>
-    {% endif %}
-</div>
+    </div>
 
-<div class="row justify-content-center g-3">
-    {% for show in shows %}
-        <div class="col-12 col-md-4" style="max-width: 450px;">
-            <div class="card show-card h-100">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a href="{% url 'blog_film' show.film.name %}">{{ show.film.name }}</a>
-                        <a href="https://www.imdb.com/title/{{ show.film.imdb_code }}"
-                           class="btn btn-sm ms-2 py-0 px-1"
-                           style="background-color: #f5c518; color: #000000; border: 1px solid #000000;"
-                           target="_blank"
-                           rel="noopener noreferrer">
-                            <i class="bi bi-film"></i> IMDb
-                        </a>
-                        {% if show.is_sold_out %}
-                            <span class="badge bg-danger ms-2">SOLD OUT</span>
-                        {% endif %}
-                    </h5>
-                    <h6 class="card-subtitle mb-2 text-muted">
-                        {{ show.eventtime|date:"l, F j, Y" }} at {{ show.eventtime|time:"g:i A" }}
-                    </h6>
-                    <p class="card-text">
-                        <strong>Location:</strong> <a href="{% url 'blog_location' show.location.name %}">{{ show.location }}</a><br>
-                        <strong>Status:</strong> {{ show.get_status_display }}
-                    </p>
-
-                    <a href="{% url 'blog_detail' show.id %}" class="btn btn-primary btn-sm mb-2">
-                        <i class="bi bi-info-circle"></i> Event Information
-                    </a>
-
-                    <!-- Show options display -->
-                    <div class="show-options mb-2">
-                        {% for option in show.options.all %}
-                            <span class="badge bg-success">
-                                <i class="bi bi-check-circle me-1"></i>{{ option.name }}
-                            </span>
-                        {% endfor %}
-                    </div>
-
-                    <div class="progress mt-3">
-                        <div class="progress-bar {% if show.is_sold_out %}bg-danger{% elif show.credits >= show.location.min_capacity %}bg-success{% endif %}"
-                             role="progressbar"
-                             style="width:{% if show.credits < show.location.min_capacity %}{{ show.credits|default:0|multiply:100|divide:show.location.min_capacity }}{% else %}100{% endif %}%"
-                             aria-valuenow="{{ show.credits|default:0 }}"
-                             aria-valuemin="0"
-                             aria-valuemax="{{ show.location.min_capacity }}">
+    <div class="row justify-content-center g-3">
+        {% for show in shows %}
+            <div class="col-12 col-md-4" style="max-width: 450px;">
+                <div class="card show-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{% url 'blog_film' show.film.name %}">{{ show.film.name }}</a>
                             {% if show.is_sold_out %}
-                                SOLD OUT
-                            {% elif show.credits >= show.location.min_capacity %}
-                                ON SALE
-                            {% else %}
-                                {{ show.credits|default:0 }}/{{ show.location.min_capacity }} attendees required
+                                <span class="badge bg-danger ms-2">SOLD OUT</span>
                             {% endif %}
-                        </div>
-                    </div>
+                        </h5>
 
-                    {% if show.status == 'inactive' and show.days_until_expiry %}
-                        <div class="text-danger small mt-1">
-                            <i class="bi bi-clock"></i> 
-                            {% if show.days_until_expiry == 0 %}
-                                Expires today!
-                            {% else %}
-                                {{ show.days_until_expiry }} days to reach minimum credits
-                            {% endif %}
-                        </div>
-                    {% endif %}
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            {{ show.eventtime|date:"l, F j, Y" }} at {{ show.eventtime|time:"g:i A" }}
+                        </h6>
 
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div class="text-muted small">
-                            {% if show.created_by %}
-                                Suggested by <a href="{% url 'profile' show.created_by.username %}">{{ show.created_by.username }}</a>
-                            {% else %}
-                                Suggested by Anonymous
-                            {% endif %}
+                        <p class="card-text">
+                            <strong>Location:</strong> 
+                            <a href="{% url 'blog_location' show.location.name %}">{{ show.location }}</a><br>
+                            <strong>Status:</strong> {{ show.get_status_display }}
+                        </p>
+
+                        <!-- Show options if any -->
+                        {% if show.options.exists %}
+                            <div class="show-options mb-2">
+                                {% for option in show.options.all %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle me-1"></i>{{ option.name }}
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <!-- Progress bar -->
+                        <div class="progress mt-3">
+                            <div class="progress-bar {% if show.is_sold_out %}bg-danger{% elif show.credits >= show.location.min_capacity %}bg-success{% endif %}"
+                                 role="progressbar"
+                                 style="width: {% if show.credits < show.location.min_capacity %}{{ show.credits|default:0|multiply:100|divide:show.location.min_capacity }}{% else %}100{% endif %}%"
+                                 aria-valuenow="{{ show.credits|default:0 }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="{{ show.location.min_capacity }}">
+                                {% if show.is_sold_out %}
+                                    SOLD OUT
+                                {% elif show.credits >= show.location.min_capacity %}
+                                    ON SALE
+                                {% else %}
+                                    {{ show.credits|default:0 }}/{{ show.location.min_capacity }}
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if show.status == 'inactive' and show.days_until_expiry %}
+                            <div class="text-danger mt-2">
+                                <small>
+                                    <i class="bi bi-clock"></i> 
+                                    {{ show.days_until_expiry }} days to reach minimum credits
+                                </small>
+                            </div>
+                        {% endif %}
+
+                        <div class="mt-3">
+                            <a href="{% url 'blog_detail' show.pk %}" class="btn btn-primary">View Details</a>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    {% empty %}
-        <div class="col-12">
-            <div class="alert alert-info">No shows found.</div>
-        </div>
-    {% endfor %}
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">No shows found matching your criteria.</div>
+            </div>
+        {% endfor %}
+    </div>
 </div>
-
-{% block scripts %}
-    <script src="{% static 'js/filter_handlers.js' %}"></script>
-{% endblock %}

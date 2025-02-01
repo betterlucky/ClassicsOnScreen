@@ -47,12 +47,5 @@
 
     <!-- Shows Section -->
     <h2 class="mb-4">Upcoming Shows</h2>
-    <div class="show-listings">
-        {% include "show_listings.html" with exclude_user_filter=True exclude_location_filter=False exclude_film_filter=False %}
-    </div>
+    {% include "show_listings.html" with exclude_user_filter=True exclude_location_filter=False exclude_film_filter=False %}
 {% endblock page_content %}
-
-{% block scripts %}
-    {{ block.super }}
-    <script src="{% static 'js/form_handlers.js' %}"></script>
-{% endblock scripts %}

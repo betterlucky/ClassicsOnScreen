@@ -147,6 +147,14 @@ def index(request):
         if filters:
             shows = shows.filter(**filters)
 
+    if request.htmx:
+        return render(request, 'show_listings.html', {
+            'shows': shows,
+            'form': form,
+            'exclude_location_filter': False,
+            'exclude_film_filter': False
+        })
+    
     context = {
         'form': form,
         'shows': shows,
@@ -170,6 +178,13 @@ def blog_film(request, film_name):
     if form.is_valid() and form.cleaned_data.get('status') and form.cleaned_data['status'] != 'all':
         shows = shows.filter(status=form.cleaned_data['status'])
 
+    if request.htmx:
+        return render(request, 'show_listings.html', {
+            'shows': shows,
+            'form': form,
+            'exclude_film_filter': True,
+        })
+
     context = {
         "shows": shows,
         "form": form,
@@ -187,6 +202,13 @@ def blog_location(request, location_name):
 
     if form.is_valid() and form.cleaned_data.get('status') and form.cleaned_data['status'] != 'all':
         shows = shows.filter(status=form.cleaned_data['status'])
+
+    if request.htmx:
+        return render(request, 'show_listings.html', {
+            'shows': shows,
+            'form': form,
+            'exclude_location_filter': True,
+        })
 
     context = {
         "shows": shows,

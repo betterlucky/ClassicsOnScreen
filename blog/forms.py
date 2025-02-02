@@ -40,18 +40,49 @@ class ContactForm(forms.Form):
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
-            Field('name', css_class='mb-3'),
-            Field('email', css_class='mb-3'),
+            Row(
+                Column('name', css_class='form-group col-md-6 mb-3'),
+                Column('email', css_class='form-group col-md-6 mb-3'),
+                css_class='form-row'
+            ),
+            Field('subject', css_class='mb-3'),
             Field('message', css_class='mb-3'),
-            Submit('submit', 'Send Message', css_class='btn btn-primary')
         )
 
-    name = forms.CharField(label="Your Name", max_length=100, 
-                         widget=forms.TextInput(attrs={'placeholder': 'Enter your name'}))
-    email = forms.EmailField(label="Your Email", required=False, 
-                           widget=forms.EmailInput(attrs={'placeholder': 'Enter your email'}))
-    message = forms.CharField(label="Your Message", 
-                            widget=forms.Textarea(attrs={'placeholder': 'Enter your message'}))
+    name = forms.CharField(
+        label="Your Name",
+        max_length=100,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Enter your name',
+            'class': 'form-control'
+        })
+    )
+    
+    email = forms.EmailField(
+        label="Your Email",
+        widget=forms.EmailInput(attrs={
+            'placeholder': 'Enter your email',
+            'class': 'form-control'
+        })
+    )
+    
+    subject = forms.CharField(
+        label="Subject",
+        max_length=200,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'What is your message about?',
+            'class': 'form-control'
+        })
+    )
+    
+    message = forms.CharField(
+        label="Your Message",
+        widget=forms.Textarea(attrs={
+            'placeholder': 'How can we help you?',
+            'class': 'form-control',
+            'rows': 5
+        })
+    )
 
 
 class SiteUserCreationForm(UserCreationForm):

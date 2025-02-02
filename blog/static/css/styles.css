@@ -329,8 +329,8 @@ body.sidebar-collapsed .container-fluid {
     
     main {
         margin-left: var(--sidebar-width);
-        transition: margin-left 0.3s ease-in-out;
         width: calc(100% - var(--sidebar-width));
+        padding: 0 2rem;
     }
     
     main.sidebar-collapsed {
@@ -848,8 +848,8 @@ html {
 
 @media (min-width: 768px) {
     .container {
-        width: calc(100% - var(--sidebar-width) - 2rem);
-        margin-left: calc(var(--sidebar-width) + 1rem);
+        max-width: 1200px;
+        margin: 0 auto;
         padding: 0;
     }
 
@@ -860,10 +860,15 @@ html {
 }
 
 @media (max-width: 767px) {
-    .container {
+    main {
         width: 100%;
+        margin-left: 0;
         padding: 1rem;
-        margin: 0;
+    }
+
+    .container {
+        padding: 0;
+        width: 100%;
     }
 
     .jumbotron,
@@ -1387,4 +1392,19 @@ main.sidebar-collapsed {
 .col-md-3.col-lg-2 {
     padding-left: 0;
     padding-right: 0;
+}
+
+/* Contact page specific styles */
+.contact-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.contact-info {
+    color: var(--text-color);
+}
+
+.contact-info i {
+    font-size: 1.2rem;
 }

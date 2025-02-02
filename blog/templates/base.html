@@ -10,7 +10,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 </head>
 
 <body>
@@ -40,5 +39,16 @@
     
     <!-- Page-specific Scripts -->
     {% block scripts %}{% endblock scripts %}
+
+    <!-- HTMX Script -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script>
+        document.body.addEventListener('htmx:configRequest', function(evt) {
+            // Ensure form values are included in the request
+            if (evt.detail.elt.tagName === 'SELECT') {
+                evt.detail.parameters[evt.detail.elt.name] = evt.detail.elt.value;
+            }
+        });
+    </script>
 </body>
 </html>

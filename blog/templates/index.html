@@ -7,7 +7,7 @@
 
 {% block page_content %}
     <!-- Hero Section -->
-    <div class="jumbotron mb-4">
+    <div class="jumbotron">
         <h1 class="display-4">Welcome to Classics on Screen</h1>
         <p class="lead">Bringing classic films back to the big screen through community support.</p>
         <p class="text-warning"><strong>Note: This is a test website. All shows and films listed are for demonstration purposes only.</strong></p>
@@ -24,24 +24,18 @@
     </div>
 
     <!-- Stats Section -->
-    <div class="row justify-content-center g-3 mb-4">
-        <div class="col-12 col-md-4" style="max-width: 450px;">
-            <div class="stats-card">
-                <h5 class="card-title">Active Shows</h5>
-                <p class="card-text">{{ active_shows_count }}</p>
-            </div>
+    <div class="stats-section">
+        <div class="stats-card">
+            <h5>Active Shows</h5>
+            <p class="display-4">{{ active_shows_count }}</p>
         </div>
-        <div class="col-12 col-md-4" style="max-width: 450px;">
-            <div class="stats-card">
-                <h5 class="card-title">Available Films</h5>
-                <p class="card-text">{{ available_films_count }}</p>
-            </div>
+        <div class="stats-card">
+            <h5>Available Films</h5>
+            <p class="display-4">{{ available_films_count }}</p>
         </div>
-        <div class="col-12 col-md-4" style="max-width: 450px;">
-            <div class="stats-card">
-                <h5 class="card-title">Locations</h5>
-                <p class="card-text">{{ locations_count }}</p>
-            </div>
+        <div class="stats-card">
+            <h5>Locations</h5>
+            <p class="display-4">{{ locations_count }}</p>
         </div>
     </div>
 

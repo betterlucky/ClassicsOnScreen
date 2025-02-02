@@ -54,3 +54,17 @@ def timeuntil_weeks(value, weeks):
     """Returns a date that's a certain number of weeks before the given date"""
     target_date = value - timedelta(weeks=int(weeks))
     return target_date.strftime("%B %d, %Y")
+
+@register.filter
+def htmx_attrs(field, attrs_dict):
+    """
+    Adds HTMX attributes to a form field.
+    Usage: {{ form.field|htmx_attrs:{'hx-post': '/validate/', 'hx-trigger': 'change'} }}
+    """
+    if isinstance(attrs_dict, str):
+        import json
+        attrs_dict = json.loads(attrs_dict)
+    
+    existing_attrs = field.field.widget.attrs
+    existing_attrs.update(attrs_dict)
+    return field.as_widget(attrs=existing_attrs)

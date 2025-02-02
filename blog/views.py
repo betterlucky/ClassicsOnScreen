@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import get_user_model
-from django.http import HttpResponse, Http404, HttpResponseNotAllowed
+from django.contrib.auth import get_user_model, authenticate, login
+from django.contrib.auth.forms import AuthenticationForm
+from django.http import HttpResponse, Http404, HttpResponseNotAllowed, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
@@ -513,6 +514,11 @@ def film_list(request):
         'search_query': search_query,
         'MAX_FILM_VOTES': settings.MAX_FILM_VOTES,
     }
+
+    if request.htmx:
+        # Return the show_listings template for HTMX requests
+        return render(request, 'show_listings.html', context)
+    
     return render(request, 'film_list.html', context)
 
 @login_required
@@ -550,3 +556,47 @@ def toggle_film_vote(request, film_id):
             messages.success(request, f'Vote added for {film.name}')
     
     return redirect('film_list')
+
+def validate_username(request):
+    """Validate username availability."""
+    username = request.POST.get('username', '').strip()
+    response = {'is_valid': True, 'message': ''}
+    
+    if not username:
+        response['is_valid'] = False
+        response['message'] = 'Username is required.'
+    elif len(username) < 3:
+        response['is_valid'] = False
+        response['message'] = 'Username must be at least 3 characters long.'
+    elif SiteUser.objects.filter(username=username).exists():
+        response['is_valid'] = False
+        response['message'] = 'This username is already taken.'
+    
+    if request.htmx:
+        if response['is_valid']:
+            return HttpResponse('')
+        return HttpResponse(
+            f'<div class="invalid-feedback d-block">{response["message"]}</div>'
+        )
+    return JsonResponse(response)
+
+def validate_email(request):
+    """Validate email availability and format."""
+    email = request.POST.get('email', '').strip()
+    response = {'is_valid': True, 'message': ''}
+    
+    if not email:
+        response['is_valid'] = False
+        response['message'] = 'Email is required.'
+    elif SiteUser.objects.filter(email=email).exists():
+        response['is_valid'] = False
+        response['message'] = 'This email is already registered.'
+    
+    if request.htmx:
+        if response['is_valid']:
+            return HttpResponse('')
+        return HttpResponse(
+            f'<div class="invalid-feedback d-block">{response["message"]}</div>'
+        )
+    return JsonResponse(response)
+

@@ -28,7 +28,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <form method="post" action="{% url 'buy_credits' %}">
+                    <form method="post" action="{% url 'buy_credits' %}" hx-post="{% url 'buy_credits' %}" hx-target="#sidebarMenu">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-link nav-link">
                             <i class="bi bi-cash-coin"></i> Buy 10 Credits
@@ -36,7 +36,7 @@
                     </form>
                 </li>
                 <li class="nav-item">
-                    <form id="logout-form" method="post" action="{% url 'logout' %}">
+                    <form method="post" action="{% url 'logout' %}">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-link nav-link">
                             <i class="bi bi-box-arrow-in-left"></i> Logout
@@ -45,7 +45,7 @@
                 </li>
             {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}?next={{ request.path }}">
+                    <a class="nav-link" href="{% url 'login' %}">
                         <i class="bi bi-box-arrow-in-right"></i> Login
                     </a>
                 </li>
@@ -77,4 +77,6 @@
         </ul>
     </div>
 </nav>
+
+
 

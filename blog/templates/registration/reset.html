@@ -1,16 +1,29 @@
 {% extends "base.html" %}
 
 {% block page_content %}
-
-<head>
-    <title>Password Reset</title>
-</head>
-<body>
+<div class="reset-container">
     <h1>Reset Your Password</h1>
-    <form method="post">
+    
+    <form method="post" 
+          hx-post="{% url 'reset' %}"
+          hx-target="#reset-messages">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Send Password Reset Email</button>
+        
+        <div id="reset-messages"></div>
+        
+        <div class="mb-3">
+            {{ form.email|add_class:"form-control" }}
+        </div>
+        
+        <button type="submit" 
+                class="btn btn-primary"
+                hx-indicator="#loading-indicator">
+            Send Password Reset Email
+        </button>
+        
+        <div id="loading-indicator" class="htmx-indicator">
+            Sending email...
+        </div>
     </form>
-</body>
-{% endblock page_content %}
+</div>
+{% endblock %}

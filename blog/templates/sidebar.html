@@ -28,7 +28,10 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <form method="post" action="{% url 'buy_credits' %}" hx-post="{% url 'buy_credits' %}" hx-target="#sidebarMenu">
+                    <form method="post" action="{% url 'buy_credits' %}" 
+                          hx-post="{% url 'buy_credits' %}" 
+                          hx-swap="none"
+                          hx-on::after-request="window.location.reload()">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-link nav-link">
                             <i class="bi bi-cash-coin"></i> Buy 10 Credits

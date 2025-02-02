@@ -1,87 +1,89 @@
-<!-- Toggle Button (outside sidebar) -->
-<button class="sidebar-toggle" aria-label="Toggle Sidebar">
+<!-- Move toggle button outside the container -->
+<button class="sidebar-toggle d-md-none" aria-label="Toggle Sidebar">
     <i class="bi bi-chevron-right"></i>
 </button>
 
-<!-- Sidebar Navigation -->
-<nav id="sidebarMenu" class="sidebar collapsed">
-    <div class="position-sticky pt-3">
-        <ul class="nav flex-column">
-            <li class="nav-item">
-                <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'index' %}">
-                    <i class="bi bi-house-door"></i>
-                    Home
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if request.path == '/films/' %}active{% endif %}" href="{% url 'film_list' %}">
-                    <i class="bi bi-film"></i> Films
-                </a>
-            </li>
-            {% if user.is_authenticated %}
+<div class="sidebar-container collapsed">
+    <!-- Sidebar Navigation -->
+    <nav id="sidebarMenu" class="sidebar">
+        <div class="position-sticky pt-3">
+            <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'create_show' %}">
-                        <i class="bi bi-calendar-plus"></i> Create A New Event
+                    <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'index' %}">
+                        <i class="bi bi-house-door"></i>
+                        Home
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'profile' user.username %}">
-                        <i class="bi bi-person-circle"></i> View Your Profile
+                    <a class="nav-link {% if request.path == '/films/' %}active{% endif %}" href="{% url 'film_list' %}">
+                        <i class="bi bi-film"></i> Films
+                    </a>
+                </li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'create_show' %}">
+                            <i class="bi bi-calendar-plus"></i> Create A New Event
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'profile' user.username %}">
+                            <i class="bi bi-person-circle"></i> View Your Profile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <form method="post" action="{% url 'buy_credits' %}" 
+                              hx-post="{% url 'buy_credits' %}" 
+                              hx-swap="none"
+                              hx-on::after-request="window.location.reload()">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-link nav-link">
+                                <i class="bi bi-cash-coin"></i> Buy 10 Credits
+                            </button>
+                        </form>
+                    </li>
+                    <li class="nav-item">
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-link nav-link">
+                                <i class="bi bi-box-arrow-in-left"></i> Logout
+                            </button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </li>
+                {% endif %}
+                {% if user.is_staff %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin:index' %}">
+                            <i class="bi bi-shield-lock"></i> Admin
+                        </a>
+                    </li>
+                {% endif %}
+                
+                <!-- Info links available to all users -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'blog_contact' %}">
+                        <i class="bi bi-envelope"></i> Contact Us
                     </a>
                 </li>
                 <li class="nav-item">
-                    <form method="post" action="{% url 'buy_credits' %}" 
-                          hx-post="{% url 'buy_credits' %}" 
-                          hx-swap="none"
-                          hx-on::after-request="window.location.reload()">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-link nav-link">
-                            <i class="bi bi-cash-coin"></i> Buy 10 Credits
-                        </button>
-                    </form>
-                </li>
-                <li class="nav-item">
-                    <form method="post" action="{% url 'logout' %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-link nav-link">
-                            <i class="bi bi-box-arrow-in-left"></i> Logout
-                        </button>
-                    </form>
-                </li>
-            {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}">
-                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    <a class="nav-link" href="{% url 'blog_faq' %}">
+                        <i class="bi bi-question-circle"></i> FAQ
                     </a>
                 </li>
-            {% endif %}
-            {% if user.is_staff %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admin:index' %}">
-                        <i class="bi bi-shield-lock"></i> Admin
+                    <a class="nav-link" href="{% url 'blog_about' %}">
+                        <i class="bi bi-info-circle"></i> About Us
                     </a>
                 </li>
-            {% endif %}
-            
-            <!-- Info links available to all users -->
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'blog_contact' %}">
-                    <i class="bi bi-envelope"></i> Contact Us
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'blog_faq' %}">
-                    <i class="bi bi-question-circle"></i> FAQ
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'blog_about' %}">
-                    <i class="bi bi-info-circle"></i> About Us
-                </a>
-            </li>
-        </ul>
-    </div>
-</nav>
+            </ul>
+        </div>
+    </nav>
+</div>
 
 
 

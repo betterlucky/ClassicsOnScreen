@@ -5,54 +5,60 @@
 {% block page_content %}
     <!-- Hero Section -->
     <div class="jumbotron">
-        <h1 class="display-4">Classic Films Library</h1>
-        <p class="lead">Discover timeless classics available for community screenings.</p>
-        {% if user.is_authenticated %}
-            <p class="text-light">
-                Due to licensing requirements, we can only maintain a relatively small selection of films.<br>
-                You can help keep your favorites available by voting - each vote lasts 30 days, 
-                and you can vote for up to {{ MAX_FILM_VOTES }} films.<br>
-                Read more in our <a href="{% url 'blog_faq' %}" class="text-warning">FAQ</a>.
-            </p>
-            <div class="d-flex align-items-center gap-3">
-                <div class="badge bg-light text-primary p-2">
-                    <i class="bi bi-star-fill me-2"></i>
-                    {{ votes_remaining }} votes remaining
+        <div class="content-wrapper text-center">
+            <h1 class="display-4">Classic Films Library</h1>
+            <p class="lead">Discover timeless classics available for community screenings.</p>
+            {% if user.is_authenticated %}
+                <p class="text-light">
+                    Due to licensing requirements, we can only maintain a relatively small selection of films.<br>
+                    You can help keep your favorites available by voting - each vote lasts 30 days, 
+                    and you can vote for up to {{ MAX_FILM_VOTES }} films.<br>
+                    Read more in our <a href="{% url 'blog_faq' %}" class="text-warning">FAQ</a>.
+                </p>
+                <div class="d-flex justify-content-center align-items-center gap-3">
+                    <div class="badge bg-light text-primary p-2">
+                        <i class="bi bi-star-fill me-2"></i>
+                        {{ votes_remaining }} votes remaining
+                    </div>
                 </div>
-            </div>
-        {% else %}
-            <p class="text-light">
-                Due to licensing requirements, we can only maintain a relatively small selection of films.<br>
-                Read more in our <a href="{% url 'blog_faq' %}" class="text-warning">FAQ</a>.
-            </p>
-            <div class="d-flex gap-2">
-                <a class="btn btn-primary btn-lg" href="{% url 'login' %}?next={{ request.path }}" role="button">
-                    <i class="bi bi-box-arrow-in-right me-1"></i>Login to Vote
-                </a>
-            </div>
-        {% endif %}
+            {% else %}
+                <p class="text-light">
+                    Due to licensing requirements, we can only maintain a relatively small selection of films.<br>
+                    Read more in our <a href="{% url 'blog_faq' %}" class="text-warning">FAQ</a>.
+                </p>
+                <div class="d-flex justify-content-center gap-2">
+                    <a class="btn btn-primary btn-lg" href="{% url 'login' %}?next={{ request.path }}" role="button">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Login to Vote
+                    </a>
+                </div>
+            {% endif %}
+        </div>
     </div>
 
     <!-- Stats Card -->
     {% if top_films %}
-        <div class="stats-card mb-4 w-100">
-            <h5>Most Popular Films</h5>
-            <div class="popular-films-list">
-                {% for film in top_films|slice:":3" %}
-                    <div class="popular-film-item">
-                        <div class="film-title">
-                            <a href="{% url 'blog_film' film.name %}" class="text-decoration-none">
-                                <i class="bi bi-film me-2"></i>{{ film.name }}
-                            </a>
+        <div class="content-wrapper">
+            <div class="stats-card mb-4">
+                <h5 class="text-center">Most Popular Films</h5>
+                <div class="popular-films-list">
+                    {% for film in top_films|slice:":3" %}
+                        <div class="popular-film-item">
+                            <div class="film-title">
+                                <a href="{% url 'blog_film' film.name %}" class="text-decoration-none">
+                                    <i class="bi bi-film me-2"></i>{{ film.name }}
+                                </a>
+                            </div>
+                            <div class="vote-count">
+                                <small class="text-muted">Votes</small>
+                                <span class="badge bg-primary">{{ film.vote_count }}</span>
+                            </div>
                         </div>
-                        <div class="vote-count">
-                            <small class="text-muted">Votes</small>
-                            <span class="badge bg-primary">{{ film.vote_count }}</span>
-                        </div>
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{% url 'most_desired_films' %}" class="btn btn-sm btn-primary">View All Rankings</a>
+                </div>
             </div>
-            <a href="{% url 'most_desired_films' %}" class="btn btn-sm btn-primary mt-3">View All Rankings</a>
         </div>
     {% endif %}
 

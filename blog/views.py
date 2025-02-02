@@ -412,28 +412,53 @@ def blog_faq(request):
     return render(request, 'faq.html', {'faqs_by_category': faqs_by_category})
 
 
-def blog_contact(request):
-    """Handle contact form."""
+def contact(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
+            # Get form data
+            name = form.cleaned_data['name']
+            email = form.cleaned_data['email']
+            subject = form.cleaned_data['subject']
+            message = form.cleaned_data['message']
+            
+            # Format email message
+            email_message = f"""
+            New contact form submission:
+            
+            From: {name}
+            Email: {email}
+            Subject: {subject}
+            
+            Message:
+            {message}
+            """
+            
+            # Send email
             try:
                 send_mail(
-                    f'Contact Form Submission from {form.cleaned_data["name"]}',
-                    f'Name: {form.cleaned_data["name"]}\n'
-                    f'Email: {form.cleaned_data["email"]}\n\n'
-                    f'Message:\n{form.cleaned_data["message"]}',
-                    settings.DEFAULT_FROM_EMAIL,
-                    [settings.CONTACT_EMAIL],
+                    subject=f"Contact Form: {subject}",
+                    message=email_message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[settings.CONTACT_EMAIL],
                     fail_silently=False,
                 )
-                messages.success(request, 'Thank you for your message! We will get back to you shortly.')
-                return redirect('/')
+                
+                if request.htmx:
+                    return render(request, 'contact.html', {'success': True})
+                return render(request, 'contact.html', {'success': True})
+                
             except Exception as e:
-                messages.error(request, f'There was an error sending your message: {e}. Please try again later.')
-                return redirect('/')
+                if request.htmx:
+                    form.add_error(None, "Failed to send message. Please try again later.")
+                    return render(request, 'contact.html', {'form': form})
+                messages.error(request, "Failed to send message. Please try again later.")
+        
+        if request.htmx:
+            return render(request, 'contact.html', {'form': form})
     else:
         form = ContactForm()
+    
     return render(request, 'contact.html', {'form': form})
 
 

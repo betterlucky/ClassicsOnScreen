@@ -19,7 +19,7 @@ urlpatterns = [
     path('show/<int:show_id>/add-credits/', views.add_credits_to_show, name='add_credits_to_show'),
     path("about/", views.blog_about, name="blog_about"),
     path("faq/", views.blog_faq, name="blog_faq"),
-    path("contact/", views.blog_contact, name="blog_contact"),
+    path("contact/", views.contact, name="contact"),
     path('accounts/', include('django.contrib.auth.urls')),
     path('__debug__/', include('debug_toolbar.urls')),
     path('refund-credits/<int:show_id>/', views.refund_credits_view, name='refund_credits'),

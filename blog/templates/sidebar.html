@@ -66,8 +66,9 @@
                 
                 <!-- Info links available to all users -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'blog_contact' %}">
-                        <i class="bi bi-envelope"></i> Contact Us
+                    <a href="{% url 'contact' %}" class="nav-link {% if request.path == '/contact/' %}active{% endif %}">
+                        <i class="bi bi-envelope"></i>
+                        Contact Us
                     </a>
                 </li>
                 <li class="nav-item">

@@ -40,10 +40,15 @@
             <div class="popular-films-list">
                 {% for film in top_films|slice:":3" %}
                     <div class="popular-film-item">
-                        <a href="{% url 'blog_film' film.name %}" class="text-decoration-none">
-                            <i class="bi bi-film me-2"></i>{{ film.name }}
-                        </a>
-                        <span class="badge bg-primary">{{ film.vote_count }}</span>
+                        <div class="film-title">
+                            <a href="{% url 'blog_film' film.name %}" class="text-decoration-none">
+                                <i class="bi bi-film me-2"></i>{{ film.name }}
+                            </a>
+                        </div>
+                        <div class="vote-count">
+                            <small class="text-muted">Votes</small>
+                            <span class="badge bg-primary">{{ film.vote_count }}</span>
+                        </div>
                     </div>
                 {% endfor %}
             </div>

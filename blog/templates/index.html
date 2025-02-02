@@ -2,44 +2,50 @@
 {% load static %}
 
 {% block page_title %}
-    <h2 class="mb-4">Upcoming Shows</h2>
+    <h2 class="mb-4 d-none">Welcome</h2>
 {% endblock page_title %}
 
 {% block page_content %}
     <!-- Hero Section -->
     <div class="jumbotron">
-        <h1 class="display-4">Welcome to Classics on Screen</h1>
-        <p class="lead">Bringing classic films back to the big screen through community support.</p>
-        <p class="text-warning"><strong>Note: This is a test website. All shows and films listed are for demonstration purposes only.</strong></p>
-        <hr class="my-4">
-        {% if user.is_authenticated %}
-            <p>Welcome back, {{ user.username }}! Ready to discover more classic films?</p>
-            <a class="btn btn-primary btn-lg" href="{% url 'create_show' %}" role="button">Create a Show</a>
-        {% else %}
-            <p>Join our community to help bring your favorite classics to life! <a href="{% url 'blog_about' %}" class="text-warning">Learn how it works <i class="bi bi-arrow-right"></i></a></p>
-            <div class="d-flex gap-2">
-                <a class="btn btn-primary btn-lg" href="{% url 'login' %}" role="button">Join In Now</a>
-            </div>
-        {% endif %}
+        <div class="content-wrapper text-center">
+            <h1 class="display-4">Welcome to Classics on Screen</h1>
+            <p class="lead">Bringing classic films back to the big screen through community support.</p>
+            <p class="text-warning"><strong>Note: This is a test website. All shows and films listed are for demonstration purposes only.</strong></p>
+            <hr class="my-4">
+            {% if user.is_authenticated %}
+                <p>Welcome back, {{ user.username }}! Ready to discover more classic films?</p>
+                <a class="btn btn-primary btn-lg w-100 w-md-auto" href="{% url 'create_show' %}" role="button">
+                    <i class="bi bi-plus-circle me-2"></i>Create a Show
+                </a>
+            {% else %}
+                <p>Join our community to help bring your favorite classics to life! <a href="{% url 'blog_about' %}" class="text-warning">Learn how it works <i class="bi bi-arrow-right"></i></a></p>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                    <a class="btn btn-primary btn-lg" href="{% url 'login' %}" role="button">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Join In Now
+                    </a>
+                </div>
+            {% endif %}
+        </div>
     </div>
 
     <!-- Stats Section -->
     <div class="stats-section">
         <div class="stats-card">
-            <h5>Active Shows</h5>
-            <p class="display-4">{{ active_shows_count }}</p>
+            <h5 class="card-title">Active Shows</h5>
+            <p class="card-text display-4">{{ active_shows_count }}</p>
         </div>
         <div class="stats-card">
-            <h5>Available Films</h5>
-            <p class="display-4">{{ available_films_count }}</p>
+            <h5 class="card-title">Available Films</h5>
+            <p class="card-text display-4">{{ available_films_count }}</p>
         </div>
         <div class="stats-card">
-            <h5>Locations</h5>
-            <p class="display-4">{{ locations_count }}</p>
+            <h5 class="card-title">Locations</h5>
+            <p class="card-text display-4">{{ locations_count }}</p>
         </div>
     </div>
 
     <!-- Shows Section -->
-    <h2 class="mb-4">Upcoming Shows</h2>
+    <h2 class="mt-5 mb-4">Upcoming Shows</h2>
     {% include "show_listings.html" with exclude_user_filter=True exclude_location_filter=False exclude_film_filter=False %}
 {% endblock page_content %}

@@ -1,0 +1,28 @@
+﻿{
+  "name": "theme",
+  "version": "3.8.0",
+  "description": "",
+  "scripts": {
+    "start": "npm run dev",
+    "build": "npm run build:clean && npm run build:sass && npm run build:tailwind",
+    "build:clean": "rimraf ../static/css/dist",
+    "build:sass": "sass --style compressed src/styles.scss ../static/css/dist/styles.css",
+    "build:tailwind": "tailwindcss -i src/styles.css -o ../static/css/dist/styles.css --minify",
+    "dev": "concurrently npm:watch:*",
+    "watch:sass": "sass --watch src/styles.scss ../static/css/dist/styles.css",
+    "watch:tailwind": "tailwindcss -i src/styles.css -o ../static/css/dist/styles.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "autoprefixer": "^10.4.19",
+    "concurrently": "^8.2.2",
+    "postcss": "^8.4.38",
+    "postcss-import": "^16.1.0",
+    "postcss-nested": "^6.0.1",
+    "postcss-simple-vars": "^7.0.1",
+    "rimraf": "^5.0.5",
+    "tailwindcss": "^3.4.1"
+  }
+}

@@ -28,6 +28,6 @@ urlpatterns = [
     path('film/vote/<int:film_id>/', views.toggle_film_vote, name='toggle_film_vote'),
     path('validate/username/', views.validate_username, name='validate_username'),
     path('validate/email/', views.validate_email, name='validate_email'),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]
 # Add Django site authentication urls (for login, logout, password management)
 

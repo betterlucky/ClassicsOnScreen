@@ -11,26 +11,41 @@ from django.utils import timezone
 class ShowFilterForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = 'get'
-        self.helper.layout = Layout(
-            Row(
-                Column('location', css_class='form-group col-md-4 mb-0'),
-                Column('film', css_class='form-group col-md-4 mb-0'),
-                Column('status', css_class='form-group col-md-4 mb-0'),
-                css_class='form-row'
-            ),
-            Submit('submit', 'Filter Shows', css_class='btn btn-primary')
-        )
+        # Only show active locations and films
+        self.fields['location'].queryset = Location.objects.filter(active=True)
+        self.fields['film'].queryset = Film.objects.filter(active=True)
 
-    location = forms.ModelChoiceField(queryset=Location.objects.all(), required=False, empty_label="All Locations")
-    film = forms.ModelChoiceField(queryset=Film.objects.all(), required=False, empty_label="All Films")
+    location = forms.ModelChoiceField(
+        queryset=Location.objects.all(), 
+        required=False, 
+        empty_label="All Locations",
+        widget=forms.Select(attrs={
+            'class': 'select-navy text-gray-900 bg-white'
+        })
+    )
+    film = forms.ModelChoiceField(
+        queryset=Film.objects.all(), 
+        required=False, 
+        empty_label="All Films",
+        widget=forms.Select(attrs={
+            'class': 'select-navy text-gray-900 bg-white'
+        })
+    )
     status = forms.ChoiceField(
-        choices=[('all', 'Upcoming Shows'), ('inactive', 'Inactive'), ('tbc', 'To Be Confirmed'), 
-                ('confirmed', 'Confirmed'), ('completed', 'Completed'), ('expired', 'Expired'), 
-                ('cancelled', 'Cancelled')],
+        choices=[
+            ('', 'All Status'),
+            ('upcoming', 'Upcoming Shows'),
+            ('inactive', 'Inactive'), 
+            ('tbc', 'To Be Confirmed'), 
+            ('confirmed', 'Confirmed'), 
+            ('completed', 'Completed'), 
+            ('expired', 'Expired'), 
+            ('cancelled', 'Cancelled')
+        ],
         required=False,
-        initial='all',
+        widget=forms.Select(attrs={
+            'class': 'select-navy text-gray-900 bg-white'
+        })
     )
 
 

@@ -1,0 +1,77 @@
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  /* Custom component styles */
+  .btn {
+    @apply px-8 py-3 font-semibold uppercase tracking-wider rounded-full transition-all;
+  }
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-secondary-color to-accent-color border-none;
+    @apply shadow-md shadow-secondary-color/30;
+    @apply hover:-translate-y-0.5 hover:shadow-lg hover:shadow-secondary-color/40;
+    @apply self-start;
+  }
+
+  .btn-info {
+    @apply bg-[#4299e1] text-white border-none;
+    @apply hover:bg-[#3182ce];
+  }
+
+  .btn-info.btn-sm {
+    @apply px-3 py-1 text-sm rounded-lg;
+  }
+
+  .btn-vote {
+    @apply relative transition-all border-2 bg-white w-full px-4 py-2 rounded-lg shadow-sm;
+    @apply border-green-600 text-green-600;
+    @apply hover:bg-green-600 hover:text-white hover:shadow-lg hover:shadow-green-600/30;
+    @apply disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:opacity-70;
+  }
+
+  .btn-vote.voted {
+    @apply bg-pink-500 text-white border-pink-500;
+  }
+
+  .btn-vote:not([disabled]):active {
+    animation: pulse 0.3s ease;
+  }
+
+  .form-control {
+    @apply border-2 border-gray-200 rounded-xl px-4 py-3;
+    @apply focus:border-navy-blue focus:ring focus:ring-navy-blue/20 focus:ring-opacity-50;
+  }
+
+  /* Custom select styling */
+  .select-navy {
+    @apply w-full rounded-lg border-white/20 shadow-sm;
+    @apply focus:border-amber-300 focus:ring focus:ring-amber-300/20 focus:ring-opacity-50 transition-colors;
+  }
+  
+  .select-navy option {
+    @apply bg-white text-gray-900;
+  }
+}
+
+@layer utilities {
+  /* Custom utility classes */
+  .hover\:parent-\[\.sidebar-container\]\:translate-x-0:hover .sidebar-container {
+    --tw-translate-x: 0px;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+}

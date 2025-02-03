@@ -1,250 +1,208 @@
 {% load static %}
 {% load custom_filters %}
 
-<div class="filters-and-shows">
-    {% if form %}
-        <div class="filter-section mb-4">
-            <form id="filters-form" 
-                  hx-get="{{ request.path }}" 
-                  hx-trigger="change" 
-                  hx-target=".filters-and-shows"
-                  hx-swap="outerHTML"
-                  action=""
-                  method="get">
+<div class="filters-and-shows bg-navy-blue rounded-2xl shadow-sm p-6 text-white">
+    <!-- Filter Section -->
+    <div class="filter-section mb-8 border-b border-white/20 pb-6">
+        <form id="filters-form" 
+              hx-get="{{ request.path }}" 
+              hx-trigger="change" 
+              hx-target=".filters-and-shows"
+              hx-swap="outerHTML"
+              class="w-full"
+              method="get">
+            <div class="flex flex-col md:flex-row gap-4">
+                {% if not exclude_location_filter %}
+                <div class="flex-1">
+                    <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-gray-100 mb-2">Location</label>
+                    {{ form.location }}
+                </div>
+                {% endif %}
                 
-                <div class="filter-grid">
-                    {% if exclude_location_filter != True %}
-                        <div class="filter-item">
-                            <label class="filter-label" for="id_location">Location</label>
-                            {{ form.location|add_class:"form-select" }}
-                        </div>
-                    {% endif %}
+                {% if not exclude_film_filter %}
+                <div class="flex-1">
+                    <label for="{{ form.film.id_for_label }}" class="block text-sm font-medium text-gray-100 mb-2">Film</label>
+                    {{ form.film }}
+                </div>
+                {% endif %}
 
-                    {% if exclude_film_filter != True %}
-                        <div class="filter-item">
-                            <label class="filter-label" for="id_film">Film</label>
-                            {{ form.film|add_class:"form-select" }}
-                        </div>
-                    {% endif %}
+                {% if not exclude_status_filter %}
+                <div class="flex-1">
+                    <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-gray-100 mb-2">Status</label>
+                    {{ form.status }}
+                </div>
+                {% endif %}
+            </div>
 
-                    {% if form.status %}
-                        <div class="filter-item">
-                            <label class="filter-label" for="id_status">Status</label>
-                            {{ form.status|add_class:"form-select" }}
+            <!-- Active Filters -->
+            <div class="active-filters mt-4 flex flex-wrap gap-2">
+                {% if form.location.value and exclude_location_filter != True %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-600 text-white">
+                        Location: {{ form.location|get_selected_object }}
+                        <button type="button" 
+                                class="ml-2 text-white hover:text-gray-200"
+                                hx-get="{{ request.path }}"
+                                hx-target=".filters-and-shows"
+                                hx-vals='{"location": "", "film": "{{ form.film.value|default:"" }}", "status": "{{ form.status.value|default:"" }}"}'>
+                            <i class="bi bi-x-circle"></i>
+                        </button>
+                    </span>
+                {% endif %}
+
+                {% if form.film.value and exclude_film_filter != True %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-600 text-white">
+                        Film: {{ form.film|get_selected_object }}
+                        <button type="button" 
+                                class="ml-2 text-white hover:text-gray-200"
+                                hx-get="{{ request.path }}"
+                                hx-target=".filters-and-shows"
+                                hx-vals='{"film": "", "location": "{{ form.location.value|default:"" }}", "status": "{{ form.status.value|default:"" }}"}'>
+                            <i class="bi bi-x-circle"></i>
+                        </button>
+                    </span>
+                {% endif %}
+
+                {% if form.status.value and form.status.value != 'all' %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-600 text-white">
+                        Status: {{ form.status|get_selected_object }}
+                        <button type="button" 
+                                class="ml-2 text-white hover:text-gray-200"
+                                hx-get="{{ request.path }}"
+                                hx-target=".filters-and-shows"
+                                hx-vals='{"status": "", "location": "{{ form.location.value|default:"" }}", "film": "{{ form.film.value|default:"" }}"}'>
+                            <i class="bi bi-x-circle"></i>
+                        </button>
+                    </span>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Shows Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for show in shows %}
+        <div class="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-sm hover:shadow-md 
+                    transition-all duration-300 border border-gray-200 overflow-hidden 
+                    hover:border-navy-blue/20 hover:from-white hover:to-blue-50">
+            <div class="p-5">
+                <!-- Header with film name and date -->
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900 line-clamp-1 flex items-center gap-2">
+                        <a href="{% url 'blog_film' show.film.name %}" 
+                           class="hover:text-amber-600 transition-colors duration-200">
+                            {{ show.film.name }}
+                        </a>
+                        <a href="https://www.imdb.com/title/{{ show.film.imdb_code }}" 
+                           class="px-3 py-1 text-sm bg-[#f5c518] text-black rounded-full hover:bg-[#f4bb07] transition-colors border border-black"
+                           target="_blank"
+                           rel="noopener noreferrer">
+                            <i class="bi bi-film"></i> IMDb
+                        </a>
+                    </h3>
+                    <span class="text-sm text-gray-500 bg-white/50 px-2 py-1 rounded-full">
+                        {{ show.eventtime|date:"D, M j, Y" }}
+                    </span>
+                </div>
+                
+                <!-- Show details -->
+                <div class="space-y-3 mb-4">
+                    <div class="flex items-center text-gray-600">
+                        <i class="bi bi-geo-alt text-navy-blue mr-2"></i>
+                        <a href="{% url 'blog_location' show.location.name %}" 
+                           class="hover:text-amber-600 transition-colors duration-200 line-clamp-1">
+                            {{ show.location.name }}
+                        </a>
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <i class="bi bi-clock text-navy-blue mr-2"></i>
+                        <span>{{ show.eventtime|time:"g:i A" }}</span>
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <i class="bi bi-ticket-perforated text-navy-blue mr-2"></i>
+                        <span>{{ show.location.min_capacity }} credits needed</span>
+                    </div>
+                    {% if show.status != 'inactive' %}
+                        <div class="flex items-center text-gray-600">
+                            <i class="bi bi-info-circle text-navy-blue mr-2"></i>
+                            <span class="bg-white/50 px-2 py-1 rounded-full text-sm">
+                                Status: {{ show.get_status_display }}
+                            </span>
                         </div>
                     {% endif %}
                 </div>
 
-                <!-- Active Filters -->
-                <div class="active-filters mt-3">
-                    {% if form.location.value and exclude_location_filter != True %}
-                        <span class="badge bg-secondary me-2">
-                            Location: {{ form.location|get_selected_object }}
-                            <button type="button" 
-                                    class="btn-close btn-close-white ms-2"
-                                    hx-get="{{ request.path }}"
-                                    hx-target=".filters-and-shows"
-                                    hx-vals='{"location": "", "film": "{{ form.film.value|default:"" }}", "status": "{{ form.status.value|default:"" }}"}'></button>
-                        </span>
-                    {% endif %}
-
-                    {% if form.film.value and exclude_film_filter != True %}
-                        <span class="badge bg-secondary me-2">
-                            Film: {{ form.film|get_selected_object }}
-                            <button type="button" 
-                                    class="btn-close btn-close-white ms-2"
-                                    hx-get="{{ request.path }}"
-                                    hx-target=".filters-and-shows"
-                                    hx-vals='{"film": "", "location": "{{ form.location.value|default:"" }}", "status": "{{ form.status.value|default:"" }}"}'></button>
-                        </span>
-                    {% endif %}
-
-                    {% if form.status.value and form.status.value != 'all' %}
-                        <span class="badge bg-secondary me-2">
-                            Status: {{ form.status|get_selected_object }}
-                            <button type="button" 
-                                    class="btn-close btn-close-white ms-2"
-                                    hx-get="{{ request.path }}"
-                                    hx-target=".filters-and-shows"
-                                    hx-vals='{"status": "", "location": "{{ form.location.value|default:"" }}", "film": "{{ form.film.value|default:"" }}"}'></button>
-                        </span>
-                    {% endif %}
+                <!-- Progress bar section -->
+                <div class="flex items-center justify-between pt-4 border-t border-gray-200/70">
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-sm font-medium text-gray-700">Progress</span>
+                            <span class="text-sm text-gray-500 bg-white/50 px-2 rounded-full">
+                                {{ show.credits }}/{{ show.location.min_capacity }}
+                            </span>
+                        </div>
+                        <div class="w-full bg-gray-200/50 rounded-full h-2 overflow-hidden shadow-inner">
+                            <div class="bg-navy-blue rounded-full h-2 transition-all duration-300 shadow-sm" 
+                                 style="width: {% widthratio show.credits show.location.min_capacity 100 %}%">
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </form>
-        </div>
-    {% endif %}
-
-    <!-- Search Box (for films list) -->
-    {% if films %}
-        <div class="stats-card mb-4 w-100">
-            <h5>Search Films</h5>
-            <div class="input-group">
-                <span class="input-group-text">
-                    <i class="bi bi-search"></i>
-                </span>
-                <input type="text" 
-                       id="filmSearch" 
-                       class="form-control"
-                       hx-get="{{ request.path }}"
-                       hx-trigger="keyup changed delay:500ms"
-                       hx-target=".filters-and-shows"
-                       name="search"
-                       value="{{ search_query }}"
-                       placeholder="Search films by title..." 
-                       aria-label="Search films">
             </div>
         </div>
-    {% endif %}
-
-    <!-- Grid Section -->
-    <div class="show-grid">
-        {% if shows %}
-            {% for show in shows %}
-                <div class="show-card">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <a href="{% url 'blog_film' show.film.name %}">{{ show.film.name }}</a>
-                                {% if show.is_sold_out %}
-                                    <span class="badge bg-danger ms-2">SOLD OUT</span>
-                                {% endif %}
-                            </h5>
-
-                            <h6 class="card-subtitle mb-2 text-muted">
-                                {{ show.eventtime|date:"l, F j, Y" }} at {{ show.eventtime|time:"g:i A" }}
-                            </h6>
-
-                            <p class="card-text">
-                                <strong>Location:</strong> 
-                                <a href="{% url 'blog_location' show.location.name %}">{{ show.location }}</a><br>
-                                <strong>Status:</strong> {{ show.get_status_display }}
-                            </p>
-
-                            <!-- Show options if any -->
-                            {% if show.options.exists %}
-                                <div class="show-options mb-2">
-                                    {% for option in show.options.all %}
-                                        <span class="badge bg-success">
-                                            <i class="bi bi-check-circle me-1"></i>{{ option.name }}
-                                        </span>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-
-                            <!-- Progress bar -->
-                            <div class="progress mt-3">
-                                <div class="progress-bar {% if show.is_sold_out %}bg-danger{% elif show.credits >= show.location.min_capacity %}bg-success{% endif %}"
-                                     role="progressbar"
-                                     style="width: {% if show.credits < show.location.min_capacity %}{{ show.credits|default:0|multiply:100|divide:show.location.min_capacity }}{% else %}100{% endif %}%"
-                                     aria-valuenow="{{ show.credits|default:0 }}"
-                                     aria-valuemin="0"
-                                     aria-valuemax="{{ show.location.min_capacity }}">
-                                    {% if show.is_sold_out %}
-                                        SOLD OUT
-                                    {% elif show.credits >= show.location.min_capacity %}
-                                        ON SALE
-                                    {% else %}
-                                        {{ show.credits|default:0 }}/{{ show.location.min_capacity }}
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            {% if show.status == 'inactive' and show.days_until_expiry %}
-                                <div class="text-danger mt-2">
-                                    <small>
-                                        <i class="bi bi-clock"></i> 
-                                        {{ show.days_until_expiry }} days to reach minimum credits
-                                    </small>
-                                </div>
-                            {% endif %}
-
-                            <div class="mt-3">
-                                <a href="{% url 'blog_detail' show.pk %}" class="btn btn-primary">View Details</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% empty %}
-                <div class="col-12">
-                    <div class="alert alert-info">No shows found matching your criteria.</div>
-                </div>
-            {% endfor %}
-        {% endif %}
-
-        {% if films %}
-            {% for film in films %}
-                <div class="film-item">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title d-flex justify-content-between align-items-center">
-                                <a href="{% url 'blog_film' film.name %}" class="text-decoration-none">{{ film.name }}</a>
-                                <a href="https://www.imdb.com/title/{{ film.imdb_code }}" 
-                                   class="btn btn-sm py-0 px-1"
-                                   style="background-color: #f5c518; color: #000000;"
-                                   target="_blank"
-                                   rel="noopener noreferrer">
-                                    <i class="bi bi-film"></i> IMDb
-                                </a>
-                            </h5>
-                            
-                            <p class="card-text text-muted">{{ film.description }}</p>
-                            
-                            {% if film.upcoming_shows.exists %}
-                                <div class="mb-3">
-                                    <h6 class="mb-2">
-                                        <i class="bi bi-calendar-event me-2"></i>Upcoming Shows
-                                    </h6>
-                                    <ul class="list-unstyled">
-                                        {% for show in film.upcoming_shows|slice:":3" %}
-                                            <li class="mb-1">
-                                                <a href="{% url 'blog_detail' show.id %}" class="text-decoration-none">
-                                                    <i class="bi bi-arrow-right-circle me-1"></i>
-                                                    {{ show.eventtime|date:"D, M j" }} at {{ show.location.name }}
-                                                </a>
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                            {% endif %}
-
-                            <div class="vote-container mt-auto">
-                                {% if user.is_authenticated %}
-                                    {% if film.id in user_voted_films %}
-                                        <form method="post" action="{% url 'toggle_film_vote' film.id %}" class="d-inline">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-vote voted w-100">
-                                                <i class="bi bi-heart-fill"></i> 
-                                                <span class="vote-text">Remove Vote</span>
-                                            </button>
-                                        </form>
-                                        <div class="days-remaining text-center">
-                                            Vote expires in {{ days_remaining|get_item:film.id }} days
-                                        </div>
-                                    {% else %}
-                                        <form method="post" action="{% url 'toggle_film_vote' film.id %}" class="d-inline">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-vote w-100" {% if votes_remaining == 0 %}disabled{% endif %}>
-                                                <i class="bi bi-heart"></i>
-                                                <span class="vote-text">Vote to Keep</span>
-                                            </button>
-                                        </form>
-                                    {% endif %}
-                                {% else %}
-                                    <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-outline-primary w-100">
-                                        <i class="bi bi-box-arrow-in-right me-1"></i>Login to Vote
-                                    </a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% empty %}
-                <div class="col-12">
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle me-2"></i>No films found matching your search.
-                    </div>
-                </div>
-            {% endfor %}
-        {% endif %}
+        {% empty %}
+        <div class="col-span-full text-center py-8">
+            <p class="text-lg text-gray-100">No shows found matching your criteria.</p>
+        </div>
+        {% endfor %}
     </div>
 </div>
+
+<!-- Add JavaScript for filter functionality -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const locationFilter = document.getElementById('{{ form.location.id_for_label }}');
+        const filmFilter = document.getElementById('{{ form.film.id_for_label }}');
+        const statusFilter = document.getElementById('{{ form.status.id_for_label }}');
+        
+        function updateFilters() {
+            const params = new URLSearchParams(window.location.search);
+            
+            if (locationFilter && locationFilter.value) {
+                params.set('location', locationFilter.value);
+            } else {
+                params.delete('location');
+            }
+            
+            if (filmFilter && filmFilter.value) {
+                params.set('film', filmFilter.value);
+            } else {
+                params.delete('film');
+            }
+            
+            if (statusFilter && statusFilter.value) {
+                params.set('status', statusFilter.value);
+            } else {
+                params.delete('status');
+            }
+            
+            // Preserve any other existing parameters
+            const currentParams = new URLSearchParams(window.location.search);
+            for (let [key, value] of currentParams) {
+                if (!['location', 'film', 'status'].includes(key)) {
+                    params.set(key, value);
+                }
+            }
+            
+            // Use HTMX to update content without changing URL
+            htmx.ajax('GET', '{{ request.path }}?' + params.toString(), {
+                target: '.filters-and-shows',
+                swap: 'outerHTML',
+                history: false
+            });
+        }
+        
+        if (locationFilter) locationFilter.addEventListener('change', updateFilters);
+        if (filmFilter) filmFilter.addEventListener('change', updateFilters);
+        if (statusFilter) statusFilter.addEventListener('change', updateFilters);
+    });
+</script>

@@ -13,13 +13,14 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import socket
 
 
 # Initialize environment variables
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent  # Point to django-blog directory
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
@@ -38,6 +39,9 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
 # Application definition
 
+# Determine if we're on Pythonanywhere
+IS_PYTHONANYWHERE = 'pythonanywhere' in socket.gethostname()
+
 INSTALLED_APPS = [
     'blog',
     'crispy_forms',
@@ -49,8 +53,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # Remove debug_toolbar from here
 ]
+
+# Add Tailwind only if not on Pythonanywhere
+if not IS_PYTHONANYWHERE:
+    INSTALLED_APPS = [
+        'tailwind',
+        'theme.apps.ThemeConfig',
+    ] + INSTALLED_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -103,7 +113,7 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap5")
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",  # This is working
     }
 }
 
@@ -141,9 +151,13 @@ SITE_ID = 1
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-STATIC_ROOT = "/home/daveharris/ClassicsOnScreen/blog/static"
-STATIC_URL = "/static/"
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Update STATICFILES_DIRS to use the correct full path
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'django-blog', 'theme', 'static'),  # Full path to theme/static
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -207,3 +221,14 @@ LOGGING = {
 # Show timing settings
 SHOW_CREATION_MIN_DAYS = 21  # Must create shows at least 3 weeks before event
 SHOW_EXPIRY_DAYS = 14       # Shows expire 2 weeks before event if not enough credits
+
+# Tailwind Configuration
+TAILWIND_APP_NAME = 'theme'
+NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
+
+# Add Tailwind to INSTALLED_APPS only once
+if not IS_PYTHONANYWHERE and 'tailwind' not in INSTALLED_APPS:
+    INSTALLED_APPS = [
+        'tailwind',
+        'theme.apps.ThemeConfig',
+    ] + INSTALLED_APPS

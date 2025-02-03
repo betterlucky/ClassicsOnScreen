@@ -31,7 +31,9 @@ body {
     line-height: 1.6;
     color: var(--text-color);
     min-height: 100vh;
-    padding-top: 1rem;
+    margin: 0;
+    padding: 0;
+    display: flex;
 }
 
 /* 2. Layout Components */
@@ -57,6 +59,8 @@ body.sidebar-collapsed .container-fluid {
     top: 0;
     left: 0;
     bottom: 0;
+    width: var(--sidebar-width);
+    background: var(--navy-blue);
     z-index: 100;
     transition: transform 0.3s ease-in-out;
 }
@@ -166,36 +170,117 @@ body.sidebar-collapsed .container-fluid {
 /* Desktop styles */
 @media (min-width: 768px) {
     .sidebar-container {
-        transform: none;
+        transform: translateX(calc(-1 * (var(--sidebar-width) - 20px)));
+        transition: transform 0.3s ease-in-out;
     }
     
-    .sidebar.desktop-collapsed {
-        transform: translateX(calc(-1 * (var(--sidebar-width) - 3px)));
-    }
-
-    .sidebar.desktop-collapsed:hover {
+    .sidebar-container:hover {
         transform: translateX(0);
     }
-
+    
     main {
-        margin-left: 0;
-        transition: margin-left 0.3s ease-in-out;
+        width: calc(100% - 20px);
+        margin-left: 20px;
+        transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+        padding: 2rem;
+    }
+    
+    .sidebar-container:hover ~ main {
+        width: calc(100% - var(--sidebar-width));
+        margin-left: var(--sidebar-width);
     }
 
-    .sidebar:hover ~ main {
-        margin-left: var(--sidebar-width);
+    /* Content width adjustments */
+    .container,
+    .show-grid,
+    .stats-section,
+    .filter-section .content-wrapper {
+        max-width: 1400px;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Ensure content fills available space */
+    .content-wrapper {
+        max-width: none;
+        width: 100%;
+        padding: 0 2rem;
+    }
+
+    /* Adjust jumbotron to full width */
+    .jumbotron {
+        margin-left: -2rem;
+        margin-right: -2rem;
+        width: auto;
+    }
+
+    .sidebar-toggle {
+        display: none;
+    }
+}
+
+/* Large desktop screens */
+@media (min-width: 1600px) {
+    .container,
+    .show-grid,
+    .stats-section,
+    .filter-section .content-wrapper {
+        max-width: 1800px;
     }
 }
 
 /* Mobile styles */
 @media (max-width: 767px) {
-    main {
-        margin-left: 0;
-        transition: margin-left 0.3s ease-in-out;
+    body {
+        position: relative;
+        overflow-x: hidden;
     }
 
+    .sidebar-container {
+        transform: translateX(-100%);
+    }
+    
+    .sidebar-container:not(.collapsed) {
+        transform: translateX(0);
+    }
+    
+    main {
+        margin-left: 0;
+        width: 100%;
+        padding: 1rem;
+        transition: transform 0.3s ease-in-out;
+    }
+    
     .sidebar-container:not(.collapsed) ~ main {
-        margin-left: var(--sidebar-width);
+        transform: translateX(var(--sidebar-width));
+    }
+}
+
+/* Remove any Bootstrap container/row overrides */
+.container-fluid, .row {
+    padding: 0;
+    margin: 0;
+}
+
+/* Update container padding */
+.container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* Update jumbotron margins */
+.jumbotron {
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding: 4rem 1rem;
+}
+
+@media (min-width: 768px) {
+    .jumbotron {
+        margin-left: -2rem;
+        margin-right: -2rem;
+        padding: 4rem 2rem;
     }
 }
 
@@ -212,13 +297,15 @@ body.sidebar-collapsed .container-fluid {
 /* 4. Card Styles */
 .card {
     height: 100%;
-    border-radius: 8px;
-    transition: transform 0.2s;
+    border: none;
+    border-radius: var(--border-radius);
+    background: var(--card-bg);
     box-shadow: var(--card-shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-4px);
     box-shadow: var(--hover-shadow);
 }
 
@@ -328,9 +415,7 @@ body.sidebar-collapsed .container-fluid {
     }
     
     main {
-        margin-left: var(--sidebar-width);
-        width: calc(100% - var(--sidebar-width));
-        padding: 0 2rem;
+        margin-left: 20px; /* Override the previous style that set this to var(--sidebar-width) */
     }
     
     main.sidebar-collapsed {
@@ -401,16 +486,16 @@ input[type="range"]::-webkit-slider-thumb {
 /* Jumbotron styling */
 .jumbotron {
     background: var(--navy-blue);
-    padding: 2rem 0;
-    margin: 0 -1.5rem 2rem -1.5rem;
-    width: calc(100% + 3rem);
-    color: white;
+    margin: -2rem -2rem 2rem -2rem;
+    padding: 4rem 2rem;
+    position: relative;
+    width: auto;
 }
 
 .jumbotron .content-wrapper {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 1.5rem;
+    padding: 0;
 }
 
 .jumbotron h1 {
@@ -430,13 +515,12 @@ input[type="range"]::-webkit-slider-thumb {
 
 /* Footer */
 footer {
-    background: transparent;
-    padding: 3rem 0;
     margin-top: auto;
+    padding: 3rem 0;
+    background: transparent;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
     text-align: center;
     width: 100%;
-    box-shadow: none;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 footer .container {
@@ -463,29 +547,31 @@ footer .social-links a:hover {
 
 /* Stats Cards */
 .stats-section {
-    display: flex;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 2rem;
-    margin: 3rem 0;
+    margin: 3rem auto;
+    max-width: 1400px;
+    padding: 0 2rem;
 }
 
 .stats-section .stats-card {
     background: white;
-    padding: 1.5rem;
-    border-radius: 8px;
+    padding: 2rem;
+    border-radius: var(--border-radius);
     box-shadow: var(--card-shadow);
     text-align: center;
-    flex: 1;
-    min-width: 200px;
-    max-width: 300px;
 }
 
 /* Show Cards */
 .show-grid {
     display: grid;
-    gap: 1.5rem;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
     width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
 }
 
 .show-card {
@@ -593,16 +679,18 @@ footer .social-links a:hover {
 /* Filter Components */
 .filter-section {
     background: var(--navy-blue);
-    padding: 2rem 0;
-    margin: 2rem -1.5rem;
-    width: calc(100% + 3rem);
+    margin: 0 -2rem 2rem -2rem;
+    padding: 2rem;
+    width: auto;
 }
 
 .filter-section .content-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-    padding: 0 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    padding: 0;
 }
 
 .filter-section label {
@@ -840,10 +928,10 @@ html {
 
 /* Container and layout fixes */
 .container {
-    padding-right: 10px;
-    padding-left: 10px;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
+    padding: 0 2rem;
+    width: 100%;
 }
 
 @media (min-width: 768px) {
@@ -1301,46 +1389,47 @@ html {
 
 /* Main content area */
 main {
+    flex: 1;
+    min-height: 100vh;
+    padding: 2rem;
+    margin-left: 20px;
+    width: calc(100% - 20px);
     transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
-    width: 100%;
-}
-
-main.sidebar-collapsed {
-    margin-left: 0;
 }
 
 /* Filter section */
 .filter-section {
     background: var(--navy-blue);
-    padding: 2rem 0;
-    margin: 2rem -1.5rem;
-    width: calc(100% + 3rem);
+    margin: 0 -2rem 2rem -2rem;
+    padding: 2rem;
+    width: auto;
 }
 
 .filter-section .content-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-    padding: 0 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    padding: 0;
 }
 
 /* Stats Section */
 .stats-section {
-    display: flex;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 2rem;
-    margin: 3rem 0;
+    margin: 3rem auto;
+    max-width: 1400px;
+    padding: 0 2rem;
 }
 
 .stats-section .stats-card {
     background: white;
-    padding: 1.5rem;
-    border-radius: 8px;
+    padding: 2rem;
+    border-radius: var(--border-radius);
     box-shadow: var(--card-shadow);
     text-align: center;
-    flex: 1;
-    min-width: 200px;
-    max-width: 300px;
 }
 
 /* Responsive adjustments */
@@ -1380,12 +1469,12 @@ h2 {
 
 /* Main content area */
 main {
+    flex: 1;
+    min-height: 100vh;
+    padding: 2rem;
+    margin-left: 20px;
+    width: calc(100% - 20px);
     transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
-    width: 100%;
-}
-
-main.sidebar-collapsed {
-    margin-left: 0;
 }
 
 /* Sidebar column */
@@ -1396,9 +1485,12 @@ main.sidebar-collapsed {
 
 /* Contact page specific styles */
 .contact-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 2rem 1rem;
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
 }
 
 .contact-info {
@@ -1407,4 +1499,52 @@ main.sidebar-collapsed {
 
 .contact-info i {
     font-size: 1.2rem;
+}
+
+/* Desktop-specific media query refinements */
+@media (min-width: 1200px) {
+    .show-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .stats-section {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .jumbotron {
+        padding: 6rem 2rem;
+    }
+
+    .jumbotron h1 {
+        font-size: 4rem;
+    }
+
+    .filter-section .content-wrapper {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Large desktop screens */
+@media (min-width: 1600px) {
+    .container,
+    .show-grid,
+    .stats-section,
+    .filter-section .content-wrapper {
+        max-width: 1600px;
+    }
+}
+
+/* Fix for sidebar toggle on desktop */
+@media (min-width: 768px) {
+    .sidebar-toggle {
+        display: none;
+    }
+
+    .sidebar-container.collapsed {
+        transform: none;
+    }
+
+    main {
+        margin-left: var(--sidebar-width);
+    }
 }

@@ -119,46 +119,39 @@ def activate(request, uidb64, token):
 
 
 def index(request):
-    # Initial queryset with all necessary relations
-    shows = Show.objects.select_related(
-        'film', 
-        'location'
-    ).prefetch_related(
-        'options'
-    ).order_by('eventtime')
-
-    # Base filtering for active shows
-    shows = shows.filter(
-        eventtime__gte=timezone.now()
-    ).exclude(
-        status__in=['completed', 'expired', 'cancelled']
-    )
-
+    # Get base queryset
+    shows = Show.objects.select_related('film', 'location').prefetch_related('options')
+    
+    # Apply filters
     form = ShowFilterForm(request.GET)
-
+    
     if form.is_valid():
-        filters = {}
         if form.cleaned_data.get('location'):
-            filters['location'] = form.cleaned_data['location']
+            shows = shows.filter(location=form.cleaned_data['location'])
+        
         if form.cleaned_data.get('film'):
-            filters['film'] = form.cleaned_data['film']
-        if form.cleaned_data.get('status') and form.cleaned_data['status'] != 'all':
-            filters['status'] = form.cleaned_data['status']
-            
-        if filters:
-            shows = shows.filter(**filters)
-
-    if request.htmx:
-        return render(request, 'show_listings.html', {
-            'shows': shows,
-            'form': form,
-            'exclude_location_filter': False,
-            'exclude_film_filter': False
-        })
+            shows = shows.filter(film=form.cleaned_data['film'])
+        
+        if form.cleaned_data.get('status'):
+            if form.cleaned_data['status'] == 'all':
+                # Default to showing upcoming shows
+                shows = shows.filter(
+                    eventtime__gt=timezone.now(),
+                    status__in=['tbc', 'confirmed']
+                )
+            else:
+                shows = shows.filter(status=form.cleaned_data['status'])
+    else:
+        # Default to showing upcoming shows
+        shows = shows.filter(
+            eventtime__gt=timezone.now(),
+            status__in=['tbc', 'confirmed']
+        )
     
     context = {
-        'form': form,
         'shows': shows,
+        'form': form,
+        'show_status_choices': Show.STATUS_CHOICES,
         'active_shows_count': Show.objects.filter(
             eventtime__gte=timezone.now()
         ).exclude(
@@ -166,7 +159,14 @@ def index(request):
         ).count(),
         'available_films_count': Film.objects.filter(active=True).count(),
         'locations_count': Location.objects.count(),
+        'exclude_status_filter': False,
+        'exclude_location_filter': False,
+        'exclude_film_filter': False,
     }
+    
+    if request.htmx:
+        return render(request, 'show_listings.html', context)
+    
     return render(request, 'index.html', context)
 
 
@@ -174,24 +174,23 @@ def blog_film(request, film_name):
     """Display shows for a specific film."""
     film = get_object_or_404(Film, name=film_name)
     shows = Show.objects.filter(film=film).select_related('location').order_by("eventtime")
+    
     form = ShowFilterForm(request.GET)
-
-    if form.is_valid() and form.cleaned_data.get('status') and form.cleaned_data['status'] != 'all':
-        shows = shows.filter(status=form.cleaned_data['status'])
-
-    if request.htmx:
-        return render(request, 'show_listings.html', {
-            'shows': shows,
-            'form': form,
-            'exclude_film_filter': True,
-        })
-
+    if form.is_valid():
+        if form.cleaned_data.get('status') and form.cleaned_data['status'] != 'all':
+            shows = shows.filter(status=form.cleaned_data['status'])
+    
     context = {
         "shows": shows,
         "form": form,
         "title": f"Shows for {film.name}",
+        "show_status_choices": Show.STATUS_CHOICES,
         "exclude_film_filter": True,
     }
+    
+    if request.htmx:
+        return render(request, 'show_listings.html', context)
+    
     return render(request, "show_list.html", context)
 
 
@@ -199,24 +198,23 @@ def blog_location(request, location_name):
     """Display shows for a specific location."""
     location = get_object_or_404(Location, name=location_name)
     shows = Show.objects.filter(location=location).select_related('film').order_by("eventtime")
+    
     form = ShowFilterForm(request.GET)
-
-    if form.is_valid() and form.cleaned_data.get('status') and form.cleaned_data['status'] != 'all':
-        shows = shows.filter(status=form.cleaned_data['status'])
-
-    if request.htmx:
-        return render(request, 'show_listings.html', {
-            'shows': shows,
-            'form': form,
-            'exclude_location_filter': True,
-        })
-
+    if form.is_valid():
+        if form.cleaned_data.get('status') and form.cleaned_data['status'] != 'all':
+            shows = shows.filter(status=form.cleaned_data['status'])
+    
     context = {
         "shows": shows,
         "form": form,
         "title": f"Shows at {location.name}",
+        "show_status_choices": Show.STATUS_CHOICES,
         "exclude_location_filter": True,
     }
+    
+    if request.htmx:
+        return render(request, 'show_listings.html', context)
+    
     return render(request, "show_list.html", context)
 
 def blog_detail(request, pk):
@@ -624,4 +622,46 @@ def validate_email(request):
             f'<div class="invalid-feedback d-block">{response["message"]}</div>'
         )
     return JsonResponse(response)
+
+def show_listings(request):
+    # Get base queryset
+    shows = Show.objects.all()
+    
+    # Apply filters
+    location_id = request.GET.get('location')
+    film_id = request.GET.get('film')
+    status = request.GET.get('status')
+    
+    if location_id:
+        shows = shows.filter(location_id=location_id)
+    
+    if film_id:
+        shows = shows.filter(film_id=film_id)
+    
+    if status:
+        if status == 'upcoming':
+            # Filter for upcoming shows (tbc or confirmed)
+            shows = shows.filter(
+                eventtime__gt=timezone.now(),
+                status__in=['tbc', 'confirmed']
+            )
+        else:
+            shows = shows.filter(status=status)
+    
+    # Get all active locations and films for filters
+    locations = Location.objects.filter(active=True)
+    films = Film.objects.filter(active=True)
+    
+    context = {
+        'shows': shows,
+        'locations': locations,
+        'films': films,
+        'show_status_choices': Show.STATUS_CHOICES,
+        'exclude_user_filter': request.GET.get('exclude_user_filter', False),
+        'exclude_location_filter': request.GET.get('exclude_location_filter', False),
+        'exclude_film_filter': request.GET.get('exclude_film_filter', False),
+        'exclude_status_filter': request.GET.get('exclude_status_filter', False),
+    }
+    
+    return render(request, 'show_listings.html', context)
 

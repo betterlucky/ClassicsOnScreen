@@ -1,0 +1,9 @@
+---
+description: javascript location should be in the static folder
+globs: 
+---
+
+# Your rule content
+
+- You can @ files here
+- You can use markdown but dont have to

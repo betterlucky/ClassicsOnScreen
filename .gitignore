@@ -208,3 +208,19 @@ production_settings.py
 logs/
 error.log
 access.log
+
+# Tailwind CSS
+/theme/static_src/node_modules/
+/theme/static_src/.npm/
+.npm/
+node_modules/
+package-lock.json
+
+# Don't ignore the dist files since they're needed for PythonAnywhere
+!/theme/static/dist/
+!/static/dist/
+
+# But still ignore other static files as before
+/static/
+/media/
+

@@ -409,7 +409,11 @@ def blog_faq(request):
             faqs_by_category[category] = []
         faqs_by_category[category].append(faq)
     
-    return render(request, 'faq.html', {'faqs_by_category': faqs_by_category})
+    context = {
+        'faqs_by_category': faqs_by_category,
+        'MAX_FILM_VOTES': settings.MAX_FILM_VOTES,
+    }
+    return render(request, 'faq.html', context)
 
 
 def contact(request):

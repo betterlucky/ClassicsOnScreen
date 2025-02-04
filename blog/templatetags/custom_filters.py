@@ -1,5 +1,7 @@
 from django import template
 from datetime import datetime, timedelta
+from django.conf import settings
+from django.template.defaultfilters import stringfilter
 
 register = template.Library()
 
@@ -68,3 +70,12 @@ def htmx_attrs(field, attrs_dict):
     existing_attrs = field.field.widget.attrs
     existing_attrs.update(attrs_dict)
     return field.as_widget(attrs=existing_attrs)
+
+@register.filter
+@stringfilter
+def replace_settings(value):
+    """
+    Replaces settings placeholders in text with their actual values.
+    Usage: {{ text|replace_settings }}
+    """
+    return value.replace('{{MAX_FILM_VOTES}}', str(settings.MAX_FILM_VOTES))

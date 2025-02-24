@@ -114,7 +114,10 @@ class FilmAdmin(admin.ModelAdmin):
                     ]
                     return JsonResponse({'results': results})
             except Exception as e:
-                return JsonResponse({'error': str(e)}, status=500)
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error("Error during IMDb search", exc_info=True)
+                return JsonResponse({'error': 'An internal error has occurred.'}, status=500)
         return JsonResponse({'results': []})
 
     def deactivate_films(self, request, queryset):

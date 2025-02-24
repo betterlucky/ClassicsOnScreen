@@ -21,7 +21,7 @@ from django.utils import timezone
 from django.db import connection
 from datetime import timedelta
 from django.db import models
-
+from django.utils.http import url_has_allowed_host_and_scheme
 
 def reset(request):
     """Handle password reset requests."""
@@ -233,7 +233,10 @@ def blog_detail(request, pk):
                 show=show,
             )
             comment.save()
-            return redirect(request.path_info)
+            if url_has_allowed_host_and_scheme(request.path_info, allowed_hosts=None):
+                return redirect(request.path_info)
+            else:
+                return redirect('/')
         # No else here. Form errors will be handled in the template
     else:  # This else is for GET requests
         form = CommentForm(request=request)

@@ -114,7 +114,7 @@ def create_test_data():
 
     # Add some credits to shows (only if they don't have any)
     for show in shows:
-        if show.total_credits() < 10:
+        if show.total_credits < 10:
             show.add_credits(test_user, 10)
     print("Added initial credits to shows where needed")
 

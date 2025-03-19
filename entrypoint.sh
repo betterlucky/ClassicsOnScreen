@@ -10,8 +10,25 @@ sudo mkdir -p /app/db
 sudo chown -R appuser:appuser /app/db
 sudo chmod -R 777 /app/db
 
-# Only reset database if it doesn't exist or if RESET_DB is set to true
-if [ ! -f /app/db/db.sqlite3 ] || [ "$RESET_DB" = "true" ]; then
+# Function to check if required tables exist
+check_tables() {
+    echo "Checking if required tables exist..."
+    python << END
+import sqlite3
+try:
+    conn = sqlite3.connect('/app/db/db.sqlite3')
+    cursor = conn.cursor()
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='blog_siteuser'")
+    exists = cursor.fetchone() is not None
+    conn.close()
+    exit(0 if exists else 1)
+except:
+    exit(1)
+END
+}
+
+# Reset database if it doesn't exist, if RESET_DB is true, or if required tables are missing
+if [ ! -f /app/db/db.sqlite3 ] || [ "$RESET_DB" = "true" ] || ! check_tables; then
     echo "Creating fresh database..."
     if [ -f /app/db/db.sqlite3 ]; then
         echo "Removing existing database..."
@@ -28,6 +45,11 @@ if [ ! -f /app/db/db.sqlite3 ] || [ "$RESET_DB" = "true" ]; then
     sudo mkdir -p blog/migrations
     sudo chown -R appuser:appuser blog/migrations
     sudo chmod -R 777 blog/migrations
+
+    # Remove any existing migrations
+    echo "Cleaning up old migrations..."
+    sudo rm -f blog/migrations/0*.py
+    sudo rm -f blog/migrations/*.pyc
 
     # Make and apply migrations in correct order
     echo "Creating migrations..."

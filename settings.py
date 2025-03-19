@@ -25,6 +25,12 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-development-key')
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')  # Split comma-separated string into list
 
+# CSRF Settings
+CSRF_TRUSTED_ORIGINS = [
+    'https://classicsonscreen.theworkpc.com',
+    'https://www.classicsonscreen.theworkpc.com'
+]
+
 # Database path from environment or default
 DB_PATH = os.getenv('DJANGO_DB_PATH', str(BASE_DIR / 'db' / 'db.sqlite3'))
 

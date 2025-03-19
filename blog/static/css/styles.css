@@ -58,13 +58,12 @@ body.sidebar-collapsed .container-fluid {
     top: 0;
     left: 0;
     bottom: 0;
-    width: var(--sidebar-width);
     z-index: 100;
-    transition: width 0.3s ease-in-out;
+    transition: transform 0.3s ease-in-out;
 }
 
 .sidebar-container.collapsed {
-    width: 60px;
+    transform: translateX(-100%);
 }
 
 /* Toggle button */
@@ -103,11 +102,15 @@ body.sidebar-collapsed .container-fluid {
 
 /* Sidebar styles */
 .sidebar {
-    width: 100%;
+    width: var(--sidebar-width);
     height: 100vh;
     background: var(--navy-blue);
+    position: fixed;
+    left: 0;
+    top: 0;
     padding-top: 1rem;
     overflow-y: auto;
+    transition: width 0.3s ease-in-out;
 }
 
 /* Sidebar navigation */
@@ -166,8 +169,8 @@ main {
 }
 
 main.sidebar-collapsed {
-    margin-left: 60px;
-    width: calc(100% - 60px);
+    margin-left: 0;
+    width: 100%;
 }
 
 /* Hero Section */
@@ -722,26 +725,14 @@ html {
 
 @media (max-width: 767px) {
     main {
-        margin-left: 0;
         width: 100%;
-    }
-
-    main.sidebar-collapsed {
         margin-left: 0;
+        padding: 1rem;
+    }
+
+    .container {
+        padding: 0;
         width: 100%;
-    }
-
-    .sidebar-container {
-        transform: translateX(-100%);
-    }
-
-    .sidebar-container.collapsed {
-        transform: translateX(0);
-        width: 60px;
-    }
-
-    .content-wrapper {
-        padding: 0 1rem;
     }
 
     .jumbotron,
@@ -1147,8 +1138,7 @@ main {
 }
 
 main.sidebar-collapsed {
-    margin-left: 60px;
-    width: calc(100% - 60px);
+    margin-left: 0;
 }
 
 /* Filter section */
@@ -1262,8 +1252,7 @@ main {
 }
 
 main.sidebar-collapsed {
-    margin-left: 60px;
-    width: calc(100% - 60px);
+    margin-left: 0;
 }
 
 /* Sidebar column */
@@ -1311,17 +1300,15 @@ main > *:not(.jumbotron):not(.filter-section) {
 
 /* Content sections */
 .content-section {
-    width: 100%;
-    padding: 2rem;
-    margin: 0;
+    margin: 2rem 0;
 }
 
-/* Content wrapper */
+/* Content wrapper styles */
 .content-wrapper {
-    width: 100%;
-    max-width: 1400px;
+    max-width: 800px;
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: 2rem;
+    width: 100%;
 }
 
 /* Stats section */
@@ -1342,11 +1329,6 @@ main > *:not(.jumbotron):not(.filter-section) {
     }
     
     main {
-        margin-left: 0;
-        width: 100%;
-    }
-
-    main.sidebar-collapsed {
         margin-left: 0;
         width: 100%;
     }

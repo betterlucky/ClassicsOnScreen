@@ -6,24 +6,30 @@ nginx -c /etc/nginx/nginx.conf
 
 # Create database directory if it doesn't exist
 echo "Setting up database..."
-mkdir -p /app/db
+sudo mkdir -p /app/db
 sudo chown -R appuser:appuser /app/db
-chmod -R 777 /app/db
+sudo chmod -R 777 /app/db
 
 # Check if database file exists
 if [ ! -f /app/db/db.sqlite3 ]; then
     echo "Creating database file..."
-    touch /app/db/db.sqlite3
+    sudo touch /app/db/db.sqlite3
     sudo chown appuser:appuser /app/db/db.sqlite3
-    chmod 666 /app/db/db.sqlite3
+    sudo chmod 666 /app/db/db.sqlite3
 fi
 
 echo "Database directory permissions:"
 ls -la /app/db
 
+# Create migrations directory if it doesn't exist
+echo "Setting up migrations directory..."
+sudo mkdir -p blog/migrations
+sudo chown -R appuser:appuser blog/migrations
+sudo chmod -R 777 blog/migrations
+
 # Make and apply migrations
 echo "Creating migrations..."
-python manage.py makemigrations
+python manage.py makemigrations blog
 
 echo "Applying database migrations..."
 python manage.py migrate
@@ -43,6 +49,10 @@ chmod -R 755 /app/staticfiles
 # Create superuser if it doesn't exist
 echo "Creating superuser..."
 python manage.py create_superuser || true
+
+# Create test data
+echo "Creating test data..."
+python manage.py setup_test_data || true
 
 # Start Gunicorn
 echo "Starting Gunicorn server..."

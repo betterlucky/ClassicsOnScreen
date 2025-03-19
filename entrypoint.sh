@@ -55,15 +55,16 @@ if [ ! -f /app/db/db.sqlite3 ] || [ "$RESET_DB" = "true" ] || ! check_tables; th
     echo "Creating migrations..."
     python manage.py makemigrations blog
 
-    echo "Applying migrations in correct order..."
-    python manage.py migrate auth
-    python manage.py migrate contenttypes
-    python manage.py migrate blog
-    python manage.py migrate admin
-    python manage.py migrate sessions
-    python manage.py migrate sites
+    # Temporarily disable the post_migrate signal
+    echo "Applying migrations with post_migrate signal disabled..."
+    DJANGO_DISABLE_POST_MIGRATE=true python manage.py migrate contenttypes
+    DJANGO_DISABLE_POST_MIGRATE=true python manage.py migrate auth
+    DJANGO_DISABLE_POST_MIGRATE=true python manage.py migrate blog
+    DJANGO_DISABLE_POST_MIGRATE=true python manage.py migrate admin
+    DJANGO_DISABLE_POST_MIGRATE=true python manage.py migrate sessions
+    DJANGO_DISABLE_POST_MIGRATE=true python manage.py migrate sites
 
-    # Create superuser if it doesn't exist
+    # Now create the superuser after all tables exist
     echo "Creating superuser..."
     python manage.py create_superuser || true
 

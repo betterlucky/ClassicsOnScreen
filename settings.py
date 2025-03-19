@@ -161,7 +161,7 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = 'classicsbackonscreen@gmail.com'
 CONTACT_EMAIL = 'classicsbackonscreen+contact@gmail.com'
 ADMIN_EMAIL = 'classicsbackonscreen+admin@gmail.com'
-SITE_DOMAIN = 'daveharris.eu.pythonanywhere.com'
+SITE_DOMAIN = 'classicsonscreen.theworkpc.com'
 
 OMDB_API_KEY = os.getenv('OMDB_API_KEY')
 

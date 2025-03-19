@@ -33,32 +33,28 @@
         </div>
     </div>
 
-    <div class="content-container">
-        <!-- Stats Section -->
-        <div class="stats-section">
-            <div class="stats-card">
-                <i class="bi bi-calendar-event mb-3" style="font-size: 2rem; color: var(--secondary-color);"></i>
-                <h5 class="card-title">Active Shows</h5>
-                <p class="card-text">{{ active_shows_count }}</p>
-            </div>
-            <div class="stats-card">
-                <i class="bi bi-film mb-3" style="font-size: 2rem; color: var(--secondary-color);"></i>
-                <h5 class="card-title">Available Films</h5>
-                <p class="card-text">{{ available_films_count }}</p>
-            </div>
-            <div class="stats-card">
-                <i class="bi bi-geo-alt mb-3" style="font-size: 2rem; color: var(--secondary-color);"></i>
-                <h5 class="card-title">Locations</h5>
-                <p class="card-text">{{ locations_count }}</p>
-            </div>
+    <!-- Stats Section -->
+    <div class="stats-section">
+        <div class="stats-card">
+            <i class="bi bi-calendar-event mb-3" style="font-size: 2rem; color: var(--secondary-color);"></i>
+            <h5 class="card-title">Active Shows</h5>
+            <p class="card-text">{{ active_shows_count }}</p>
         </div>
+        <div class="stats-card">
+            <i class="bi bi-film mb-3" style="font-size: 2rem; color: var(--secondary-color);"></i>
+            <h5 class="card-title">Available Films</h5>
+            <p class="card-text">{{ available_films_count }}</p>
+        </div>
+        <div class="stats-card">
+            <i class="bi bi-geo-alt mb-3" style="font-size: 2rem; color: var(--secondary-color);"></i>
+            <h5 class="card-title">Locations</h5>
+            <p class="card-text">{{ locations_count }}</p>
+        </div>
+    </div>
 
-        <!-- Shows Section -->
-        <div class="shows-section">
-            <div class="content-wrapper">
-                <h2>Upcoming Shows</h2>
-                {% include "show_listings.html" with exclude_user_filter=True exclude_location_filter=False exclude_film_filter=False %}
-            </div>
-        </div>
+    <!-- Shows Section -->
+    <div class="shows-section">
+        <h2>Upcoming Shows</h2>
+        {% include "show_listings.html" with exclude_user_filter=True exclude_location_filter=False exclude_film_filter=False %}
     </div>
 {% endblock page_content %}

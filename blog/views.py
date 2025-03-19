@@ -83,7 +83,7 @@ def register(request):
             token = default_token_generator.make_token(user)
 
             # Send confirmation email
-            subject = 'Confirm your email'
+            subject = 'Welcome to Classics on Screen - Confirm Your Email'
             message = render_to_string('registration/confirmation_email.html', {
                 'user': user,
                 'uid': uid,
@@ -91,9 +91,25 @@ def register(request):
                 'domain': settings.SITE_DOMAIN,
             })
 
-            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
-            messages.success(request, 'Please check your email to confirm your registration.')
-            return redirect('/')
+            try:
+                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+                messages.success(
+                    request,
+                    'Thank you for registering! Please check your email to confirm your account. '
+                    'If you don\'t see it, please check your spam folder.'
+                )
+            except Exception as e:
+                messages.error(
+                    request,
+                    'There was an error sending the confirmation email. Please try again later.'
+                )
+                # Log the error for debugging
+                print(f"Error sending confirmation email: {str(e)}")
+                user.delete()  # Clean up the user if email fails
+                return render(request, 'registration/register.html', {'form': form})
+
+            # Redirect to login page after successful registration
+            return redirect('login')
 
     else:
         form = SiteUserCreationForm()

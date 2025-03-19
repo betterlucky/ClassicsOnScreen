@@ -18,8 +18,15 @@ def convert_value(name: str, value) -> str:
         return str(str(value).lower() == 'true')
     
     # ALLOWED_HOSTS should be passed through as-is if it's already a string representation of a list
-    if name == 'ALLOWED_HOSTS' and isinstance(value, str) and value.startswith('[') and value.endswith(']'):
-        return value
+    if name == 'ALLOWED_HOSTS':
+        # If it's already a string representation of a list, return it as-is
+        if isinstance(value, str) and value.startswith('[') and value.endswith(']'):
+            return value
+        # If it's a list, convert it to a string representation
+        if isinstance(value, (list, tuple)):
+            return str(value)
+        # Otherwise, convert to string and ensure it's a list representation
+        return str(value)
     
     # Email password should be stripped of quotes and whitespace
     if name == 'EMAIL_HOST_PASSWORD':

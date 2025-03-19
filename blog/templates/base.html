@@ -14,13 +14,18 @@
 
 <body>
     <!-- Sidebar -->
-    {% include "sidebar.html" %}
+    <div class="sidebar-container">
+        {% include "sidebar.html" %}
+    </div>
+    
+    <!-- Sidebar Toggle Button -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="bi bi-chevron-left"></i>
+    </button>
 
     <!-- Main Content -->
     <main>
-        <div class="main-container">
-            {% block page_content %}{% endblock page_content %}
-        </div>
+        {% block page_content %}{% endblock page_content %}
     </main>
 
     <footer>
@@ -41,6 +46,18 @@
             if (evt.detail.elt.tagName === 'SELECT') {
                 evt.detail.parameters[evt.detail.elt.name] = evt.detail.elt.value;
             }
+        });
+
+        // Sidebar toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebarContainer = document.querySelector('.sidebar-container');
+            const mainContent = document.querySelector('main');
+            
+            sidebarToggle.addEventListener('click', function() {
+                sidebarContainer.classList.toggle('collapsed');
+                mainContent.classList.toggle('sidebar-collapsed');
+            });
         });
     </script>
 </body>

@@ -21,7 +21,7 @@ from django.utils import timezone
 from django.db import connection
 from datetime import timedelta
 from django.db import models
-
+from django.utils.http import url_has_allowed_host_and_scheme
 
 def reset(request):
     """Handle password reset requests."""
@@ -219,6 +219,12 @@ def blog_location(request, location_name):
     }
     return render(request, "show_list.html", context)
 
+ALLOWED_PATHS = [
+    '/some-safe-path/',
+    '/another-safe-path/',
+    # Add other allowed paths here
+]
+
 def blog_detail(request, pk):
     """Display show details and handle comments."""
     show = get_object_or_404(Show.objects.select_related('film', 'location', 'created_by'), pk=pk)
@@ -233,7 +239,10 @@ def blog_detail(request, pk):
                 show=show,
             )
             comment.save()
-            return redirect(request.path_info)
+            if request.path_info in ALLOWED_PATHS:
+                return redirect(request.path_info)
+            else:
+                return redirect('/')
         # No else here. Form errors will be handled in the template
     else:  # This else is for GET requests
         form = CommentForm(request=request)

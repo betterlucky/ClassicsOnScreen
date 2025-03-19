@@ -18,21 +18,16 @@
         {% include "sidebar.html" %}
     </div>
     
-    <!-- Sidebar Toggle Button -->
-    <button class="sidebar-toggle" id="sidebarToggle">
-        <i class="bi bi-chevron-left"></i>
-    </button>
-
     <!-- Main Content -->
     <main>
         <div class="main-container">
             {% block page_content %}{% endblock page_content %}
         </div>
+        
+        <footer>
+            <p>&copy; 2025 Classics Back On Screen. All Rights Reserved.</p>
+        </footer>
     </main>
-
-    <footer>
-        <p>&copy; 2025 Classics Back On Screen. All Rights Reserved.</p>
-    </footer>
 
     <!-- Global Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -48,18 +43,6 @@
             if (evt.detail.elt.tagName === 'SELECT') {
                 evt.detail.parameters[evt.detail.elt.name] = evt.detail.elt.value;
             }
-        });
-
-        // Sidebar toggle functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const sidebarToggle = document.getElementById('sidebarToggle');
-            const sidebarContainer = document.querySelector('.sidebar-container');
-            const mainContent = document.querySelector('main');
-            
-            sidebarToggle.addEventListener('click', function() {
-                sidebarContainer.classList.toggle('collapsed');
-                mainContent.classList.toggle('sidebar-collapsed');
-            });
         });
     </script>
 </body>

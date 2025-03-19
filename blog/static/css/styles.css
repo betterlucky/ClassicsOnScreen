@@ -58,8 +58,10 @@ body.sidebar-collapsed .container-fluid {
     top: 0;
     left: 0;
     bottom: 0;
+    width: var(--sidebar-width);
     z-index: 100;
     transition: transform 0.3s ease-in-out;
+    background: var(--navy-blue);
 }
 
 .sidebar-container.collapsed {
@@ -102,15 +104,10 @@ body.sidebar-collapsed .container-fluid {
 
 /* Sidebar styles */
 .sidebar {
-    width: var(--sidebar-width);
-    height: 100vh;
-    background: var(--navy-blue);
-    position: fixed;
-    left: 0;
-    top: 0;
+    width: 100%;
+    height: 100%;
     padding-top: 1rem;
     overflow-y: auto;
-    transition: width 0.3s ease-in-out;
 }
 
 /* Sidebar navigation */
@@ -166,6 +163,7 @@ main {
     padding: 0;
     background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
     transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+    position: relative;
 }
 
 main.sidebar-collapsed {
@@ -173,15 +171,27 @@ main.sidebar-collapsed {
     width: 100%;
 }
 
+.main-container {
+    width: 100%;
+    min-height: 100vh;
+    padding: 0;
+    position: relative;
+}
+
+.content-container {
+    width: 100%;
+    padding: 2rem;
+    margin: 0;
+}
+
 /* Hero Section */
 .jumbotron {
-    background: linear-gradient(135deg, var(--navy-blue) 0%, #2c5282 100%);
-    padding: 4rem 2rem;
     margin: 0;
+    padding: 4rem 2rem;
     width: 100%;
+    background: linear-gradient(135deg, var(--navy-blue) 0%, #2c5282 100%);
     color: white;
     position: relative;
-    overflow: hidden;
 }
 
 .jumbotron::before {
@@ -725,9 +735,8 @@ html {
 
 @media (max-width: 767px) {
     main {
-        width: 100%;
         margin-left: 0;
-        padding: 1rem;
+        width: 100%;
     }
 
     .container {
@@ -1427,5 +1436,20 @@ main > *:not(.jumbotron):not(.filter-section) {
     
     .stats-card {
         min-height: 180px;
+    }
+}
+
+@media (max-width: 768px) {
+    main {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .sidebar-container {
+        transform: translateX(-100%);
+    }
+
+    .sidebar-container.show {
+        transform: translateX(0);
     }
 }

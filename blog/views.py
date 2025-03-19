@@ -219,6 +219,12 @@ def blog_location(request, location_name):
     }
     return render(request, "show_list.html", context)
 
+ALLOWED_PATHS = [
+    '/some-safe-path/',
+    '/another-safe-path/',
+    # Add other allowed paths here
+]
+
 def blog_detail(request, pk):
     """Display show details and handle comments."""
     show = get_object_or_404(Show.objects.select_related('film', 'location', 'created_by'), pk=pk)
@@ -233,7 +239,7 @@ def blog_detail(request, pk):
                 show=show,
             )
             comment.save()
-            if url_has_allowed_host_and_scheme(request.path_info, allowed_hosts=None):
+            if request.path_info in ALLOWED_PATHS:
                 return redirect(request.path_info)
             else:
                 return redirect('/')

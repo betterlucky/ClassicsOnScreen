@@ -17,16 +17,15 @@ def convert_value(name: str, value) -> str:
         # Convert Python boolean or string to string 'True' or 'False'
         return str(str(value).lower() == 'true')
     
-    # ALLOWED_HOSTS should be passed through as-is if it's already a string representation of a list
+    # ALLOWED_HOSTS should be a comma-separated string
     if name == 'ALLOWED_HOSTS':
-        # If it's already a string representation of a list, return it as-is
+        # If it's already a string representation of a list, convert it to comma-separated
         if isinstance(value, str) and value.startswith('[') and value.endswith(']'):
-            return value
-        # If it's a list, convert it to a string representation
-        if isinstance(value, (list, tuple)):
-            return str(value)
-        # Otherwise, convert to string and ensure it's a list representation
-        return str(value)
+            # Remove brackets and quotes, then join with commas
+            hosts = eval(value)
+            return ','.join(hosts)
+        # If it's already comma-separated, return as-is
+        return value
     
     # Email password should be stripped of quotes and whitespace
     if name == 'EMAIL_HOST_PASSWORD':

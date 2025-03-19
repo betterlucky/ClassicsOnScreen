@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Get environment variables with fallbacks
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-development-key')
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
-ALLOWED_HOSTS = eval(os.getenv('ALLOWED_HOSTS'))  # No fallback - env.py is required
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')  # Split comma-separated string into list
 
 # Database path from environment or default
 DB_PATH = os.getenv('DJANGO_DB_PATH', str(BASE_DIR / 'db' / 'db.sqlite3'))

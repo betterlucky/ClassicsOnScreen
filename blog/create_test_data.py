@@ -29,17 +29,20 @@ def create_test_data():
         Location.objects.create(
             name='Royal',
             max_capacity=100,
-            min_capacity=40
+            min_capacity=40,
+            contact_email='royal@example.com'
         ),
         Location.objects.create(
             name='Regal',
             max_capacity=70,
-            min_capacity=40
+            min_capacity=40,
+            contact_email='regal@example.com'
         ),
         Location.objects.create(
             name='Plaza',
             max_capacity=80,
-            min_capacity=40
+            min_capacity=40,
+            contact_email='plaza@example.com'
         )
     ]
     print("Created locations:", [loc.name for loc in locations])

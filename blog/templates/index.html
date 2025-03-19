@@ -9,43 +9,56 @@
     <!-- Hero Section -->
     <div class="jumbotron">
         <div class="content-wrapper text-center">
-            <h1 class="display-4">Welcome to Classics on Screen</h1>
+            <h1>Welcome to Classics on Screen</h1>
             <p class="lead">Bringing classic films back to the big screen through community support.</p>
             <p class="text-warning"><strong>Note: This is a test website. All shows and films listed are for demonstration purposes only.</strong></p>
-            <hr class="my-4">
             {% if user.is_authenticated %}
-                <p>Welcome back, {{ user.username }}! Ready to discover more classic films?</p>
-                <a class="btn btn-primary btn-lg w-100 w-md-auto" href="{% url 'create_show' %}" role="button">
-                    <i class="bi bi-plus-circle me-2"></i>Create a Show
-                </a>
+                <p class="welcome-message">Welcome back, {{ user.username }}! Ready to discover more classic films?</p>
+                <div class="mt-4">
+                    <a class="btn btn-primary btn-lg" href="{% url 'create_show' %}" role="button">
+                        <i class="bi bi-plus-circle me-2"></i>Create a Show
+                    </a>
+                </div>
             {% else %}
-                <p>Join our community to help bring your favorite classics to life! <a href="{% url 'blog_about' %}" class="text-warning">Learn how it works <i class="bi bi-arrow-right"></i></a></p>
-                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <p class="welcome-message">Join our community to help bring your favorite classics to life!</p>
+                <div class="d-flex gap-3 justify-content-center mt-4">
                     <a class="btn btn-primary btn-lg" href="{% url 'login' %}" role="button">
                         <i class="bi bi-box-arrow-in-right me-2"></i>Join In Now
+                    </a>
+                    <a class="btn btn-outline-light btn-lg" href="{% url 'blog_about' %}" role="button">
+                        <i class="bi bi-info-circle me-2"></i>Learn More
                     </a>
                 </div>
             {% endif %}
         </div>
     </div>
 
-    <!-- Stats Section -->
-    <div class="stats-section">
-        <div class="stats-card">
-            <h5 class="card-title">Active Shows</h5>
-            <p class="card-text display-4">{{ active_shows_count }}</p>
+    <div class="content-container">
+        <!-- Stats Section -->
+        <div class="stats-section">
+            <div class="stats-card">
+                <i class="bi bi-calendar-event mb-3" style="font-size: 2rem; color: var(--secondary-color);"></i>
+                <h5 class="card-title">Active Shows</h5>
+                <p class="card-text">{{ active_shows_count }}</p>
+            </div>
+            <div class="stats-card">
+                <i class="bi bi-film mb-3" style="font-size: 2rem; color: var(--secondary-color);"></i>
+                <h5 class="card-title">Available Films</h5>
+                <p class="card-text">{{ available_films_count }}</p>
+            </div>
+            <div class="stats-card">
+                <i class="bi bi-geo-alt mb-3" style="font-size: 2rem; color: var(--secondary-color);"></i>
+                <h5 class="card-title">Locations</h5>
+                <p class="card-text">{{ locations_count }}</p>
+            </div>
         </div>
-        <div class="stats-card">
-            <h5 class="card-title">Available Films</h5>
-            <p class="card-text display-4">{{ available_films_count }}</p>
-        </div>
-        <div class="stats-card">
-            <h5 class="card-title">Locations</h5>
-            <p class="card-text display-4">{{ locations_count }}</p>
+
+        <!-- Shows Section -->
+        <div class="shows-section">
+            <div class="content-wrapper">
+                <h2>Upcoming Shows</h2>
+                {% include "show_listings.html" with exclude_user_filter=True exclude_location_filter=False exclude_film_filter=False %}
+            </div>
         </div>
     </div>
-
-    <!-- Shows Section -->
-    <h2 class="mt-5 mb-4">Upcoming Shows</h2>
-    {% include "show_listings.html" with exclude_user_filter=True exclude_location_filter=False exclude_film_filter=False %}
 {% endblock page_content %}

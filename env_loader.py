@@ -17,6 +17,14 @@ def convert_value(name: str, value) -> str:
         # Convert Python boolean or string to string 'True' or 'False'
         return str(str(value).lower() == 'true')
     
+    # ALLOWED_HOSTS should be passed through as-is if it's already a string representation of a list
+    if name == 'ALLOWED_HOSTS' and isinstance(value, str) and value.startswith('[') and value.endswith(']'):
+        return value
+    
+    # Email password should be stripped of quotes and whitespace
+    if name == 'EMAIL_HOST_PASSWORD':
+        return value.strip().strip('"\'')
+    
     # All other variables should be strings
     return str(value)
 

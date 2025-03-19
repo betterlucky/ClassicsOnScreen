@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Start Nginx
-echo "Starting Nginx..."
-nginx -c /etc/nginx/nginx.conf
-
 # Create database directory if it doesn't exist
 echo "Setting up database..."
 sudo mkdir -p /app/db

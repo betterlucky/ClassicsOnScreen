@@ -12,19 +12,23 @@ class Command(BaseCommand):
             ('tt0107290', 'Jurassic Park')
         ]
 
+        # Strip any quotes from the API key
+        api_key = str(settings.OMDB_API_KEY).strip('"\'')
+
         for imdb_code, expected_title in test_codes:
             try:
                 response = requests.get(
                     'http://www.omdbapi.com/',
                     params={
                         'i': imdb_code,
-                        'apikey': settings.OMDB_API_KEY
+                        'apikey': api_key
                     }
                 )
                 data = response.json()
                 
                 self.stdout.write(f"\nTesting {imdb_code} (Expected: {expected_title})")
-                self.stdout.write(f"API Key used: {settings.OMDB_API_KEY}")
+                self.stdout.write(f"API Key used (raw): {settings.OMDB_API_KEY}")
+                self.stdout.write(f"API Key used (stripped): {api_key}")
                 self.stdout.write(f"Response: {data}")
                 
                 if data.get('Response') == 'False':

@@ -83,18 +83,21 @@ class Film(models.Model):
             
             # Validate against OMDB API
             try:
+                # Strip any quotes from the API key
+                api_key = str(settings.OMDB_API_KEY).strip('"\'')
+                
                 response = requests.get(
                     'http://www.omdbapi.com/',
                     params={
                         'i': self.imdb_code,
-                        'apikey': settings.OMDB_API_KEY
+                        'apikey': api_key
                     }
                 )
                 data = response.json()
                 
                 if data.get('Response') == 'False':
                     raise ValidationError({
-                        'imdb_code': 'Invalid IMDB code: Movie not found'
+                        'imdb_code': f'Invalid IMDB code: {data.get("Error", "Movie not found")}'
                     })
                 
                 # Compare movie title with our name (case-insensitive)
@@ -108,7 +111,7 @@ class Film(models.Model):
                 
             except requests.RequestException as e:
                 raise ValidationError({
-                    'imdb_code': 'Could not validate IMDB code: Network error'
+                    'imdb_code': f'Could not validate IMDB code: Network error ({str(e)})'
                 })
     
     def save(self, *args, **kwargs):

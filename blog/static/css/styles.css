@@ -26,14 +26,11 @@
 }
 
 body {
-    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    line-height: 1.6;
-    color: var(--text-color);
-    min-height: 100vh;
     margin: 0;
     padding: 0;
-    display: flex;
+    min-height: 100vh;
+    background: #e2e8f0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 /* 2. Layout Components */
@@ -58,12 +55,10 @@ body.sidebar-collapsed .container-fluid {
     position: fixed;
     top: 0;
     left: 0;
-    bottom: 0;
     width: var(--sidebar-width);
+    height: 100vh;
     background: var(--navy-blue);
     z-index: 100;
-    height: 100vh;
-    flex-shrink: 0;
 }
 
 .sidebar-container.collapsed {
@@ -157,12 +152,11 @@ body.sidebar-collapsed .container-fluid {
     margin-right: 0;
 }
 
-/* Main content adjustment */
+/* Main content */
 main {
-    flex: 1;
     margin-left: var(--sidebar-width);
     min-height: 100vh;
-    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
+    background: #e2e8f0;
     width: calc(100% - var(--sidebar-width));
 }
 
@@ -173,12 +167,10 @@ main.sidebar-collapsed {
 
 .main-container {
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    padding: 0;
 }
 
 .content-container {
-    flex: 1;
     padding: 2rem;
     width: 100%;
     max-width: 1400px;

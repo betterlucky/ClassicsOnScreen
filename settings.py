@@ -24,6 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-development-key')
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 ALLOWED_HOSTS = eval(os.getenv('ALLOWED_HOSTS'))  # No fallback - env.py is required
+if isinstance(ALLOWED_HOSTS, str):
+    # Convert string representation of list to actual list
+    ALLOWED_HOSTS = eval(ALLOWED_HOSTS)
 
 # Database path from environment or default
 DB_PATH = os.getenv('DJANGO_DB_PATH', str(BASE_DIR / 'db' / 'db.sqlite3'))

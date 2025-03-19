@@ -150,13 +150,15 @@ LOGOUT_REDIRECT_URL = '/'
 
 AUTH_USER_MODEL = 'blog.SiteUser'
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_TIMEOUT = 300
 EMAIL_HOST_USER = 'classicsbackonscreen@gmail.com'
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = 'no-reply@classicsbackonscreen.com'
+DEFAULT_FROM_EMAIL = 'classicsbackonscreen@gmail.com'
 CONTACT_EMAIL = 'classicsbackonscreen+contact@gmail.com'
 ADMIN_EMAIL = 'classicsbackonscreen+admin@gmail.com'
 SITE_DOMAIN = 'daveharris.eu.pythonanywhere.com'

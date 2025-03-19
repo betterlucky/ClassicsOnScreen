@@ -54,27 +54,8 @@ def load_environment_variables() -> bool:
         return False
     
     try:
-        # First try to parse as KEY=value format
+        # Parse as KEY=value format
         env_vars = parse_env_file(env_path)
-        
-        if not env_vars:
-            # If that fails, try to load as a Python module
-            sys.path.insert(0, str(env_path.parent))
-            try:
-                env_module = __import__(env_path.stem)
-                # Get all variables that don't start with _ and aren't callable
-                env_vars = {
-                    name: getattr(env_module, name)
-                    for name in dir(env_module)
-                    if not name.startswith('_') and not callable(getattr(env_module, name))
-                }
-            except ImportError:
-                print("Failed to load environment file in both formats")
-                return False
-            finally:
-                # Clean up sys.path
-                if str(env_path.parent) in sys.path:
-                    sys.path.remove(str(env_path.parent))
         
         # Update environment with converted values
         for name, value in env_vars.items():
